@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends 'base.html' %}
 
 {% block title %} Order_Check {% endblock %}
 {% block content %}
@@ -46,9 +46,9 @@
                           {% for Order in Orders %}
                             <tr class = "wow fadeInUp">
                                 <td>{{Order.order_id}}</td>
-                                <td>{{Order.user}}</td>
+                                <td>{{Order.user.user_name}}</td>
                                 <td>{{Order.order_date}}</td>
-                                <td></td><!-- this is status-->>
+                                <td></td><!-- this is status-->
                                 <td>{{Order.total_price}}</td>
                                 <td>{{Order.place_delivery}}</td>
                                 <td>

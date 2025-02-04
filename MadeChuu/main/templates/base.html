@@ -64,33 +64,33 @@
     <div class="offcanvas-body px-0">
         <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
             <li class = "box-sidebar">
-                <a href="Admin_Dashboard.html" class="nav-link text-truncate ">
+                <a href="{% url 'Dashboard' %}" class="nav-link text-truncate ">
                     <i class="fs-5 bi bi-clipboard-data"></i><span class="ms-1 d-none d-sm-inline">Dashboard</span> 
                 </a>
             </li>
             <li class = "box-sidebar">
-                <a href="Admin_AllProduct.html" class="nav-link text-truncate">
+                <a href="{% url 'ProductsAdmin' %}" class="nav-link text-truncate">
                     <i class="fs-5 bi-grid"></i><span class="ms-1 d-none d-sm-inline">Products</span>
                 </a>
 
             </li>
             <li class = "box-sidebar">
-                <a href="Admin_AllPromotion.html" class="nav-link text-truncate ">
+                <a href="{% url 'PromotionsAdmin' %}" class="nav-link text-truncate ">
                     <i class="fs-5 bi bi-megaphone-fill"></i><span class="ms-1 d-none d-sm-inline">Promotions</span>
                 </a>
             </li>
             <li class = "box-sidebar">
-                <a href="Admin_AllComment.html" class="nav-link text-truncate">
+                <a href="{% url 'CommentsAdmin' %}" class="nav-link text-truncate">
                  <i class="fs-5 bi bi-chat-left-dots-fill"></i><span class="ms-1 d-none d-sm-inline">Comments</span>
                 </a>
             </li>
             <li class = "box-sidebar">
-                <a href="Admin_A_Chat.html" class="nav-link text-truncate ">
+                <a href="{% url 'ChatsAdmin' %}" class="nav-link text-truncate ">
                     <i class="bi bi-chat-dots-fill"></i><span class="ms-1 d-none d-sm-inline">Chats</span>
                 </a>
             </li>
             <li class = "box-sidebar">
-                <a href="Admin_AllOrder.html" class="nav-link text-truncate">
+                <a href="{% url 'OrderAdmin' %}" class="nav-link text-truncate">
                     <i class="fs-5 bi bi-cart-check-fill"></i><span class="ms-1 d-none d-sm-inline">Orders</span> 
                 </a>
             </li>
