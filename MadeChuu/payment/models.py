@@ -93,6 +93,7 @@ class Order(models.Model):
     def __str__(self):
         # คืนค่าเลข order_id และชื่อผู้ใช้
         return f"Order ID: {self.order_id}, User: {self.user.user_name if self.user else 'No User'}"
+
     class Meta:
         managed = False
         db_table = 'order'
