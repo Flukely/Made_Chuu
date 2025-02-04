@@ -5,6 +5,7 @@
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -107,10 +108,10 @@ class OrderProducts(models.Model):
 
 class Payment(models.Model):
     payment_id = models.AutoField(primary_key=True)
-    order = models.ForeignKey(Order, models.DO_NOTHING, blank=True, null=True)
+    order = models.ForeignKey('Order', models.DO_NOTHING, blank=True, null=True)
     payment_date = models.DateTimeField(blank=True, null=True)
     payment_status = models.CharField(max_length=50, blank=True, null=True)
-    image_payment = models.CharField(max_length=255, blank=True, null=True)
+    image_payment = models.ImageField(upload_to='receipts/', blank=True, null=True)
 
     class Meta:
         managed = False
