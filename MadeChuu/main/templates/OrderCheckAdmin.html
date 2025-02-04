@@ -1,0 +1,158 @@
+{% extends 'layout.html' %}
+
+{% block title %} Order_Check {% endblock %}
+{% block content %}
+  <!-- Page Header Start -->
+  <div class="container-fluid page-header py-5 mb-5">
+      <div class="container py-5">
+          <h1 class="display-3  mb-3 animated slideInDown">Check Orders</h1>
+          <h5 class=" mb-3 animated slideInDown">ตรวจสอบออเดอร์ / การขอคืนเงิน</h5>
+          <nav aria-label="breadcrumb animated slideInDown">
+              <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a class="" href="">Home</a></li>
+                  <li class="breadcrumb-item  active" aria-current="page">Check Orders</li>
+              </ol>
+          </nav>
+      </div>
+  </div>
+  <div class="container-xxl mb-5">
+    <div class="container">
+        
+        <!-- this is a Products group-->
+        <div class="row mt-4" id = "">
+            <div class="col-lg-12 d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="text-primary wow fadeInUp" id = "">ตรวจสอบ/แก้ไข สถานะคำสั่งซื้อ</h4>
+                </div>
+            </div>
+        </div>
+        <hr class = 'wow fadeInUp'>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="table-responsive">
+                    <table class="table table-striped table-boredered text-center wow fadeInUp">
+                        <thead>
+                            <tr class = "wow fadeInUp">
+                                <th>OrderID</th>
+                                <th>Username</th>
+                                <th>วันที่สั่ง</th>
+                                <th>สถานะ</th>
+                                <th>ยอดชำระ</th>
+                                <th>สถานที่ส่ง</th>
+                                <th>Edit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                          {% for Order in Orders %}
+                            <tr class = "wow fadeInUp">
+                                <td>{{order.order_id}}</td>
+                                <td>{{order.user}}</td>
+                                <td>{{order.order_date}}</td>
+                                <td></td><!-- this is status-->>
+                                <td>{{order.total_price}}</td>
+                                <td>{{order.place_delivery}}</td>
+                                <td>
+                                    <a href ="#"><button class='btn btn-warning' type='button' data-bs-toggle='modal'> 
+                                        <i class='fa-solid fa-wrench'></i>
+                                    </button></a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4" id = "">
+            <div class="col-lg-12 d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="text-primary wow fadeInUp" id = "">การขอคืนสินค้า</h4>
+                </div>
+            </div>
+        </div>
+        <hr class = 'wow fadeInUp'>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="table-responsive">
+                    <table class="table table-striped table-boredered text-center wow fadeInUp">
+                        <thead>
+                            <tr class = "wow fadeInUp">
+                                <th>OrderID</th>
+                                <th>Username</th>
+                                <th>วันที่สั่ง</th>
+                                <th>สถานะ</th>
+                                <th>ยอดชำระ</th>
+                                <th>สถานที่ส่ง</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class = "wow fadeInUp">
+                                <td>4</td>
+                                <td>kitti</td>
+                                <td>30/07/2565</td>
+                                <td>สำเร็จ</td>
+                                <td>199.00฿</td>
+                                <td>Address</td>
+                                <td>
+                                    <button class='btn btn-success' type='button' data-bs-toggle="modal" data-bs-target="#ShowDetailOrder" > 
+                                        <i class="bi bi-zoom-in"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="ShowDetailOrder" tabindex="-1" aria-labelledby="ShowDetailOrder"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="ShowDetailOrder">Detail OrderID : xx </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Form for Adding Product -->
+                            <form>
+                                <div class="mb-3">
+                                    <label for="Username">ชื่อผู้ใช้</label>
+                                    <input type="text" class="form-control" id="Username"value="" disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="product">สินค้าที่ต้องการเคลม</label>
+                                    <input type="text" class="form-control" id="ClaimProduct"value="" disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="DetailforClaim">รายละเอียดการเคลม</label>
+                                    <textarea placeholder="สินค้นมีการชำรุดเสียหาย" class="form-control" style="max-height: max-content;" disabled></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="productImage" class="form-label">รูปภาพหลักฐาน</label>
+                                    <img src = "img/heart_salai.jpg">
+                                </div>
+                                <div class="mb-3 text-center">
+                                    <button type="cancel" class="btn btn-success" style="width: 80%;">แชทกับลูกค้า</button>
+                                </div>
+                                <div class="mb-3 text-center">
+                                    <button type="cancel" class="btn btn-danger" style="width: 40%;">ไม่คืนสินค้า</button>
+                                    <button type="submit" class="btn btn-primary" style="width: 40%;">คืนสินค้า</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+    </div>
+</div>
+{% endblock%}
