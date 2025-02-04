@@ -45,12 +45,12 @@
                         <tbody>
                           {% for Order in Orders %}
                             <tr class = "wow fadeInUp">
-                                <td>{{order.order_id}}</td>
-                                <td>{{order.user}}</td>
-                                <td>{{order.order_date}}</td>
+                                <td>{{Order.order_id}}</td>
+                                <td>{{Order.user}}</td>
+                                <td>{{Order.order_date}}</td>
                                 <td></td><!-- this is status-->>
-                                <td>{{order.total_price}}</td>
-                                <td>{{order.place_delivery}}</td>
+                                <td>{{Order.total_price}}</td>
+                                <td>{{Order.place_delivery}}</td>
                                 <td>
                                     <a href ="#"><button class='btn btn-warning' type='button' data-bs-toggle='modal'> 
                                         <i class='fa-solid fa-wrench'></i>

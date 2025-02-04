@@ -9,4 +9,4 @@ def ChatAdmin(request):
 def OrderAdmin(request):
     #Query from model Order
     data = Order.objects.all()
-    return render(request , "OrderAdmin.html" , {'orders':data})
+    return render(request , "OrderCheckAdmin.html" , {'Orders':data})

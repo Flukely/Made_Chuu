@@ -2,5 +2,6 @@ from django.urls import path
 from main import views
 urlpatterns = [
     path('',views.index),
-    path('chatAdmin',views.ChatAdmin)
+    path('chatAdmin',views.ChatAdmin),
+    path('OrderCheck',views.OrderAdmin)
 ]
