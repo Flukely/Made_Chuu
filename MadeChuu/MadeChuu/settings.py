@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main',  # เพิ่ม app ที่ชื่อ main เข้าไป
+    'main',# เพิ่ม app ที่ชื่อ main เข้าไป
+    'ProductDetail',# เพิ่ม app ที่ชื่อ ProductDetail เข้าไป
 ]
 
 MIDDLEWARE = [
