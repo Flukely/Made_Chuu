@@ -13,7 +13,7 @@ def Dashboard(request):
     return render(request, 'admin_function/Dashboard.html')
 
 def CommentAdmin(request):
-    return render(request, 'admin_function/CommentsAdmin.html')
+    return render(request, 'admin_function/CommentAdmin.html')
 
 def ProductAdmin(request):
     return render(request, 'admin_function/ProductsAdmin.html')
