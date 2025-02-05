@@ -17,6 +17,9 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_URL = '/media/'  # URL สำหรับเข้าถึงไฟล์ที่อัปโหลด
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # กำหนดที่เก็บไฟล์ที่อัปโหลด
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  # ตั้งค่าหมายถึงโฟลเดอร์ static ในโปรเจ็กต์ของคุณ
+]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/

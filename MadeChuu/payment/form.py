@@ -1,12 +1,12 @@
 from django import forms
 from .models import Payment, Order
 
-class Payment(forms.ModelForm):
+class Paymentform(forms.ModelForm):
     order = forms.ModelChoiceField(
         queryset=Order.objects.exclude(
             order_id__in=Payment.objects.values_list("order_id", flat=True)
         ),
-        label="เลือกคำสั่งซื้อ",
+        label="รายละเอียดคำสั่งซื้อ",
         empty_label="-- โปรดเลือกคำสั่งซื้อ --",
         widget=forms.Select(attrs={'class': 'form-control'})
     )

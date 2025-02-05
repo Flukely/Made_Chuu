@@ -111,12 +111,21 @@ class OrderProducts(models.Model):
 
 
 class Payment(models.Model):
+    PAYMENT_STATUS_CHOICES = [
+        ('wait', 'รอการตรวจสอบ'),
+        ('confirmed', 'ยืนยันแล้ว'),
+        ('rejected', 'ถูกปฏิเสธ'),
+    ]
     payment_id = models.AutoField(primary_key=True)
     order = models.ForeignKey('Order', models.DO_NOTHING, blank=True, null=True)
     payment_date = models.DateTimeField(blank=True, null=True)
-    payment_status = models.CharField(max_length=50, blank=True, null=True)
+    payment_status = models.CharField(max_length=50, choices=PAYMENT_STATUS_CHOICES, blank=True, null=True)
     image_payment = models.ImageField(upload_to='receipts/', blank=True, null=True)
 
+
+    def __str__(self):
+        # คืนค่าเลข order_id และชื่อผู้ใช้
+        return f"Payment ID: {self.payment_id}, Order ID: {self.order_id}, {self.order.user if self.order else 'No User'}"
     class Meta:
         managed = False
         db_table = 'payment'
@@ -251,6 +260,10 @@ class User(models.Model):
     email = models.CharField(max_length=255, blank=True, null=True)
     phone_num = models.CharField(max_length=15, blank=True, null=True)
     join_date = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        # คืนค่าเลข order_id และชื่อผู้ใช้
+        return f"User ID: {self.user_id if self.user_id else 'No User'}, User Name: {self.user_name if self.user_name else 'No User'}"
 
     class Meta:
         managed = False
