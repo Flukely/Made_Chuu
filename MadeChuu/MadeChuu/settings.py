@@ -77,9 +77,9 @@ WSGI_APPLICATION = 'MadeChuu.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # ใช้ MySQL เป็นฐานข้อมูล
-        'NAME': 'madechuu_db',  # ชื่อฐานข้อมูล
+        'NAME': 'madechuu_database',  # ชื่อฐานข้อมูล
         'USER': 'root',  # ชื่อผู้ใช้ MySQL
-        'PASSWORD': '12345678',  # รหัสผ่านของ MySQL
+        'PASSWORD': 'IceWolfHunt0',  # รหัสผ่านของ MySQL
         'HOST': 'localhost',  # ที่อยู่ของ MySQL server
         'PORT': '3306',  # พอร์ตของ MySQL (พอร์ตเริ่มต้นคือ 3306)
     }
