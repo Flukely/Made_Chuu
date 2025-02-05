@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
   <html lang="en">
     <head>
@@ -36,6 +37,10 @@
         <!-- Template Stylesheet -->
             <link href="css/style.css" rel="stylesheet">
             <link href="css/Style_Admin.css" rel="stylesheet">
+
+        <!-- Css style -->
+            <link rel= "stylesheet" href = "{% static 'MadeChuu/css/style_Admin.css' %}">
+            <link rel= "stylesheet" href = "{% static 'MadeChuu/css/style.css' %}">
     </head>
 <body>
 
@@ -99,7 +104,7 @@
     </div>
 
     <!-- ✅ Content Block -->
-    <div class="container mt-4">
+    <div>
         {% block content %}
         {% endblock %}
     </div>

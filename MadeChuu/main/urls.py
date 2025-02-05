@@ -7,6 +7,7 @@ urlpatterns = [
     path('Dashboard/',views.Dashboard, name = 'Dashboard'),
     path('CommentsAdmin/',views.CommentAdmin, name = 'CommentsAdmin'),
     path('ProductsAdmin/',views.ProductAdmin, name = 'ProductsAdmin'),
-    path('PromotionsAdmin/',views.PromotionsAdmin, name = 'PromotionsAdmin')
+    path('PromotionsAdmin/',views.PromotionsAdmin, name = 'PromotionsAdmin'),
+    path('admin/', admin.site.urls),
 
 ]

@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
+import os
+# import OS
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main',  # เพิ่ม app ที่ชื่อ main เข้าไป
+    'jazzmin', #!!! เพิ่ม app ที่ชื่อ jazzmin เข้าไป Admin
 ]
 
 MIDDLEWARE = [
@@ -126,3 +128,24 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STATICFILE_DIRS = [
+    # สร้าง static เลือก path ของ css , js, image
+    os.path.join(BASE_DIR , 'MadeChuu/static')
+]
+
+##!!! เพิ่มการตั้งค่าของ Jazzmin
+JAZZMIN_SETTINGS = {
+    "site_title": "My Django Site",
+    "site_header": "My Admin",
+    "site_brand": "MyApp",
+    "welcome_sign": "Welcome to My Admin Panel",
+    "topmenu_links": [
+        {"name": "Home", "url": "https://example.com", "new_window": False},
+        {"name": "Logout", "url": "/admin/logout/", "new_window": False},
+    ],
+    "user_menu_links": [
+        {"name": "Profile", "url": "/admin/profile/", "new_window": False},
+    ],
+    "show_ui_builder": True,
+}
