@@ -40,6 +40,9 @@ class Category(models.Model):
     class Meta:
         managed = False
         db_table = 'category'
+        
+    def __str__(self):
+        return self.category_name
 
 
 class Claim(models.Model):
@@ -131,6 +134,9 @@ class Product(models.Model):
     class Meta:
         managed = False
         db_table = 'product'
+        
+    def __str__(self):
+        return self.product_name
 
 
 class Promotion(models.Model):
@@ -211,6 +217,9 @@ class Shop(models.Model):
     class Meta:
         managed = False
         db_table = 'shop'
+    
+    def __str__(self):
+        return self.shop_name
 
 
 class Transaction(models.Model):
