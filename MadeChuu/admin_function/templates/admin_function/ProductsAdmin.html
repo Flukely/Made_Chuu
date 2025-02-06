@@ -15,6 +15,8 @@
             </nav>
         </div>
     </div>
+    <!-- Page Header End-->
+
 <div class="container-xxl py-5">
     <div class="container">
         <div class="section-title text-start">
@@ -83,96 +85,6 @@
                         </div>
                 </div>
 
-            <!-- Edit Product Modal -->
-            <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="editProductModalLabel">แก้ไขสินค้า</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <!-- Form for Editing Product -->
-                            <form>
-                                <div class="mb-3">
-                                    <label for="editProductName" class="form-label">ชื่อสินค้า</label>
-                                    <input type="text" class="form-control" id="editProductName" placeholder="กรอกชื่อสินค้า" value="FLODUCKY">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="category">ประเภทสินค้า</label>
-                                    <select class="form-select" name="category" id="category"required>
-                                        <option value="Ceramic">Accessorie</option>
-                                        <option value="Digital" selected>Flower</option>
-                                        <option value="Canvas">Keychain</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="editProductPrice" class="form-label">ราคา</label>
-                                    <input type="number" class="form-control" id="editProductPrice" placeholder="กรอกราคา" value="299">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="editQuantity" class="form-label">จำนวนคงเหลือ</label>
-                                    <input type="number" class="form-control" id="editProductPrice" placeholder="กรอกราคา" value="15">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="editProductImage" class="form-label">เปลี่ยนรูปภาพ</label>
-                                    <input type="file" class="form-control" id="editProductImage">
-                                </div>
-                                <div class="mb-3">
-                                    <img class="img-thumbnail" src="img/flower/page-2/product-8.png" >
-                                </div>
-                                <button type="submit" class="btn btn-primary " Style = "width: 100%;">บันทึกการเปลี่ยนแปลง</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Modal Structure -->
-            <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="addProductModalLabel">เพิ่มสินค้าใหม่</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <!-- Form for Adding Product -->
-                            <form>
-                                <div class="mb-3">
-                                    <label for="productname">ชื่อสินค้า</label>
-                                    <input type="text" class="form-control" id="productName"
-                                        placeholder="กรอกชื่อสินค้า">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="category">ประเภทสินค้า</label>
-                                    <select class="form-select" name="category" id="category"required>
-                                        <option value="Ceramic">Accessorie</option>
-                                        <option value="Digital">Flower</option>
-                                        <option value="Canvas">Keychain</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="productPrice">ราคาสินค้า</label>
-                                    <input type="number" class="form-control" id="productPrice"
-                                        placeholder="กรอกราคา">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="Quantity">จำนวนสินค้า</label>
-                                    <input type="number" class="form-control" id="productStock"
-                                        placeholder="กรอกจำนวนสินค้า">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="productImage" class="form-label">อัพโหลดรูปภาพ Products</label>
-                                    <input type="file" class="form-control" id="productImage">
-                                </div>
-                                <button type="submit" class="btn btn-primary" style="width: 100%;">เพิ่มสินค้า</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>

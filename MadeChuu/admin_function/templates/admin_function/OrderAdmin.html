@@ -35,26 +35,26 @@
                             <tr class = "wow fadeInUp">
                                 <th>OrderID</th>
                                 <th>Username</th>
-                                <th>วันที่สั่ง</th>
-                                <th>สถานะ</th>
                                 <th>ยอดชำระ</th>
                                 <th>สถานที่ส่ง</th>
+                                <th>วันที่สั่ง</th>
+                                <th>สถานะ</th>
                                 <th>ยืนยัน</th>
                             </tr>
                         </thead>
                         <tbody>
-                          {% for Order in Orders %}
+                          {% for Order in Orders_wait %}
                             <tr class = "wow fadeInUp">
                                 <td>{{Order.order_id}}</td>
                                 <td>{{Order.user.user_name}}</td>
-                                <td>{{Order.order_date}}</td>
-                                <td></td><!-- this is status-->
                                 <td>{{Order.total_price}}</td>
                                 <td>{{Order.place_delivery}}</td>
+                                <td>{{Order.order_date}}</td>
+                                <td>{{Order.status_order}}</td>
                                 <td>
-                                    <a href ="#"><button class='btn btn-success' type='button' data-bs-toggle='modal'> 
+                                    <button class='btn btn-success' type='button' data-bs-toggle='modal'> 
                                         <i class='fa-solid fa-check'></i>
-                                    </button></a>
+                                    </button>
                                 </td>
                             </tr>
                             {% endfor %}
