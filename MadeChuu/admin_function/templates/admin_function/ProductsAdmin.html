@@ -30,7 +30,20 @@
                 </button>
             </form>
         </div>
-                <div class="row g-4">
+        <div class="row g-4">
+            <!-- Add product Button-->
+            <div class="col-lg-3 col-md-6 wow fadeInUp">
+                <div class="team-item h-100 addproductthing add-product" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                    <div class="overflow-hidden position-relative rounded-3 d-flex justify-content-center align-items-center mx-auto my-auto">
+                        <img class="img-fluid p-4 mx-auto my-auto" src="{% static 'MadeChuu/images/add.png' %}" style="width: 50%; ">
+                    </div>
+                    <div class="text-center p-4">
+                        <h5 class="mb-0">Add Products </h5>
+                        <h4 class="mb-0">Here </h4>
+                        <br><br>
+                    </div>
+                </div>
+            </div>
             {% for product in products.qs %}
             <div class="col-lg-3 col-md-6 wow fadeInUp">
                 <div class="team-item h-100">
@@ -44,7 +57,7 @@
                         <small>in Stock : {{product.quantity}}</small>
                         <br><br>
                         <div class="button-edit-delete">
-                            <button class='btn btn-warning btn-radius10' type='button' data-bs-toggle="modal" data-bs-target="#editProductModal"> 
+                            <button class='btn btn-warning btn-radius10' type='button' data-bs-toggle="modal" data-bs-target="#editProductModal{{ product.product_id }}"> 
                                 <i class='fa-solid fa-wrench'></i>
                             </button>
                             <button class='btn btn-danger btn-radius10' type='button' onclick="confirmDelete()">
@@ -55,19 +68,6 @@
                 </div>
             </div>
             {% endfor %}
-            <!-- Add product Button-->
-            <div class="col-lg-3 col-md-6 wow fadeInUp">
-                <div class="team-item h-100 addproductthing add-product" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                    <div class="overflow-hidden position-relative rounded-3 d-flex justify-content-center align-items-center">
-                        <img class="img-fluid p-4" src="{% static 'MadeChuu/images/add.png' %}" style="width: 50%;">
-                    </div>
-                    <div class="text-center p-4">
-                        <h5 class="mb-0">Add Products </h5>
-                        <h4 class="mb-0">Here </h4>
-                        <br><br>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
     <!-- Modal สำหรับเพิ่มสินค้า -->
@@ -80,6 +80,24 @@
                 </div>
                 <div class="modal-body">
                     <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-success">บันทึก</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal สำหรับแก้ไขสินค้า -->
+    <div class="modal fade" id="editProductModal{{ product.product_id }}" tabindex="-1" aria-labelledby="editProductModalLabel{{ product.product_id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProductModalLabel{{ product.product_id }}">แก้ไขสินค้า</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" enctype="multipart/form-data" action="">
                         {% csrf_token %}
                         {{ form.as_p }}
                         <button type="submit" class="btn btn-success">บันทึก</button>
