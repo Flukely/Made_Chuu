@@ -29,9 +29,9 @@ def PromotionsAdmin(request):
 def product_list(request):
     product_filter = ProductFilter(request.GET, queryset=Product.objects.all())
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
+        add_form = ProductForm(request.POST, request.FILES)
+        if add_form.is_valid():
+            add_form.save()
             return redirect('ProductsAdmin')  # เปลี่ยนเป็นชื่อ URL ของหน้ารายการสินค้า
     elif 'edit_product' in request.POST:
             product_id = request.POST.get('product_id')
@@ -41,6 +41,6 @@ def product_list(request):
                 edit_form.save()
                 return redirect('ProductsAdmin')
     else:
-        form = ProductForm()
+        add_form = ProductForm()
         edit_form = ProductForm()
-    return render(request, "admin_function/ProductsAdmin.html", {"products":product_filter , 'form': form , 'edit_form': edit_form})
+    return render(request, "admin_function/ProductsAdmin.html", {"products":product_filter , 'form': add_form , 'edit_form': edit_form})
