@@ -5,7 +5,7 @@ class ProductFilter(django_filters.FilterSet):
     category = django_filters.ModelChoiceFilter(
         queryset=Category.objects.all(), 
         label="Category",
-        empty_label="Select Category",
+        empty_label="ทั้งหมด",
     )
         
     class Meta:
