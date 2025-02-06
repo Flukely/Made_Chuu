@@ -105,7 +105,7 @@ class OrderProducts(models.Model):
     class Meta:
         managed = False
         db_table = 'order_products'
-        unique_together = (('order', 'product'),)
+
 
 
 class Payment(models.Model):
@@ -128,7 +128,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     quantity = models.IntegerField(blank=True, null=True)
     category = models.ForeignKey(Category, models.DO_NOTHING, blank=True, null=True)
-    product_image = models.CharField(max_length=255, blank=True, null=True)
+    product_image = models.ImageField(upload_to='images/', blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
 
     class Meta:

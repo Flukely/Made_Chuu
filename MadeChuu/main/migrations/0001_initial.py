@@ -123,7 +123,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(blank=True, null=True)),
                 ('price', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True)),
                 ('quantity', models.IntegerField(blank=True, null=True)),
-                ('product_image', models.CharField(blank=True, max_length=255, null=True)),
+                ('product_image', models.ImageField(upload_to='ProductDetail/static/images', blank=True, null=True)),
                 ('created', models.DateTimeField(blank=True, null=True)),
             ],
             options={
