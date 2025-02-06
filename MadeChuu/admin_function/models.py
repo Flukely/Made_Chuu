@@ -128,7 +128,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     quantity = models.IntegerField(blank=True, null=True)
     category = models.ForeignKey(Category, models.DO_NOTHING, blank=True, null=True)
-    product_image = models.ImageField(upload_to='MadeChuu/images/')
+    product_image = models.ImageField(upload_to='images/')
     created = models.DateTimeField(blank=True, null=True)
     def __str__(self):
         return self.category_name
