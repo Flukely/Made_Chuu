@@ -37,6 +37,8 @@ class Category(models.Model):
     category_name = models.CharField(max_length=255, blank=True, null=True)
     shop = models.ForeignKey('Shop', models.DO_NOTHING, blank=True, null=True)
 
+    def __str__(self):
+        return self.category_name
     class Meta:
         managed = False
         db_table = 'category'
@@ -128,7 +130,8 @@ class Product(models.Model):
     category = models.ForeignKey(Category, models.DO_NOTHING, blank=True, null=True)
     product_image = models.CharField(max_length=255, blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
-
+    def __str__(self):
+        return self.category_name
     class Meta:
         managed = False
         db_table = 'product'

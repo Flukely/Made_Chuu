@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from .models import Order
+from .models import Order , Product
+from .filters import ProductFilter
 
 def admin_function(request):
     return render(request, 'admin_function/Dashboard.html')
@@ -23,3 +24,7 @@ def ProductAdmin(request):
 
 def PromotionsAdmin(request):
     return render(request, 'admin_function/PromotionsAdmin.html')
+
+def product_list(request):
+    product_filter = ProductFilter(request.GET, queryset=Product.objects.all())
+    return render(request, "admin_function/ProductsAdmin.html", {"products":product_filter})
