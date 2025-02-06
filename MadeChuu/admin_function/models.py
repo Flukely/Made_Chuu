@@ -91,32 +91,11 @@ class Order(models.Model):
     order_date = models.DateTimeField(blank=True, null=True)
     delivery_date = models.DateTimeField(blank=True, null=True)
     status_order = models.TextField(blank=True, null=False)
+    products = models.ManyToManyField('Product', through='OrderProducts')
 
     class Meta:
         managed = False
         db_table = 'order'
-
-
-class OrderProducts(models.Model):
-    order = models.ForeignKey(Order, models.DO_NOTHING)  # The composite primary key (order_id, product_id) found, that is not supported. The first column is selected.
-    product = models.ForeignKey('Product', models.DO_NOTHING)
-    quantity = models.IntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'order_products'
-
-
-class Payment(models.Model):
-    payment_id = models.AutoField(primary_key=True)
-    order = models.ForeignKey(Order, models.DO_NOTHING, blank=True, null=True)
-    payment_date = models.DateTimeField(blank=True, null=True)
-    payment_status = models.CharField(max_length=50, blank=True, null=True)
-    image_payment = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'payment'
 
 
 class Product(models.Model):
@@ -134,6 +113,28 @@ class Product(models.Model):
     class Meta:
         managed = False
         db_table = 'product'
+
+class OrderProducts(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'order_products'
+        unique_together = (('order', 'product'),)
+
+
+class Payment(models.Model):
+    payment_id = models.AutoField(primary_key=True)
+    order = models.ForeignKey(Order, models.DO_NOTHING, blank=True, null=True)
+    payment_date = models.DateTimeField(blank=True, null=True)
+    payment_status = models.CharField(max_length=50, blank=True, null=True)
+    image_payment = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'payment'
 
 
 class Promotion(models.Model):

@@ -1,5 +1,5 @@
 import django_filters
-from .models import Product, Category
+from .models import *
 
 class ProductFilter(django_filters.FilterSet):
     category = django_filters.ModelChoiceFilter(
@@ -11,3 +11,18 @@ class ProductFilter(django_filters.FilterSet):
     class Meta:
         model = Product
         fields = ["category"]
+
+class DeliveryFilter(django_filters.FilterSet):
+    delivery_status = django_filters.ChoiceFilter(
+        choices=[
+            ('preparing', 'Preparing'),
+            ('sending', 'Sending'),
+            ('transition', 'Transition'),
+            ('successfully', 'Successfully'),
+        ],
+        label="Delivery Status",
+        empty_label="ทั้งหมด",
+    )
+    class Meta:
+        model = Delivery
+        fields = ["delivery_status"]

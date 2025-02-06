@@ -1,6 +1,6 @@
 from django.shortcuts import render , redirect ,get_object_or_404
-from .models import Order , Product
-from .filters import ProductFilter
+from .models import *
+from .filters import ProductFilter , DeliveryFilter
 from .forms import ProductForm
 
 def admin_function(request):
@@ -9,10 +9,21 @@ def admin_function(request):
 def ChatAdmin(request):
     return render(request, 'admin_function/ChatsAdmin.html')
 
+
 def OrderAdmin(request):
     #Query from model Order
     Order_wait_status = Order.objects.filter(status_order = "wait")
-    return render(request, 'admin_function/OrderAdmin.html',{'Orders_wait': Order_wait_status})
+    Order_confirm_status = Order.objects.filter(status_order = "confirm")
+    return render(request, 'admin_function/OrderAdmin.html',{'Orders_wait': Order_wait_status , 'Orders_confirm': Order_confirm_status})
+    ##Delivery_preparing_status = Delivery.objects.filter(delivery_status = "preparing")
+   ## Delivery_sending_status = Delivery.objects.filter(delivery_status = "sending")
+   ## Delivery_transition_status = Delivery.objects.filter(delivery_status = "transition")
+    ##Delivery_successfully_status = Delivery.objects.filter(delivery_status = "successfully")
+
+
+def DeliveryAdmin(request):
+    Delivery_filter = DeliveryFilter(request.GET, queryset=Delivery.objects.all())
+    return render(request, 'admin_function/DeliveryAdmin.html', {"deliverys_filter": Delivery_filter})
 
 def Dashboard(request):
     return render(request, 'admin_function/Dashboard.html')
