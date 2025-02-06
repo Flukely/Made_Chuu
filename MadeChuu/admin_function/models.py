@@ -98,14 +98,13 @@ class Order(models.Model):
 
 
 class OrderProducts(models.Model):
-    order = models.OneToOneField(Order, models.DO_NOTHING, primary_key=True)  # The composite primary key (order_id, product_id) found, that is not supported. The first column is selected.
+    order = models.ForeignKey(Order, models.DO_NOTHING)  # The composite primary key (order_id, product_id) found, that is not supported. The first column is selected.
     product = models.ForeignKey('Product', models.DO_NOTHING)
     quantity = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'order_products'
-        unique_together = (('order', 'product'),)
 
 
 class Payment(models.Model):
