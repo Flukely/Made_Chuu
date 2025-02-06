@@ -172,3 +172,9 @@
   line-height: 45px;
   text-align: center;
 }
+.team-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
