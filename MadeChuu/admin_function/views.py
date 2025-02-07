@@ -1,7 +1,9 @@
 from django.shortcuts import render , redirect ,get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 from .models import *
 from .filters import ProductFilter , DeliveryFilter
-from .forms import ProductForm
+from .forms import ProductForm 
 
 def admin_function(request):
     return render(request, 'admin_function/Dashboard.html')
@@ -14,12 +16,11 @@ def OrderAdmin(request):
     #Query from model Order
     Order_wait_status = Order.objects.filter(status_order = "wait")
     Order_confirm_status = Order.objects.filter(status_order = "confirm")
-    return render(request, 'admin_function/OrderAdmin.html',{'Orders_wait': Order_wait_status , 'Orders_confirm': Order_confirm_status})
-    ##Delivery_preparing_status = Delivery.objects.filter(delivery_status = "preparing")
-   ## Delivery_sending_status = Delivery.objects.filter(delivery_status = "sending")
-   ## Delivery_transition_status = Delivery.objects.filter(delivery_status = "transition")
-    ##Delivery_successfully_status = Delivery.objects.filter(delivery_status = "successfully")
-
+    Order_Detail = OrderProducts.objects.all()
+    return render(request, 'admin_function/OrderAdmin.html',
+                  {'Orders_wait': Order_wait_status , 
+                   'Orders_confirm': Order_confirm_status,
+                   'Order_Detail': Order_Detail})
 
 def DeliveryAdmin(request):
     Delivery_filter = DeliveryFilter(request.GET, queryset=Delivery.objects.all())
@@ -43,7 +44,7 @@ def product_list(request):
         add_form = ProductForm(request.POST, request.FILES)
         if add_form.is_valid():
             add_form.save()
-            return redirect('ProductsAdmin')  # เปลี่ยนเป็นชื่อ URL ของหน้ารายการสินค้า
+            return redirect('ProductsAdmin') 
     elif 'edit_product' in request.POST:
             product_id = request.POST.get('product_id')
             product = get_object_or_404(Product, id=product_id)

@@ -20,4 +20,5 @@ urlpatterns = [
     path('add_product/',views.product_list, name = 'add_product'),
 
     path('PromotionsAdmin/',views.PromotionsAdmin, name = 'PromotionsAdmin'),
+
 ]

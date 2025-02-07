@@ -115,14 +115,15 @@ class Product(models.Model):
         db_table = 'product'
 
 class OrderProducts(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    order_products_id = models.AutoField(primary_key=True)
+    order_id = models.ForeignKey(Order, on_delete=models.CASCADE)
+    product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'order_products'
-        unique_together = (('order', 'product'),)
+        unique_together = (('order_id', 'product_id'),)
 
 
 class Payment(models.Model):
