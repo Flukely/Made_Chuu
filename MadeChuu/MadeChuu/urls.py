@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls')),  # เชื่อมเส้นทางจากแอป main
     path('payment/', include('payment.urls')),
+    path('receipt/', include('receipt.urls')),  # เพิ่มเส้นทางสำหรับ receipt
 ]

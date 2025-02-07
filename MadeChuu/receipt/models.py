@@ -122,9 +122,10 @@ class Payment(models.Model):
     payment_status = models.CharField(max_length=50, choices=PAYMENT_STATUS_CHOICES, blank=True, null=True)
     image_payment = models.ImageField(upload_to='receipts/', blank=True, null=True)
 
+
     def __str__(self):
-        return f"Payment ID: {self.payment_id}, Order ID: {self.order.order_id if self.order else 'No Order'}, {self.order.user if self.order else 'No User'}"
-    
+        # คืนค่าเลข order_id และชื่อผู้ใช้
+        return f"Payment ID: {self.payment_id}, Order ID: {self.order_id}, {self.order.user if self.order else 'No User'}"
     class Meta:
         managed = False
         db_table = 'payment'
