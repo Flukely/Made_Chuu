@@ -44,24 +44,27 @@
             <div class="col-12">
                 <div class="border p-4 rounded">
                     <div id= "product-rating">Product Ratings</div>
-                    <div id = "star-avg">★★★★★ 5/5</div>
+                    <div id="average-rating" class="star-rating" data-rating="{{ average_rating }}"></div>
                     <p>Filter by rating:</p>
                     <div class="d-flex gap-2 mb-3">
-                        <button class="btn btn-outline-warning">5 ★</button>
-                        <button class="btn btn-outline-warning">4 ★</button>
-                        <button class="btn btn-outline-warning">3 ★</button>
-                        <button class="btn btn-outline-warning">2 ★</button>
-                        <button class="btn btn-outline-warning">1 ★</button>
+                        <button class="btn btn-outline-warning show-all-button">Show All</button>
+                        <button class="btn btn-outline-warning filter-button" data-rating="5">5 ★</button>
+                        <button class="btn btn-outline-warning filter-button" data-rating="4">4 ★</button>
+                        <button class="btn btn-outline-warning filter-button" data-rating="3">3 ★</button>
+                        <button class="btn btn-outline-warning filter-button" data-rating="2">2 ★</button>
+                        <button class="btn btn-outline-warning filter-button" data-rating="1">1 ★</button>
                     </div>
                     <h4>Reviews</h4>
                     <br>
                     {% for review in reviews %}
-                        <div id="user">User 1: </div>
-                        <div class="star-rating" data-rating=" {{review.rating}} "></div>
-                        <div>{{review.review_date}}</div>
-                        <br>
-                        <div>{{review.review_text}}</div>
-                        <hr>
+                        <div class="review">
+                            <div id="user">User 1: </div>
+                            <div class="star-rating" data-rating=" {{review.rating}} "></div>
+                            <div>{{review.review_date}}</div>
+                            <br>
+                            <div>{{review.review_text}}</div>
+                            <hr>
+                        </div>
                     {% endfor %}
                 </div>
             </div>
