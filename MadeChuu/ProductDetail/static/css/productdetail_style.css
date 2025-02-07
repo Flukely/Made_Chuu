@@ -1,4 +1,36 @@
-.star-rating {
+#product-name{
+    font-size: 30px;
+    font-weight: bolder;
+}
+#shop-made{
+    font-size: 22px;
+    color: #f147f7;
+    font-style: italic;
+    font-weight: bolder;
+}
+#category{
+    font-size: 19px;
+    font-weight: 400;
+}
+#product-description{
+    font-size: 18px;
+    font-weight: bold;
+}
+#quantity{
+    font-size: 20px;
+}
+#product-rating{
     font-size: 24px;
+    font-weight: bold;
+}
+#star-avg{
+    font-size: 18px;
+    color: gold;
+}
+#user{
+    font-size: 19px;
+}
+.star-rating {
+    font-size: 18px;
     color: gold;
 }
