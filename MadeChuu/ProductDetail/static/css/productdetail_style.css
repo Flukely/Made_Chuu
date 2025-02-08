@@ -26,6 +26,11 @@
 #user{
     font-size: 19px;
 }
+#review_section{
+    margin: 10px;
+    padding: 10px;
+    background-color: #f147f7;
+}
 .star-rating {
     font-size: 20px;
     color: gold;

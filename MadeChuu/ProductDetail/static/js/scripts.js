@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener( function() {
     document.querySelectorAll('.star-rating').forEach(function(element) {
         let rating = parseInt(element.getAttribute('data-rating'), 10);
         let stars = '★'.repeat(rating) + '☆'.repeat(5 - rating); // 5 ดาวสูงสุด
@@ -39,5 +39,15 @@ document.addEventListener("DOMContentLoaded", function() {
         document.querySelectorAll('.review').forEach(function(review) {
             review.style.display = 'block';
         });
+    });
+
+    countElement.addEventListener("input", function () {
+        let value = parseInt(countElement.value);
+        if (isNaN(value) || value < 0) {
+            countElement.value = 0;
+        } else if (value > maxLimit) {
+            countElement.value = maxLimit;
+        }
+        count = parseInt(countElement.value);
     });
 });
