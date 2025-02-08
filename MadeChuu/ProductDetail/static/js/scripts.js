@@ -1,25 +1,36 @@
-document.addEventListener( function() {
-    document.querySelectorAll('.star-rating').forEach(function(element) {
-        let rating = parseInt(element.getAttribute('data-rating'), 10);
-        let stars = '★'.repeat(rating) + '☆'.repeat(5 - rating); // 5 ดาวสูงสุด
-        element.textContent = stars;
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".star-rating").forEach(function (element) {
+        let rating = parseInt(element.getAttribute("data-rating"), 10);
+        if (!isNaN(rating)) {
+            let stars = "★".repeat(rating) + "☆".repeat(5 - rating); // สูงสุด 5 ดาว
+            element.textContent = stars;
+        }
     });
 
     // New code to calculate and display average rating
-    let ratings = document.querySelectorAll('.star-rating');
+    let ratings = document.querySelectorAll(".star-rating");
     let totalRating = 0;
-    ratings.forEach(function(element) {
-        totalRating += parseInt(element.getAttribute('data-rating'), 10);
-    });
-    let averageRating = totalRating / ratings.length;
-    let averageStars = '★'.repeat(Math.round(averageRating)) + '☆'.repeat(5 - Math.round(averageRating));
-
-    // Display the average rating
-    let averageRatingElement = document.getElementById('average-rating');
-    if (averageRatingElement) {
-        averageRatingElement.textContent = averageStars + ' (' + averageRating.toFixed(1) + ' / 5)';
-    }
+    let countRatings = 0;
     
+    ratings.forEach(function (element) {
+        let rating = parseInt(element.getAttribute("data-rating"), 10);
+        if (!isNaN(rating)) {
+            totalRating += rating;
+            countRatings++;
+        }
+    });
+
+    if (countRatings > 0) {
+        let averageRating = totalRating / countRatings;
+        let averageStars = "★".repeat(Math.round(averageRating)) + "☆".repeat(5 - Math.round(averageRating));
+
+        let averageRatingElement = document.getElementById("average-rating");
+        if (averageRatingElement) {
+            averageRatingElement.textContent = averageStars + " (" + averageRating.toFixed(1) + " / 5)";
+        }
+    }
+
+    // Filter reviews by rating
     document.querySelectorAll('.filter-button').forEach(function(button) {
         button.addEventListener('click', function() {
             let filterRating = parseInt(this.getAttribute('data-rating'), 10);

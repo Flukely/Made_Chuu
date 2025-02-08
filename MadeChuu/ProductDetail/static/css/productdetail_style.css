@@ -1,11 +1,37 @@
+
+.body{
+    background-color: #fcd7ff;
+    font-family: Arial, sans-serif;
+}
+.row1{
+    background-color: white;
+    margin: auto;
+    padding: 20px;
+    border-radius: 10px;
+}
+.row-mt-5{
+    margin: 5px;
+    padding: 5px;
+}
+.review-section{
+    background-color: white;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+}
+.review{
+    background-color:rgb(245, 245, 245);
+    padding: 10px;
+    margin: 10px;
+    border-radius: 10px;
+}
 #product-name{
     font-size: 30px;
     font-weight: bolder;
 }
 #shop-made{
     font-size: 22px;
-    color: #f147f7;
-    font-style: italic;
+    color: #fb83ff;
     font-weight: bolder;
 }
 #category{
@@ -19,17 +45,36 @@
 #quantity{
     font-size: 20px;
 }
+#decrease, #increase{
+    font-weight: bold;
+    background-color: #faa6f6;
+    color: white;
+    border: none;
+}
+#add-to-cart{
+    font-size: 20px;
+    font-weight: bold;
+    background-color: #ffbb55;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+}
+#buy{
+    font-size: 20px;
+    font-weight: bold;
+    background-color: #61f3fd;
+    color: black;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+}
 #product-rating{
     font-size: 24px;
     font-weight: bold;
 }
 #user{
     font-size: 19px;
-}
-#review_section{
-    margin: 10px;
-    padding: 10px;
-    background-color: #f147f7;
 }
 .star-rating {
     font-size: 20px;
