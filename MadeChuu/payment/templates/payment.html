@@ -101,7 +101,7 @@
                     <li>เลขที่บัญชี(PromptPay): 0980456747</li>
                     <li>ชื่อบัญชี: นายสองปนนท์ คำตื้อ</li>
                     <br>
-                    <li>กรุณาชำระเงินและอัปโหลดสลิปการชำระเงินในฟอร์มด้นล่าง</li>
+                    <li>กรุณาชำระเงินและอัปโหลดสลิปการชำระเงินในฟอร์มด้านล่าง</li>
                 </ul>
             </div>
 
@@ -110,13 +110,13 @@
                 {% csrf_token %}
 
                 <div class="mb-3">
-                    <label for="{{ form.order.id_for_label }}" class="form-label">รายละเอียดคำสั่งซื้อ</label>
-                    {{ form.order }}
+                    <label for="{{ form.order_id.id_for_label }}" class="form-label">รายละเอียดคำสั่งซื้อ</label>
+                    {{ form.order_id }}
                 </div>
 
                 <div class="mb-3">
-                    <label for="{{ form.image_payment.id_for_label }}" class="form-label">อัปโหลดหลักฐานการโอน</label>
-                    {{ form.image_payment }}
+                    <label for="{{ form.payment_image.id_for_label }}" class="form-label">อัปโหลดหลักฐานการโอน</label>
+                    {{ form.payment_image }}
                 </div>
 
                 <!-- ปุ่มยืนยันการชำระเงิน -->
