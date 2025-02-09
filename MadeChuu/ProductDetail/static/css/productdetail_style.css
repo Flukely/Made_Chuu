@@ -26,12 +26,12 @@
     border-radius: 10px;
 }
 #product-image{
-    width: 20%;
+    width: 300px;
     height: auto;
     border-radius: 10px;
 }
 .product-image {
-    width: 20%; /* ปรับขนาดตามความต้องการ */
+    width: 300px; /* ปรับขนาดตามความต้องการ */
     height: auto; /* รักษาอัตราส่วน */
 }
 #product-name{
