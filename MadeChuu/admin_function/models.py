@@ -1,257 +1,213 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
-
-
-class Admin(models.Model):
-    admin_id = models.AutoField(primary_key=True)
-    shop = models.ForeignKey('Shop', models.DO_NOTHING, blank=True, null=True)
-    firstname_admin = models.CharField(max_length=100, blank=True, null=True)
-    lastname_admin = models.CharField(max_length=100, blank=True, null=True)
-    password = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'admin'
-
-
-class Cart(models.Model):
-    cart_id = models.AutoField(primary_key=True)
-    product = models.ForeignKey('Product', models.DO_NOTHING, blank=True, null=True)
-    user = models.ForeignKey('User', models.DO_NOTHING, blank=True, null=True)
-    quantity = models.IntegerField(blank=True, null=True)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'cart'
-
-
-class Category(models.Model):
-    category_id = models.AutoField(primary_key=True)
-    category_name = models.CharField(max_length=255, blank=True, null=True)
-    shop = models.ForeignKey('Shop', models.DO_NOTHING, blank=True, null=True)
-
-    def __str__(self):
-        return self.category_name
-    class Meta:
-        managed = False
-        db_table = 'category'
-
-
-class Claim(models.Model):
-    claim_id = models.AutoField(primary_key=True)
-    order = models.ForeignKey('Order', models.DO_NOTHING, blank=True, null=True)
-    claim_date = models.DateTimeField(blank=True, null=True)
-    status = models.CharField(max_length=50, blank=True, null=True)
-    comment = models.TextField(blank=True, null=True)
-    claim_image = models.CharField(max_length=255, blank=True, null=True)
-    image_detail = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'claim'
-
-
-class Delivery(models.Model):
-    delivery_id = models.AutoField(primary_key=True)
-    order = models.ForeignKey('Order', models.DO_NOTHING, blank=True, null=True)
-    shipper = models.ForeignKey('ShippingBrand', models.DO_NOTHING, blank=True, null=True)
-    delivery_date = models.DateTimeField(blank=True, null=True)
-    delivery_status = models.CharField(max_length=50, blank=True, null=True)
-    tracking_num = models.CharField(max_length=50, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'delivery'
-
-
-class FavoriteProducts(models.Model):
-    favorite_products_id = models.AutoField(primary_key=True)
-    product = models.ForeignKey('Product', models.DO_NOTHING, blank=True, null=True)
-    user = models.ForeignKey('User', models.DO_NOTHING, blank=True, null=True)
-    added_date = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'favorite_products'
-
-
-class Order(models.Model):
-    order_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey('User', models.DO_NOTHING, blank=True, null=True)
-    place_delivery = models.CharField(max_length=255, blank=True, null=True)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    shipper_id = models.IntegerField(blank=True, null=True)
-    order_date = models.DateTimeField(blank=True, null=True)
-    delivery_date = models.DateTimeField(blank=True, null=True)
-    status_order = models.TextField(blank=True, null=False)
-    products = models.ManyToManyField('Product', through='OrderProducts')
-
-    class Meta:
-        managed = False
-        db_table = 'order'
-
-
-class Product(models.Model):
-    product_id = models.AutoField(primary_key=True)
-    shop = models.ForeignKey('Shop', models.DO_NOTHING, blank=True, null=True)
-    product_name = models.CharField(max_length=255, blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    quantity = models.IntegerField(blank=True, null=True)
-    category = models.ForeignKey(Category, models.DO_NOTHING, blank=True, null=True)
-    product_image = models.ImageField(upload_to='images/')
-    created = models.DateTimeField(blank=True, null=True)
-    def __str__(self):
-        return self.category_name
-    class Meta:
-        managed = False
-        db_table = 'product'
-
-class OrderProducts(models.Model):
-    order_products_id = models.AutoField(primary_key=True)
-    order_id = models.ForeignKey(Order, on_delete=models.CASCADE)
-    product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.IntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'order_products'
-        unique_together = (('order_id', 'product_id'),)
-
-
-class Payment(models.Model):
-    payment_id = models.AutoField(primary_key=True)
-    order = models.ForeignKey(Order, models.DO_NOTHING, blank=True, null=True)
-    payment_date = models.DateTimeField(blank=True, null=True)
-    payment_status = models.CharField(max_length=50, blank=True, null=True)
-    image_payment = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'payment'
-
-
-class Promotion(models.Model):
-    promotion_id = models.AutoField(primary_key=True)
-    promotion_name = models.CharField(max_length=255, blank=True, null=True)
-    promotion_type = models.CharField(max_length=50, blank=True, null=True)
-    discount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    start_date = models.DateTimeField(blank=True, null=True)
-    end_date = models.DateTimeField(blank=True, null=True)
-    promotion_image = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'promotion'
-
-
-class PromotionProducts(models.Model):
-    promotion = models.OneToOneField(Promotion, models.DO_NOTHING, primary_key=True)  # The composite primary key (promotion_id, product_id) found, that is not supported. The first column is selected.
-    product = models.ForeignKey(Product, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'promotion_products'
-        unique_together = (('promotion', 'product'),)
-
-
-class Receipt(models.Model):
-    receipt_id = models.AutoField(primary_key=True)
-    payment = models.ForeignKey(Payment, models.DO_NOTHING, blank=True, null=True)
-    order = models.ForeignKey(Order, models.DO_NOTHING, blank=True, null=True)
-    receipt_date = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'receipt'
-
-
-class RecommendedProduct(models.Model):
-    recommend_products_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey('User', models.DO_NOTHING, blank=True, null=True)
-    product = models.ForeignKey(Product, models.DO_NOTHING, blank=True, null=True)
-    recommended_date = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'recommended_product'
-
-
-class Review(models.Model):
-    review_id = models.AutoField(primary_key=True)
-    order = models.ForeignKey(Order, models.DO_NOTHING, blank=True, null=True)
-    review_date = models.DateTimeField(blank=True, null=True)
-    rating = models.IntegerField(blank=True, null=True)
-    review_text = models.CharField(max_length=1000, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'review'
-
-
-class ShippingBrand(models.Model):
-    shipper_id = models.AutoField(primary_key=True)
-    shipper_company = models.CharField(max_length=255, blank=True, null=True)
-    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'shipping_brand'
-
-
-class Shop(models.Model):
-    shop_id = models.AutoField(primary_key=True)
-    shop_name = models.CharField(max_length=255, blank=True, null=True)
-    owner_name = models.CharField(max_length=255, blank=True, null=True)
-    location = models.CharField(max_length=255, blank=True, null=True)
-    phone_num = models.CharField(max_length=15, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'shop'
-
-
-class Transaction(models.Model):
-    transaction_id = models.AutoField(primary_key=True)
-    order = models.ForeignKey(Order, models.DO_NOTHING, blank=True, null=True)
-    transaction_type = models.ForeignKey('TransactionType', models.DO_NOTHING, blank=True, null=True)
-    transaction_date = models.DateTimeField(blank=True, null=True)
-    admin = models.ForeignKey(Admin, models.DO_NOTHING, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'transaction'
-
-
-class TransactionType(models.Model):
-    transaction_type_id = models.AutoField(primary_key=True)
-    transaction_name = models.CharField(max_length=100, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'transaction_type'
-
 
 class User(models.Model):
     user_id = models.AutoField(primary_key=True)
-    user_name = models.CharField(max_length=255, blank=True, null=True)
-    address = models.CharField(max_length=255, blank=True, null=True)
-    district = models.CharField(max_length=100, blank=True, null=True)
-    province = models.CharField(max_length=100, blank=True, null=True)
-    post_code = models.IntegerField(blank=True, null=True)
-    gender = models.CharField(max_length=10, blank=True, null=True)
-    age = models.IntegerField(blank=True, null=True)
-    email = models.CharField(max_length=255, blank=True, null=True)
-    phone_num = models.CharField(max_length=15, blank=True, null=True)
-    join_date = models.DateTimeField(blank=True, null=True)
+    user_name = models.CharField(max_length=255)
+    address = models.CharField(max_length=255)
+    district = models.CharField(max_length=255)
+    province = models.CharField(max_length=255)
+    postal_code = models.CharField(max_length=255)
+    gender = models.CharField(max_length=10)
+    birth_date = models.CharField(max_length=30)
+    birth_month = models.CharField(max_length=30)
+    birth_year = models.CharField(max_length=30)
+    age = models.IntegerField()
+    email = models.EmailField()
+    phone_num = models.CharField(max_length=10)
+    join_date = models.DateField(auto_now=True)
+    password = models.CharField(max_length=255)
 
+    def __str__(self):
+        return f"User ID: {self.user_id if self.user_id else 'No User'}, User Name: {self.user_name if self.user_name else 'No User'}"
+    
     class Meta:
-        managed = False
-        db_table = 'user'
+        db_table = 'User'
+
+class Product(models.Model):
+    product_id = models.AutoField(primary_key=True)
+    product_name = models.CharField(max_length=255)
+    category = models.ForeignKey('Category', on_delete=models.CASCADE)
+    shop = models.ForeignKey('Shop', on_delete=models.CASCADE)
+    description = models.CharField(max_length=255, blank=True, null=True)
+    price = models.FloatField()
+    quantity = models.IntegerField()
+    product_image = models.ImageField(upload_to='product_image/', blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Product ID: {self.product_id if self.product_id else 'No Product'}, Product Name: {self.product_name if self.product_name else 'No Product'}"
+    class Meta:
+        db_table = 'Product'
+
+class Category(models.Model):
+    category_id = models.AutoField(primary_key=True)
+    category_name = models.CharField(max_length=255)
+    shop = models.ForeignKey('Shop', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.category_name
+    class Meta:
+        db_table = 'Category'
+
+class Shop(models.Model):
+    shop_id = models.AutoField(primary_key=True)
+    shop_name = models.CharField(max_length=255)
+    owner_name = models.CharField(max_length=255)
+    location = models.CharField(max_length=255)
+    phone_num = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.shop_name 
+    class Meta:
+        db_table = 'Shop'
+
+class Cart(models.Model):
+    cart_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    total_price = models.FloatField()
+
+    def __str__(self):
+        return f"Cart ID: {self.cart_id if self.cart_id else 'No Cart'}, User ID: {self.user.user_id if self.user else 'No User'}, Product ID: {self.product.product_id if self.product else 'No Product'}"
+    class Meta:
+        db_table = 'Cart'
+
+class Order(models.Model):
+    order_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    total_price = models.FloatField()
+    order_date = models.DateTimeField(auto_now_add=True)
+    status_order = models.ForeignKey('StatusOrder', on_delete=models.CASCADE, blank=True, null=True)
+    place_delivery = models.CharField(max_length=255, blank=True, null=True)
+    shipper = models.ForeignKey('ShippingBrand', on_delete=models.CASCADE, blank=True, null=True)
+    tracking_num = models.CharField(max_length=255, blank=True, null=True)
+    delivery_date = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Order ID: {self.order_id if self.order_id else 'No Order'}, User ID: {self.user.user_id if self.user else 'No User'}"
+    class Meta:
+        db_table = 'Order'
+
+class OrderProduct(models.Model):
+    order = models.ForeignKey('Order', on_delete=models.CASCADE)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+
+    def __str__(self):
+        return f"Order ID: {self.order.order_id if self.order else 'No Order'}, Product ID: {self.product.product_id if self.product else 'No Product'}"
+    class Meta:
+        db_table = 'OrderProduct'
+
+class StatusOrder(models.Model):
+    status_order_id = models.AutoField(primary_key=True)
+    status_name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.status_name
+    class Meta:
+        db_table = 'StatusOrder'
+
+class ShippingBrand(models.Model):
+    shipper_id = models.AutoField(primary_key=True)
+    shipper_name = models.CharField(max_length=255)
+    phone_num = models.CharField(max_length=10)
+
+    def __str__(self):
+        return f"Shipper ID: {self.shipper_id if self.shipper_id else 'No Shipper'}, Shipper Name: {self.shipper_name if self.shipper_name else 'No Shipper'}"
+    class Meta:
+        db_table = 'ShippingBrand'
+
+class Payment(models.Model):
+    payment_id = models.AutoField(primary_key=True)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE)
+    payment_date = models.DateTimeField(auto_now_add=True)
+    payment_status = models.CharField(max_length=255)
+    payment_image = models.ImageField(upload_to='payment_image/', blank=True, null=True)
+
+    def __str__(self):
+        return f"Payment ID: {self.payment_id}, Order ID: {self.order.order_id if self.order else 'No Order'}, User ID: {self.order.user.user_id if self.order else 'No User'}"
+    class Meta:
+        db_table = 'Payment'
+
+class Receipt(models.Model):
+    receipt_id = models.AutoField(primary_key=True)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE)
+    payment = models.ForeignKey('Payment', on_delete=models.CASCADE)
+    receipt_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Receipt ID: {self.receipt_id}, Order ID: {self.order.order_id if self.order else 'No Order'}, User ID: {self.order.user.user_id if self.order else 'No User'}"
+    class Meta:
+        db_table = 'Receipt'
+
+class DeliveryStatus(models.Model):
+    delivery_status_id = models.AutoField(primary_key=True)
+    delivery_status_name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"Delivery ID: {self.delivery_status_id if self.delivery_status_id else 'No Delivery'}, Delivery Name: {self.delivery_status_name if self.delivery_status_name else 'No Delivery'}"
+    class Meta:
+        db_table = 'DeliveryStatus'
+
+class Review(models.Model):
+    review_id = models.AutoField(primary_key=True)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    rating = models.IntegerField()
+    review_text = models.CharField(max_length=255)
+    review_image = models.ImageField(upload_to='review_image/', blank=True, null=True)
+    review_text_admin = models.CharField(max_length=255, blank=True, null=True)
+    review_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Review ID: {self.review_id}, User ID: {self.order.user.user_id if self.order else 'No User'}, Product ID: {self.product.product_id if self.product else 'No Product'}"
+    class Meta:
+        db_table = 'Review'
+
+class Claim(models.Model):
+    claim_id = models.AutoField(primary_key=True)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE)
+    reason = models.CharField(max_length=255)
+    comment = models.CharField(max_length=255)
+    promtpay_number = models.CharField(max_length=255)
+    claim_contact = models.CharField(max_length=255)
+    claim_status = models.CharField(max_length=255)
+    claim_video = models.FileField(upload_to='claim_video/', blank=True, null=True)
+    claim_image = models.ImageField(upload_to='claim_image/', blank=True, null=True)
+    claim_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Claim ID: {self.claim_id}, Order ID: {self.order.order_id if self.order else 'No Order'}, User ID: {self.order.user.user_id if self.order else 'No User'}"
+    class Meta:
+        db_table = 'Claim'
+
+class Chat(models.Model):
+    chat_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Chat ID: {self.chat_id}, User ID: {self.user.user_id if self.user else 'No User'}"
+    class Meta:
+        db_table = 'Chat'
+
+class ChatMessage(models.Model):
+    chat = models.ForeignKey('Chat', on_delete=models.CASCADE)
+    message = models.CharField(max_length=255)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Chat ID: {self.chat.chat_id if self.chat else 'No Chat'}, Message: {self.message if self.message else 'No Message'}"
+    class Meta:
+        db_table = 'ChatMessage'
+
+class Admin(models.Model):
+    admin_id = models.AutoField(primary_key=True)
+    admin_name = models.CharField(max_length=255, default='default_admin_name')
+    shop = models.ForeignKey('Shop', on_delete=models.CASCADE)
+    password = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.admin_name}, {self.shop.shop_id if self.shop else 'No Shop'}, {self.password}, {self.admin_id}"
+    class Meta:
+        db_table = 'Admin'

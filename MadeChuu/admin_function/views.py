@@ -1,9 +1,8 @@
 from django.shortcuts import render , redirect ,get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-from .models import *
-from .filters import ProductFilter , DeliveryFilter
+from .filters import *
 from .forms import ProductForm 
+from .models import *
 
 def admin_function(request):
     return render(request, 'admin_function/Dashboard.html')
@@ -14,17 +13,8 @@ def ChatAdmin(request):
 
 def OrderAdmin(request):
     #Query from model Order
-    Order_wait_status = Order.objects.filter(status_order = "wait")
-    Order_confirm_status = Order.objects.filter(status_order = "confirm")
-    Order_Detail = OrderProducts.objects.all()
-    return render(request, 'admin_function/OrderAdmin.html',
-                  {'Orders_wait': Order_wait_status , 
-                   'Orders_confirm': Order_confirm_status,
-                   'Order_Detail': Order_Detail})
-
-def DeliveryAdmin(request):
-    Delivery_filter = DeliveryFilter(request.GET, queryset=Delivery.objects.all())
-    return render(request, 'admin_function/DeliveryAdmin.html', {"deliverys_filter": Delivery_filter})
+    order_filter = OrderFilter(request.GET, queryset=Order.objects.all())
+    return render(request, 'admin_function/OrderAdmin.html',{'orders':order_filter})
 
 def Dashboard(request):
     return render(request, 'admin_function/Dashboard.html')
@@ -45,14 +35,35 @@ def product_list(request):
         if add_form.is_valid():
             add_form.save()
             return redirect('ProductsAdmin') 
-    elif 'edit_product' in request.POST:
-            product_id = request.POST.get('product_id')
-            product = get_object_or_404(Product, id=product_id)
-            edit_form = ProductForm(request.POST, request.FILES, instance=product)
-            if edit_form.is_valid():
-                edit_form.save()
-                return redirect('ProductsAdmin')
     else:
         add_form = ProductForm()
-        edit_form = ProductForm()
-    return render(request, "admin_function/ProductsAdmin.html", {"products":product_filter , 'form': add_form , 'edit_form': edit_form})
+    return render(request, "admin_function/ProductsAdmin.html", 
+                  {"products":product_filter , 
+                   'form': add_form
+                   })
+@csrf_exempt
+def edit_product(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            return redirect('ProductsAdmin')
+    else:
+        form = ProductForm(instance=product)
+    return render(request, 'admin_function/Edit_ProductsAdmin.html', {'form': form, 'product': product})
+
+def delete_product(request, product_id):
+    # ตรวจสอบว่าวิธีการของคำขอเป็น POST หรือไม่
+    if request.method == 'POST':
+        # ดึงข้อมูลสินค้าที่ต้องการลบจากฐานข้อมูล
+        product = get_object_or_404(Product, product_id=product_id)
+        # ลบสินค้าที่เลือก
+        product.delete()
+        # เปลี่ยนเส้นทางผู้ใช้กลับไปยังหน้า ProductsAdmin
+        return redirect('ProductsAdmin')
+    else:
+        # ถ้าวิธีการของคำขอไม่ใช่ POST, เปลี่ยนเส้นทางกลับไปยังหน้า ProductsAdmin
+        return redirect('ProductsAdmin')
+
+
