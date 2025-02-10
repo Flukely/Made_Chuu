@@ -16,9 +16,9 @@ urlpatterns = [
 
     path('ProductsAdmin/',views.product_list, name = 'ProductsAdmin'),
 
-    path('add_product/',views.product_list, name = 'add_product'),
-
     path('PromotionsAdmin/',views.PromotionsAdmin, name = 'PromotionsAdmin'),
+    
+    path('add_product/',views.product_list, name = 'add_product'),
 
     path('edit_product/<int:product_id>/', views.edit_product, name='edit_product'),
 

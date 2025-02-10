@@ -1,5 +1,6 @@
 import django_filters
 from main.models import *
+from .models import *
 
 class ProductFilter(django_filters.FilterSet):
     category = django_filters.ModelChoiceFilter(

@@ -24,8 +24,8 @@ class ShopAdmin(admin.ModelAdmin):
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ('cart_id', 'user', 'product', 'quantity', 'total_price')
-    search_fields = ('user__user_name', 'product__product_name')
+    list_display = ('cart_id', 'user', 'total_price')
+    search_fields = ('user__user_name', )
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):

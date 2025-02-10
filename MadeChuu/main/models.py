@@ -64,14 +64,23 @@ class Shop(models.Model):
 class Cart(models.Model):
     cart_id = models.AutoField(primary_key=True)
     user = models.ForeignKey('User', on_delete=models.CASCADE)
-    product = models.ForeignKey('Product', on_delete=models.CASCADE)
-    quantity = models.IntegerField()
     total_price = models.FloatField()
 
     def __str__(self):
-        return f"Cart ID: {self.cart_id if self.cart_id else 'No Cart'}, User ID: {self.user.user_id if self.user else 'No User'}, Product ID: {self.product.product_id if self.product else 'No Product'}"
+        return f"Cart ID: {self.cart_id if self.cart_id else 'No Cart'}, User ID: {self.user.user_id if self.user else 'No User'}"
     class Meta:
         db_table = 'Cart'
+
+class CartItem(models.Model):
+    id = models.AutoField(primary_key=True)
+    cart = models.ForeignKey('Cart', on_delete=models.CASCADE)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+
+    def __str__(self):
+        return f"Cart ID: {self.cart.cart_id if self.cart else 'No Cart'}, Product ID: {self.product.product_id if self.product else 'No Product'}"
+    class Meta:
+        db_table = 'CartItem'
 
 class Order(models.Model):
     order_id = models.AutoField(primary_key=True)
