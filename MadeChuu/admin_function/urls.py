@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from  django.conf.urls.static import static
+from django.contrib.admin.views.decorators import staff_member_required
 
 urlpatterns = [
     path('', views.admin_function, name='admin_function'),
@@ -10,9 +11,9 @@ urlpatterns = [
 
     path('OrderAdmin/',views.OrderAdmin, name = 'OrderAdmin'),
 
-    path('Dashboard/',views.Dashboard, name = 'Dashboard'),
+    path('Dashboard/', staff_member_required(views.dashboard_admin), name='Dashboard'),
 
-    path('CommentsAdmin/',views.CommentAdmin, name = 'CommentsAdmin'),
+    path('CommentAdmin/', staff_member_required(views.comment_admin), name='CommentAdmin'),
 
     path('ProductsAdmin/',views.product_list, name = 'ProductsAdmin'),
 

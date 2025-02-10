@@ -1,5 +1,6 @@
 from django.shortcuts import render , redirect ,get_object_or_404
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt 
+from django.contrib.admin.views.decorators import staff_member_required
 from .filters import *
 from .forms import ProductForm 
 from main.models import *
@@ -70,5 +71,32 @@ def delete_product(request, product_id):
     else:
         # ถ้าวิธีการของคำขอไม่ใช่ POST, เปลี่ยนเส้นทางกลับไปยังหน้า ProductsAdmin
         return redirect('ProductsAdmin')
+    
+
+@staff_member_required
+def dashboard_admin(request):
+    return render(request, 'admin_function/Dashboard.html')
+
+@staff_member_required
+def comment_admin(request):
+    reviews = Review.objects.all()
+    products = Product.objects.all()
+    return render(request, 'admin_function/CommentAdmin.html', {'reviews': reviews, 'products': products})
+
+@csrf_exempt
+def add_reply(request):
+    if request.method == 'POST':
+        review_id = request.POST.get('review_id')
+        reply_text = request.POST.get('reply_text')
+
+        try:
+            review = models.Review.objects.get(review_id=review_id)
+            review.review_text_admin = reply_text
+            review.save()
+            return redirect('admin_comment')
+        except models.Review.DoesNotExist:
+            return redirect('admin_comment')
+
+    return redirect('admin_comment')
 
 
