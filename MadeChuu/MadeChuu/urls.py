@@ -9,5 +9,7 @@ urlpatterns = [
     path('review/', include('review.urls')), # URL สำหรับ review
     path('payment/', include('payment.urls')), # URL สำหรับ payment
     path('receipt/', include('receipt.urls')), # URL สำหรับ receipt
+    path('tracking/', include('tracking.urls')), # URL สำหรับ tracking
+    path('product/', include('product.urls')), # URL สำหรับ product
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -19,8 +19,8 @@ class PaymentForm(forms.ModelForm):
             'payment_image': forms.FileInput(attrs={'class': 'form-control', 'required': 'required'}),  
         }
 
-    def __init__(self, *args, **kwargs): 
-        super().__init__(*args, **kwargs) 
+    def __init__(self, *args, **kwargs): # สร้างเมธอด __init__ สำหรับกำหนดค่าให้กับ order_id
+        super().__init__(*args, **kwargs)  
         self.fields['order_id'].queryset = Order.objects.exclude( 
             order_id__in=Payment.objects.values_list("order_id", flat=True) 
         ).select_related('user') 

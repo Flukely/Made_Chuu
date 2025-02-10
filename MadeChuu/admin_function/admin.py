@@ -1,6 +1,5 @@
 from django.contrib import admin
-from main.models import User, Product, Category, Shop, Cart, Order, OrderProduct, StatusOrder, ShippingBrand, Payment, Receipt, DeliveryStatus, Review, Claim, Chat, ChatMessage, Admin
-
+from main.models import *
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('user_id', 'user_name', 'email', 'phone_num', 'join_date')
@@ -87,3 +86,8 @@ class ChatMessageAdmin(admin.ModelAdmin):
 class AdminAdmin(admin.ModelAdmin):
     list_display = ('admin_id', 'admin_name', 'shop')
     search_fields = ('admin_name', 'shop__shop_name')
+
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ('cart', 'product', 'quantity')
+    search_fields = ('cart__cart_id', 'product__product_name')
