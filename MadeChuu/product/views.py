@@ -1,19 +1,54 @@
 from django.shortcuts import render
-from main.models import Product, Category, Shop
-from .filters import ProductFilter
+from main.models import *
+from .filters import ProductFilter, ShopFilter
+from .forms import CartForm
+from django.shortcuts import render , redirect ,get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 
 def product(request):
-    products = Product.objects.all()
     categories = Category.objects.all()
-    product_filter = ProductFilter(request.GET, queryset=Product.objects.all())
-    return render(request, 'product.html', {'filter': product_filter, categories: 'categories'})
-def shop1(request):
-    shop = Shop.objects.get(shop_id=1)
-    products = Product.objects.filter(shop=shop)[:16]
-    categories = Category.objects.all()
-    return render(request, 'shop1.html', {'products': products, 'categories': categories, 'shop': shop})
-def shop2(request):
-    shop = Shop.objects.get(shop_id=2)
-    products = Product.objects.filter(shop=shop)[:29]
-    categories = Category.objects.all()
-    return render(request, 'shop2.html', {'products': products, 'categories': categories, 'shop': shop})
+
+    shop_filter = ShopFilter(request.GET, queryset=Shop.objects.all())
+    
+    # Combine the filtered results
+    if shop_filter.qs.exists():
+        selected_shop = shop_filter.qs.first()
+        product_filter = ProductFilter(request.GET, queryset=Product.objects.filter(shop=selected_shop))
+        categories = Category.objects.filter(product__shop=selected_shop).distinct()
+    else:
+        product_filter = ProductFilter(request.GET, queryset=Product.objects.all())
+    filtered_products = product_filter.qs
+    
+    context = {
+        'categories': categories,
+        'filtered_products': filtered_products,
+        'product_filter': product_filter,
+        'shop_filter': shop_filter,
+    }
+    
+    return render(request, 'product.html', context)
+
+def add_cart(request , product_id):
+    # test user session
+    request.session['user_id'] = 1
+    ## end test user session
+    product = get_object_or_404(Product, product_id=product_id)
+    user_id = request.session.get('user_id')
+
+    if not user_id:
+        return redirect ('login')
+    
+    quantity = int(request.POST.get('quantity', 1))
+
+    cart, created = Cart.objects.get_or_create(user_id=user_id)
+    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product , quantity=quantity)
+
+    if not created:
+        cart_item.quantity += quantity
+    else:
+        cart_item.quantity = quantity
+    cart_item.save()
+
+    cart.save()
+    
+    return redirect('product')
