@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Product, Category, Shop, Cart, Order, OrderProduct, StatusOrder, ShippingBrand, Payment, Receipt, DeliveryStatus, Review, Claim, Chat, ChatMessage, Admin
+from main.models import User, Product, Category, Shop, Cart, Order, OrderProduct, StatusOrder, ShippingBrand, Payment, Receipt, DeliveryStatus, Review, Claim, Chat, ChatMessage, Admin
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
@@ -24,12 +24,12 @@ class ShopAdmin(admin.ModelAdmin):
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ('cart_id', 'user', 'product', 'quantity', 'total_price')
-    search_fields = ('user__user_name', 'product__product_name')
+    list_display = ('cart_id', 'user', 'total_price')
+    search_fields = ('user__user_name', )
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('order_id', 'user', 'quantity', 'total_price', 'order_date', 'status_order', 'place_delivery', 'shipper', 'tracking_num', 'delivery_date')
+    list_display = ('order_id', 'user', 'total_price', 'order_date', 'status_order', 'place_delivery', 'shipper', 'tracking_num', 'delivery_date')
     search_fields = ('user__user_name', 'status_order__status_name', 'shipper__shipper_name')
     list_filter = ('status_order', 'shipper')
 

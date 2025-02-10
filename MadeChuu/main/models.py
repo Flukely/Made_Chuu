@@ -45,7 +45,7 @@ class Category(models.Model):
     shop = models.ForeignKey('Shop', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"Category ID: {self.category_id if self.category_id else 'No Category'}, Category Name: {self.category_name if self.category_name else 'No Category'}"
+        return self.category_name
     class Meta:
         db_table = 'Category'
 
@@ -57,26 +57,34 @@ class Shop(models.Model):
     phone_num = models.CharField(max_length=10)
 
     def __str__(self):
-        return f"Shop ID: {self.shop_id if self.shop_id else 'No Shop'}, Shop Name: {self.shop_name if self.shop_name else 'No Shop'}"
+        return self.shop_name 
     class Meta:
         db_table = 'Shop'
 
 class Cart(models.Model):
     cart_id = models.AutoField(primary_key=True)
     user = models.ForeignKey('User', on_delete=models.CASCADE)
-    product = models.ForeignKey('Product', on_delete=models.CASCADE)
-    quantity = models.IntegerField()
     total_price = models.FloatField()
 
     def __str__(self):
-        return f"Cart ID: {self.cart_id if self.cart_id else 'No Cart'}, User ID: {self.user.user_id if self.user else 'No User'}, Product ID: {self.product.product_id if self.product else 'No Product'}"
+        return f"Cart ID: {self.cart_id if self.cart_id else 'No Cart'}, User ID: {self.user.user_id if self.user else 'No User'}"
     class Meta:
         db_table = 'Cart'
+
+class CartItem(models.Model):
+    id = models.AutoField(primary_key=True)
+    cart = models.ForeignKey('Cart', on_delete=models.CASCADE)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+
+    def __str__(self):
+        return f"Cart ID: {self.cart.cart_id if self.cart else 'No Cart'}, Product ID: {self.product.product_id if self.product else 'No Product'}"
+    class Meta:
+        db_table = 'CartItem'
 
 class Order(models.Model):
     order_id = models.AutoField(primary_key=True)
     user = models.ForeignKey('User', on_delete=models.CASCADE)
-    quantity = models.IntegerField()
     total_price = models.FloatField()
     order_date = models.DateTimeField(auto_now_add=True)
     status_order = models.ForeignKey('StatusOrder', on_delete=models.CASCADE, blank=True, null=True)
@@ -105,7 +113,7 @@ class StatusOrder(models.Model):
     status_name = models.CharField(max_length=255)
 
     def __str__(self):
-        return f"Status Order ID: {self.status_order_id if self.status_order_id else 'No Status'}, Status Name: {self.status_name if self.status_name else 'No Status'}"
+        return self.status_name
     class Meta:
         db_table = 'StatusOrder'
 
