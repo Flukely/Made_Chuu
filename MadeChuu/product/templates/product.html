@@ -1,0 +1,162 @@
+<!-- filepath: /c:/xampp/htdocs/madechuu/Made_Chuu/MadeChuu/main/templates/product.html -->
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Product List | Made Chuu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .dropdown .btn-secondary {
+            background: linear-gradient(to right, #FF66B2,rgb(238, 51, 255));
+            border: none;
+            padding: 10px 15px;
+            font-weight: bold;
+            border-radius: 25px;
+        }
+        
+        .dropdown .btn-secondary:hover {
+            background: linear-gradient(to right, #FF3399, #FF0066);
+        }
+        
+        .dropdown-menu {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #fff;
+        }
+        
+        .dropdown-item {
+            font-size: 16px;
+            padding: 10px 15px;
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #FF99CC;
+            color: white;
+        }
+        
+        body {
+            background: linear-gradient(to right, #ffe6f2, #ffccff);
+        }
+        .header {
+            background: linear-gradient(45deg, #FF99CC, #FF66B2);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+        .header h1 {
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        .search-box {
+            border-radius: 20px;
+            border: none;
+            padding: 8px 15px;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card img {
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            object-fit: cover;
+            height: 200px;
+        }
+        .card-title {
+            color: #FF3399;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, #FF66B2, #FF3399);
+            border: none;
+            transition: 0.3s;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(to right, #FF3399, #FF0066);
+        }
+        .btn-buy-now {
+            background: linear-gradient(to right, #FF3399, #FF0066);
+            border: none;
+            color: white;
+            transition: 0.3s;
+        }
+        .btn-buy-now:hover {
+            background: linear-gradient(to right, #FF0066, #CC0052);
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header d-flex justify-content-between align-items-center my-4">
+            <h1><img src="https://via.placeholder.com/50" class="me-2"> Made Chuu - Product List</h1>
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="shopDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    Select Shop
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="shopDropdown">
+                    <li><a class="dropdown-item" href="{% url 'shop1' %}">Kajang</a></li>
+                    <li><a class="dropdown-item" href="{% url 'shop2' %}">Mommam</a></li>
+                    <li><a class="dropdown-item" href="{% url 'product' %}">All</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Category Filter Form -->
+        <form method="get" class="d-flex align-items-center mb-4">
+            {{ filter.form.as_p }}
+            <button type="submit" class="btn btn-primary ms-2">Search</button>
+        </form>
+        <h2 class="text-center text-pink mb-4">✨ All Products ✨</h2>
+
+        <!-- Product List -->
+        <div id="product-list">
+            <div class="row">
+                {% for product in filter.qs %}
+                <div class="col-lg-3 col-md-6 mb-4 product-item" data-category="{{ product.category.category_name }}">
+                    <div class="card h-100">
+                        <img class="card-img-top" src="{{ product.image_url }}" alt="{{ product.name }}">
+                        <div class="card-body text-center">
+                            <h4 class="card-title">{{ product.name }}</h4>
+                            <p class="card-text">Product Name: {{ product.product_name }}</p>
+                            <p class="card-text"><strong>Category:</strong> {{ product.category.category_name }}</p>
+                            <p class="card-text"><strong>Stock:</strong> {{ product.quantity }}</p>
+                            <p class="card-text text-muted">{{ product.price }} ฿</p>
+                            <p class="card-text"><strong>Created:</strong> {{ product.created }}</p>
+                        </div>
+                        <div class="card-footer d-flex justify-content-around">
+                            <button class="btn btn-primary w-50" onclick="addToCart({{ product.id }})">🛒 Add to Cart</button>
+                            <button class="btn btn-buy-now w-50" onclick="buyNow({{ product.id }})">⚡ Buy Now</button>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No products available.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function addToCart(productId) {
+            alert("✅ Product " + productId + " added to cart!");
+        }
+
+        function buyNow(productId) {
+            alert("🚀 Purchased product " + productId + " successfully!");
+        }
+    </script>
+</body>
+</html>
