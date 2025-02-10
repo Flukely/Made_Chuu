@@ -58,6 +58,15 @@
             background-color: #ff748c;
         }
 
+        .btn-primary:active {
+            background-color: #ff4c6d;
+        }
+
+        .btn-primary:focus {
+            background-color: #ff4c6d;
+            box-shadow: none;
+        }
+
         .star-rating {
             display: flex;
             gap: 5px;
@@ -115,7 +124,7 @@
             <div class="review-card" id="review-card-{{ product.product_id }}-{{ order.order.order_id }}">
                 <div class="d-flex align-items-center mb-3">
                     {% if product.product_image %}
-                    <img src="{{ product.product_image }}" alt="{{ product.product_name }}" class="me-3">
+                    <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" class="me-3">
                     {% else %}
                     <div class="me-3 text-muted">ไม่มีรูปภาพ</div>
                     {% endif %}
