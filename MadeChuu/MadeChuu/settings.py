@@ -40,7 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main',  # เพิ่ม app ที่ชื่อ main เข้าไป
+    'main',
+    'review',
+    'payment',
+    'receipt',
 ]
 
 JAZZMIN_SETTINGS = {
