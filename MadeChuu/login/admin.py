@@ -1,5 +1,5 @@
 from django.contrib import admin
-from main.models import User, Product, Category, Shop, Cart, Order, OrderProduct, StatusOrder, ShippingBrand, Payment, Receipt, DeliveryStatus, Review, Claim, Chat, ChatMessage, Admin
+from main.models import *
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
