@@ -1,252 +1,89 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
-from django.db import models
+from django.contrib import admin
+from main.models import User, Product, Category, Shop, Cart, Order, OrderProduct, StatusOrder, ShippingBrand, Payment, Receipt, DeliveryStatus, Review, Claim, Chat, ChatMessage, Admin
 
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('user_id', 'user_name', 'email', 'phone_num', 'join_date')
+    search_fields = ('user_name', 'email', 'phone_num')
 
-class Admin(models.Model):
-    admin_id = models.AutoField(primary_key=True)
-    shop = models.ForeignKey('Shop', models.DO_NOTHING, blank=True, null=True)
-    firstname_admin = models.CharField(max_length=100, blank=True, null=True)
-    lastname_admin = models.CharField(max_length=100, blank=True, null=True)
-    password = models.CharField(max_length=255, blank=True, null=True)
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('product_id', 'product_name', 'category', 'shop', 'price', 'quantity', 'created')
+    search_fields = ('product_name', 'category__category_name', 'shop__shop_name')
+    list_filter = ('category', 'shop')
 
-    class Meta:
-        managed = False
-        db_table = 'admin'
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('category_id', 'category_name', 'shop')
+    search_fields = ('category_name', 'shop__shop_name')
 
+@admin.register(Shop)
+class ShopAdmin(admin.ModelAdmin):
+    list_display = ('shop_id', 'shop_name', 'owner_name', 'phone_num')
+    search_fields = ('shop_name', 'owner_name', 'phone_num')
 
-class Cart(models.Model):
-    cart_id = models.AutoField(primary_key=True)
-    product = models.ForeignKey('Product', models.DO_NOTHING, blank=True, null=True)
-    user = models.ForeignKey('User', models.DO_NOTHING, blank=True, null=True)
-    quantity = models.IntegerField(blank=True, null=True)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    list_display = ('cart_id', 'user', 'total_price')
+    search_fields = ('user__user_name', )
 
-    class Meta:
-        managed = False
-        db_table = 'cart'
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('order_id', 'user', 'total_price', 'order_date', 'status_order', 'place_delivery', 'shipper', 'tracking_num', 'delivery_date')
+    search_fields = ('user__user_name', 'status_order__status_name', 'shipper__shipper_name')
+    list_filter = ('status_order', 'shipper')
 
+@admin.register(OrderProduct)
+class OrderProductAdmin(admin.ModelAdmin):
+    list_display = ('order', 'product', 'quantity')
+    search_fields = ('order__order_id', 'product__product_name')
 
-class Category(models.Model):
-    category_id = models.AutoField(primary_key=True)
-    category_name = models.CharField(max_length=255, blank=True, null=True)
-    shop = models.ForeignKey('Shop', models.DO_NOTHING, blank=True, null=True)
+@admin.register(StatusOrder)
+class StatusOrderAdmin(admin.ModelAdmin):
+    list_display = ('status_order_id', 'status_name')
+    search_fields = ('status_name',)
 
-    class Meta:
-        managed = False
-        db_table = 'category'
+@admin.register(ShippingBrand)
+class ShippingBrandAdmin(admin.ModelAdmin):
+    list_display = ('shipper_id', 'shipper_name', 'phone_num')
+    search_fields = ('shipper_name', 'phone_num')
 
+@admin.register(Payment)
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = ('payment_id', 'order', 'payment_date', 'payment_status')
+    search_fields = ('order__order_id', 'payment_status')
 
-class Claim(models.Model):
-    claim_id = models.AutoField(primary_key=True)
-    order = models.ForeignKey('Order', models.DO_NOTHING, blank=True, null=True)
-    claim_date = models.DateTimeField(blank=True, null=True)
-    status = models.CharField(max_length=50, blank=True, null=True)
-    comment = models.TextField(blank=True, null=True)
-    claim_image = models.CharField(max_length=255, blank=True, null=True)
-    image_detail = models.CharField(max_length=255, blank=True, null=True)
+@admin.register(Receipt)
+class ReceiptAdmin(admin.ModelAdmin):
+    list_display = ('receipt_id', 'order', 'payment', 'receipt_date')
+    search_fields = ('order__order_id', 'payment__payment_id')
 
-    class Meta:
-        managed = False
-        db_table = 'claim'
+@admin.register(DeliveryStatus)
+class DeliveryStatusAdmin(admin.ModelAdmin):
+    list_display = ('delivery_status_id', 'delivery_status_name')
+    search_fields = ('delivery_status_name',)
 
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('review_id', 'order', 'product', 'rating', 'review_date')
+    search_fields = ('order__order_id', 'product__product_name', 'rating')
 
-class Delivery(models.Model):
-    delivery_id = models.AutoField(primary_key=True)
-    order = models.ForeignKey('Order', models.DO_NOTHING, blank=True, null=True)
-    shipper = models.ForeignKey('ShippingBrand', models.DO_NOTHING, blank=True, null=True)
-    delivery_date = models.DateTimeField(blank=True, null=True)
-    delivery_status = models.CharField(max_length=50, blank=True, null=True)
-    tracking_num = models.CharField(max_length=50, blank=True, null=True)
+@admin.register(Claim)
+class ClaimAdmin(admin.ModelAdmin):
+    list_display = ('claim_id', 'order', 'reason', 'claim_status', 'claim_date')
+    search_fields = ('order__order_id', 'reason', 'claim_status')
 
-    class Meta:
-        managed = False
-        db_table = 'delivery'
+@admin.register(Chat)
+class ChatAdmin(admin.ModelAdmin):
+    list_display = ('chat_id', 'user')
+    search_fields = ('user__user_name',)
 
+@admin.register(ChatMessage)
+class ChatMessageAdmin(admin.ModelAdmin):
+    list_display = ('chat', 'message', 'created')
+    search_fields = ('chat__chat_id', 'message')
 
-class FavoriteProducts(models.Model):
-    favorite_products_id = models.AutoField(primary_key=True)
-    product = models.ForeignKey('Product', models.DO_NOTHING, blank=True, null=True)
-    user = models.ForeignKey('User', models.DO_NOTHING, blank=True, null=True)
-    added_date = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'favorite_products'
-
-
-class Order(models.Model):
-    order_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey('User', models.DO_NOTHING, blank=True, null=True)
-    place_delivery = models.CharField(max_length=255, blank=True, null=True)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    shipper_id = models.IntegerField(blank=True, null=True)
-    order_date = models.DateTimeField(blank=True, null=True)
-    delivery_date = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'order'
-
-
-class OrderProducts(models.Model):
-    order = models.OneToOneField(Order, models.DO_NOTHING, primary_key=True)  # The composite primary key (order_id, product_id) found, that is not supported. The first column is selected.
-    product = models.ForeignKey('Product', models.DO_NOTHING)
-    quantity = models.IntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'order_products'
-        unique_together = (('order', 'product'),)
-
-
-class Payment(models.Model):
-    payment_id = models.AutoField(primary_key=True)
-    order = models.ForeignKey(Order, models.DO_NOTHING, blank=True, null=True)
-    payment_date = models.DateTimeField(blank=True, null=True)
-    payment_status = models.CharField(max_length=50, blank=True, null=True)
-    image_payment = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'payment'
-
-
-class Product(models.Model):
-    product_id = models.AutoField(primary_key=True)
-    shop = models.ForeignKey('Shop', models.DO_NOTHING, blank=True, null=True)
-    product_name = models.CharField(max_length=255, blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    quantity = models.IntegerField(blank=True, null=True)
-    category = models.ForeignKey(Category, models.DO_NOTHING, blank=True, null=True)
-    product_image = models.CharField(max_length=255, blank=True, null=True)
-    created = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'product'
-
-
-class Promotion(models.Model):
-    promotion_id = models.AutoField(primary_key=True)
-    promotion_name = models.CharField(max_length=255, blank=True, null=True)
-    promotion_type = models.CharField(max_length=50, blank=True, null=True)
-    discount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    start_date = models.DateTimeField(blank=True, null=True)
-    end_date = models.DateTimeField(blank=True, null=True)
-    promotion_image = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'promotion'
-
-
-class PromotionProducts(models.Model):
-    promotion = models.OneToOneField(Promotion, models.DO_NOTHING, primary_key=True)  # The composite primary key (promotion_id, product_id) found, that is not supported. The first column is selected.
-    product = models.ForeignKey(Product, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'promotion_products'
-        unique_together = (('promotion', 'product'),)
-
-
-class Receipt(models.Model):
-    receipt_id = models.AutoField(primary_key=True)
-    payment = models.ForeignKey(Payment, models.DO_NOTHING, blank=True, null=True)
-    order = models.ForeignKey(Order, models.DO_NOTHING, blank=True, null=True)
-    receipt_date = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'receipt'
-
-
-class RecommendedProduct(models.Model):
-    recommend_products_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey('User', models.DO_NOTHING, blank=True, null=True)
-    product = models.ForeignKey(Product, models.DO_NOTHING, blank=True, null=True)
-    recommended_date = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'recommended_product'
-
-
-class Review(models.Model):
-    review_id = models.AutoField(primary_key=True)
-    order = models.ForeignKey(Order, models.DO_NOTHING, blank=True, null=True)
-    review_date = models.DateTimeField(blank=True, null=True)
-    rating = models.IntegerField(blank=True, null=True)
-    review_text = models.CharField(max_length=1000, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'review'
-
-
-class ShippingBrand(models.Model):
-    shipper_id = models.AutoField(primary_key=True)
-    shipper_company = models.CharField(max_length=255, blank=True, null=True)
-    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'shipping_brand'
-
-
-class Shop(models.Model):
-    shop_id = models.AutoField(primary_key=True)
-    shop_name = models.CharField(max_length=255, blank=True, null=True)
-    owner_name = models.CharField(max_length=255, blank=True, null=True)
-    location = models.CharField(max_length=255, blank=True, null=True)
-    phone_num = models.CharField(max_length=15, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'shop'
-
-
-class Transaction(models.Model):
-    transaction_id = models.AutoField(primary_key=True)
-    order = models.ForeignKey(Order, models.DO_NOTHING, blank=True, null=True)
-    transaction_type = models.ForeignKey('TransactionType', models.DO_NOTHING, blank=True, null=True)
-    transaction_date = models.DateTimeField(blank=True, null=True)
-    admin = models.ForeignKey(Admin, models.DO_NOTHING, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'transaction'
-
-
-class TransactionType(models.Model):
-    transaction_type_id = models.AutoField(primary_key=True)
-    transaction_name = models.CharField(max_length=100, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'transaction_type'
-
-
-class User(models.Model):
-    user_id = models.AutoField(primary_key=True)
-    user_name = models.CharField(max_length=255, blank=True, null=True)
-    address = models.CharField(max_length=255, blank=True, null=True)
-    district = models.CharField(max_length=100, blank=True, null=True)
-    province = models.CharField(max_length=100, blank=True, null=True)
-    post_code = models.IntegerField(blank=True, null=True)
-    gender = models.CharField(max_length=10, blank=True, null=True)
-    age = models.IntegerField(blank=True, null=True)
-    email = models.CharField(max_length=255, blank=True, null=True)
-    phone_num = models.CharField(max_length=15, blank=True, null=True)
-    join_date = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'user'
+@admin.register(Admin)
+class AdminAdmin(admin.ModelAdmin):
+    list_display = ('admin_id', 'admin_name', 'shop')
+    search_fields = ('admin_name', 'shop__shop_name')
