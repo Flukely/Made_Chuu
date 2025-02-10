@@ -35,12 +35,15 @@ def PromotionsAdmin(request):
     return render(request, 'admin_function/PromotionsAdmin.html')
 
 def product_list(request):
+    request.session['shop_id'] = 1
     product_filter = ProductFilter(request.GET, queryset=Product.objects.all())
     if request.method == 'POST':
         add_form = ProductForm(request.POST, request.FILES)
         if add_form.is_valid():
-            add_form.save()
-            return redirect('ProductsAdmin') 
+            product = add_form.save(commit=False)
+            product.shop_id = request.session.get('shop_id')
+            product.save()
+            return redirect('ProductsAdmin')
     else:
         add_form = ProductForm()
     return render(request, "admin_function/ProductsAdmin.html", 
