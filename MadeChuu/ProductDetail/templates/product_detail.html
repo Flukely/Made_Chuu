@@ -101,7 +101,9 @@
                         <div class="review">
                             <div id="user">{{review.order.user.user_name}} </div>
                             <div class="star-rating" data-rating="{{ review.rating }}"></div>
-                            <!--<div> {{review.review_image}}-->
+                            <div class="col-md-6 text-center" id = "review_image">
+                                <img src ="{{review.review_image.url}}" alt="User Image" class="img-fluid rounded review_image">
+                            </div>
                             <div>{{ review.review_date }}</div>
                             <div>{{ review.review_text }}</div>
                             <br>
