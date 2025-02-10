@@ -60,7 +60,7 @@
                         <small>{{product.price}}</small><br>
                         <small>in Stock : {{product.quantity}}</small>
                         <br><br>
-                        <div class="button-edit-delete">
+                        <div class="button-edit-delete d-flex justify-content-center">
                             <form method="GET" action="{% url 'edit_product' product.product_id %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="product_id" value="{{ product.product_id }}">

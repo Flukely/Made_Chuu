@@ -22,7 +22,8 @@
     <div class="d-flex justify-content-between align-items-end mb-3">
         <div class = "d-flex ml-3 align-items-end">
             <h1 class="display-6 mb-1 ml-2">Order </h1>
-            <h6 class="text-primary wow fadeInUp " id = "">คำสั่งซื้อ | สถานะกำลังรอ </h6>
+            <h6 class="text-primary wow fadeInUp " id = "">
+                คำสั่งซื้อ | </h6>
         </div>
       <form method="GET" class="d-flex align-items-end width-100">
           <div class="form-group flex-grow-1 mb-0">
@@ -50,7 +51,7 @@
                   </tr>
               </thead>
               <tbody>
-                {% for orders in orders.qs %}
+                {% for orders in page_obj %}
                   <tr class = "wow fadeInUp">
                       <td>{{orders.order_id}}</td>
                       <td>{{orders.user.user_name}}</td>
@@ -59,7 +60,7 @@
                       <td>{{orders.place_delivery}}</td>
                       <td>{{orders.status_order.status_name}}</td>
                       <td>
-                          <button class='btn btn-success' type='button' data-bs-toggle='modal'> 
+                          <button class='btn btn-success' type='button' data-bs-toggle='modal' data-bs-target='#ShowCheckOrder'> 
                               <i class='fa-solid fa-paper-plane'></i>
                           </button>
                       </td>
@@ -71,6 +72,44 @@
           </table>
       </div>
   </div>
+</div>
+    <!-- Pagination -->
+<div class="d-flex justify-content-center">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
 </div>
 <div>
         <!-- modal-->
@@ -101,6 +140,9 @@
                         </div>
                     </div>
                 </div>
+        </div>
+    </div>
+    <!-- modal-->
 
                 <div class="modal fade" id="ShowDetailOrder" tabindex="-1" aria-labelledby="ShowDetailOrder"
                 aria-hidden="true">
@@ -124,60 +166,4 @@
 
         
 </div>
-<script>
-    var showDetailOrderModal = document.getElementById('ShowCheckOrder');
-    showDetailOrderModal.addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget; // Button that triggered the modal
-        var orderId = button.getAttribute('data-order-id'); // Extract info from data-* attributes
-
-        // Update the modal's content.
-        var modalTitle = showDetailOrderModal.querySelector('.modal-title span#modalOrderID');
-        modalTitle.textContent = orderId;
-
-        // Fetch order details using AJAX or update other modal fields here
-        // Example:
-        // fetch('/get-order-details/?order_id=' + orderId)
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         document.getElementById('Username').value = data.username;
-        //         document.getElementById('ClaimProduct').value = data.claim_product;
-        //         document.querySelector('textarea').value = data.detail_for_claim;
-        //         // Update other fields as needed
-        //     });
-    });
-
-    document.getElementById('confirmOrderButton').addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent the default form submission
-
-        var orderId = document.querySelector('.modal-title span#modalOrderID').textContent;
-
-        // Send AJAX request to update order status
-        fetch('/update-order-status/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token for security
-            },
-            body: JSON.stringify({
-                order_id: orderId,
-                status: 'confirm'
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Close the modal and refresh the page or update the UI as needed
-                showDetailOrderModal.modal('hide');
-                location.reload();
-            } else {
-                // Handle error
-                alert('Failed to update order status');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred');
-        });
-    });
-</script>
 {% endblock%}

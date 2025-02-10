@@ -2,7 +2,8 @@ from django.shortcuts import render , redirect ,get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from .filters import *
 from .forms import ProductForm 
-from .models import *
+from main.models import *
+from django.core.paginator import Paginator
 
 def admin_function(request):
     return render(request, 'admin_function/Dashboard.html')
@@ -14,7 +15,11 @@ def ChatAdmin(request):
 def OrderAdmin(request):
     #Query from model Order
     order_filter = OrderFilter(request.GET, queryset=Order.objects.all())
-    return render(request, 'admin_function/OrderAdmin.html',{'orders':order_filter})
+    paginator = Paginator(order_filter.qs, 10)
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'admin_function/OrderAdmin.html',{'orders':order_filter , 'page_obj': page_obj}) 
 
 def Dashboard(request):
     return render(request, 'admin_function/Dashboard.html')
