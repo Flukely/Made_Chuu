@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+LOGIN_REDIRECT_URL = '/chat/'
 
 # Application definition
 
@@ -38,6 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main',  # เพิ่ม app ที่ชื่อ main เข้าไป
+    'chat',
+    'django_htmx',
+    "django_bootstrap5",
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -69,7 +74,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'MadeChuu.wsgi.application'
-
+ASGI_APPLICATION = 'MadeChuu.routing.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
