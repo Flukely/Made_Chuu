@@ -50,38 +50,42 @@ def delete(request, id):                  #ลบสินค้าในตะ�
     return redirect('AddCart')
 
 @csrf_exempt
-def place_order(request):                 #ขั้นตอนการส่งข้อมูลไปยัง Order 
-    if request.method == 'POST': 
-        data = json.loads(request.body)
-        items = data.get('items', []) 
-        total_price = data.get('total_price', 0)
+def place_order(request):
+    user_id = request.session.get('user_id', 1)
+    if request.method == 'POST':
+        order_data = json.loads(request.POST.get('order_data'))
+        items = order_data.get('items', [])
+        total_price = order_data.get('total_price', 0)
 
         if not items:
             return JsonResponse({'success': False, 'message': 'ไม่มีสินค้าที่เลือก'})
 
-        user = User.objects.first() 
-        
+        user = User.objects.get(user_id=user_id)
+
         order = Order.objects.create(
             user=user,
-            quantity=len(items),
             total_price=total_price,
-            status_order=None, 
             place_delivery=user.address,
-            shipper=None, 
+            status_order=None,
+            shipper=None,
             tracking_num='',
             delivery_date=None
         )
+
         for item in items:
-            product = Product.objects.get(id=item['id']) 
+            product = Product.objects.get(product_id=item['product_id'])
             OrderProduct.objects.create(
                 order=order,
                 product=product,
                 quantity=item['quantity']
             )
-        
-        return JsonResponse({'success': True})
-    
-    return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
+        # ลบสินค้าที่เลือกในฐานข้อมูล
+        item_ids = [item['product_id'] for item in items]
+        CartItem.objects.filter(cart__user_id=user_id, product_id__in=item_ids).delete()
+
+        return redirect('AddCart')
+    return redirect('AddCart')
    
 
 @csrf_exempt          
@@ -97,7 +101,6 @@ def delete_cart_items(request):                   #กดสั่งซื้�
         return JsonResponse({'status': 'success'})
 
     return JsonResponse({'status': 'failed'}, status=400)
-
     
     
 

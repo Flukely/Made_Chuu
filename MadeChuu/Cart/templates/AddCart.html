@@ -90,6 +90,7 @@
                             
                             <!-- เอาไว้เก็บข้อมูลสินค้าเพื่อใช้ในหน้าต่อไป นะเตง -->
                             <input type="checkbox" class="form-check-input me-2 item-checkbox" 
+                                data-id="{{ Item.product.product_id }}"
                                 data-name="{{ Item.product.product_name }}" 
                                 data-price="{{ Item.product.price }}" 
                                 data-image="{{ Item.product.product_image.url }}" 

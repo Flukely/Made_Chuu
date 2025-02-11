@@ -18,7 +18,6 @@
         
         .container {
             max-width: 1000px;
-            
         }
 
         .card {
@@ -137,45 +136,38 @@
             // เมื่อกดปุ่ม "สั่งสินค้า"
             orderBtn.addEventListener("click", function () {
                 let orderData = {
-                    items: selectedItems,
+                    items: selectedItems.map(item => ({
+                        product_id: item.id,  // ตรวจสอบให้แน่ใจว่ามีคีย์ product_id
+                        quantity: item.quantity
+                    })),
                     total_price: totalPrice
                 };
 
                 // เพิ่มการตั้งค่า CSRF token
                 let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-                fetch('/place_order/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken
-                    },
-                    body: JSON.stringify(orderData)
-                })
-                .then(() => {
-                    alert("สั่งซื้อสำเร็จ! 🎉");
-                    localStorage.removeItem("selectedCartItems"); // เคลียร์สินค้าใน localStorage
+                // สร้างฟอร์มเพื่อส่งข้อมูลไปยังเซิร์ฟเวอร์
+                let form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/place_order/';
+                form.style.display = 'none';
 
-                    // ลบสินค้าที่เลือกในฐานข้อมูล 
-                    fetch('/delete_cart_items/', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': csrfToken
-                        },
-                        body: JSON.stringify({ items: selectedItems })
-                    })
-                    .then(() => {
-                        window.location.href = "/"; // กลับไปหน้าหลัก
-                    })
-                    .catch(() => {
-                        window.location.href = "/"; // กลับไปหน้าหลัก
-                    });
-                })
-                .catch(() => {
-                    localStorage.removeItem("selectedCartItems"); // เคลียร์สินค้าใน localStorage
-                    window.location.href = "/"; // กลับไปหน้าหลัก
-                });
+                // เพิ่ม CSRF token ลงในฟอร์ม
+                let csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = csrfToken;
+                form.appendChild(csrfInput);
+
+                // เพิ่มข้อมูล orderData ลงในฟอร์ม
+                let orderDataInput = document.createElement('input');
+                orderDataInput.type = 'hidden';
+                orderDataInput.name = 'order_data';
+                orderDataInput.value = JSON.stringify(orderData);
+                form.appendChild(orderDataInput);
+
+                document.body.appendChild(form);
+                form.submit();
             });
         });
     </script>
@@ -215,7 +207,7 @@
     <!-- รวมและปุ่มสั่งสินค้า -->
     <div class="fixed-footer d-flex justify-content-between align-items-center">
         <div class="ms-auto">
-            <span class="fw-bold me-2">รวม: <span id="total-price" class="total-price">฿0.00</span></span>
+            <span class="fw-bold me-2">รวม: <span id="total-price" class="total-price" name = "total-price">฿0.00</span></span>
             <button id="order-btn" class="btn btn-danger disabled order-btn" >สั่งสินค้า</button>
         </div>
     </div>
