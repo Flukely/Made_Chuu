@@ -31,7 +31,7 @@ def product(request):
 
 def add_cart(request , product_id):
     # test user session
-    request.session['user_id'] = 1
+    request.session['user_id'] = 17
     ## end test user session
     product = get_object_or_404(Product, product_id=product_id)
     user_id = request.session.get('user_id')

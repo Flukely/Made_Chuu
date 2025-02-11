@@ -47,6 +47,11 @@ INSTALLED_APPS = [
     'tracking',
     'product',
     'claim',
+    'chat',
+    'allauth',
+    'ProductDetail',
+    'allauth.account',
+    'django_htmx',
 ]
 
 JAZZMIN_SETTINGS = {
@@ -185,6 +190,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+    'django_htmx.middleware.HtmxMiddleware',
 ]
 
 ROOT_URLCONF = 'MadeChuu.urls'
@@ -192,7 +199,7 @@ ROOT_URLCONF = 'MadeChuu.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "product" / "templates"],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

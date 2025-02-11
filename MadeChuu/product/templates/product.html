@@ -43,11 +43,11 @@
                         <small></small>
                         <br>
                         <div class="card-footer d-flex justify-content-around">
-                            <form method="POST" action="{% url 'add_cart' product.product_id %}">
+                            <form method="POST" action="{% url 'add_cart1' product.product_id %}">
                                 {% csrf_token %}
                                 <input type="number" name="quantity" value="1" min="1" class="form-control mb-2" style="width: 60px; display: inline-block;">
                                 <input type="hidden" name="product_id" value="{{ product.product_id }}">
-                                <button class='btn btn-primary w-20 btn-radius10' type='submit' onclick="addToCart({{ product.product.id }}">
+                                <button class='btn btn-primary w-20 btn-radius10' type='submit' onclick="addToCart({ product.product_id })">
                                     🛒 Add to Cart
                                 </button>
                             </form>
