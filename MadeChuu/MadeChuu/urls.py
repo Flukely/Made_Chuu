@@ -14,5 +14,6 @@ urlpatterns = [
     path('claim/', include('claim.urls')), # URL สำหรับ claim
     path('chat/', include('chat.urls')), # URL สำหรับ chat
     path('ProductDetail/', include('ProductDetail.urls')), # URL สำหรับ ProductDetail
+    path('Cart/', include('Cart.urls')), # URL สำหรับ cart
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

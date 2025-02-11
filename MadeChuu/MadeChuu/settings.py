@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'product',
     'claim',
     'chat',
+    'Cart',
     'allauth',
     'ProductDetail',
     'allauth.account',

@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect # นำเข้าฟังก์ชัน render และ redirect จาก Django
+from django.shortcuts import render, redirect, get_object_or_404 # นำเข้าฟังก์ชัน render และ redirect จาก Django
 from django.contrib import messages 
 from django.utils.timezone import now 
 from .form import PaymentForm 
-from main.models import Order  # นำเข้าโมเดล Order
+from main.models import Order,Receipt  # นำเข้าโมเดล Order
+
 
 # ฟังก์ชันสำหรับจัดการการชำระเงิน
 def payment(request): 

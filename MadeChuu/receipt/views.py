@@ -1,9 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from main.models import Receipt, OrderProduct, User, Order, Product, Shop  # นำเข้าโมเดล Shop
 
-def index(request):
-    return render(request, 'receipt.html')
-
 def receipt(request, receipt_id):
     receipt = get_object_or_404(Receipt, pk=receipt_id)  # แก้ไขการค้นหา
     order_items = OrderProduct.objects.filter(order_id=receipt.order_id)  # ดึงรายการสินค้าในคำสั่งซื้อ

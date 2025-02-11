@@ -19,7 +19,7 @@ def claim_request(request, order_id=1):  # รองรับทั้ง /claim
 
     return render(request, 'claim_form.html', {'form': form, 'order': order, 'orderproduct': orderproduct})
 
-def claim_status(request, claim_id=9):
+def claim_status(request, claim_id=2):
     claim = get_object_or_404(Claim, claim_id=claim_id)  # ใช้ get_object_or_404 แทน Claim.objects.get
     orderproduct = get_object_or_404(OrderProduct, order_id=claim.order.order_id)  # ใช้ get_object_or_404 แทน OrderProduct.objects.get
     context = {
@@ -35,6 +35,6 @@ def claim_status(request, claim_id=9):
     }
     return render(request, 'claim_status.html', context)
 
-def claim_success(request, claim_id=9):
+def claim_success(request, claim_id=3):
     claim = get_object_or_404(Claim, claim_id=claim_id)
     return render(request, 'claim_success.html', {'claim': claim})
