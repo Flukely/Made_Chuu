@@ -5,6 +5,7 @@ from .forms import CartForm
 from django.shortcuts import render , redirect ,get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
+
 def product(request):
     categories = Category.objects.all()
 
@@ -12,9 +13,9 @@ def product(request):
     
     # Combine the filtered results
     if shop_filter.qs.exists():
-        selected_shop = shop_filter.qs.first()
-        product_filter = ProductFilter(request.GET, queryset=Product.objects.filter(shop=selected_shop))
-        categories = Category.objects.filter(product__shop=selected_shop).distinct()
+        selected_shops = shop_filter.qs
+        product_filter = ProductFilter(request.GET, queryset=Product.objects.filter(shop__in=selected_shops))
+        categories = Category.objects.filter(product__shop__in=selected_shops).distinct()
     else:
         product_filter = ProductFilter(request.GET, queryset=Product.objects.all())
     filtered_products = product_filter.qs

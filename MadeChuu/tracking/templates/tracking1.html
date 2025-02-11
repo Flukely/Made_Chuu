@@ -61,13 +61,13 @@
         <!-- ถ้าออเดอร์มีมากกว่า 1 ชิ้น แสดงปุ่มเดียว -->
         {% if orderproducts|length > 1 %}
         <div class="btn-group">
-          <button class="btn btn-danger">คืนเงิน/คืนสินค้า</button>
-          <button class="btn btn-primary">ให้คะแนนสินค้า</button>
+          <a href="{% url 'claim_request' order_id=1 %}" class="btn btn-danger">คืนเงิน/คืนสินค้า</a>
+          <a href="{% url 'review_page' %}" class="btn btn-primary">ให้คะแนนสินค้า</a>
         </div>
         {% else %}
         {% for orderproduct in orderproducts %}
-        <button class="btn btn-danger">คืนเงิน/คืนสินค้า</button>
-        <button class="btn btn-primary">ให้คะแนนสินค้า</button>
+        <a href="{% url 'claim_request' order_id=1 %}" class="btn btn-danger">คืนเงิน/คืนสินค้า</a>
+        <a href="{% url 'review_page' %}" class="btn btn-primary">ให้คะแนนสินค้า</a>
         {% endfor %}
         {% endif %}
       </div>
@@ -111,7 +111,7 @@
       <table class="table table-bordered">
         <tr>
           <td>หมายเลขคำสั่งซื้อ</td>
-          <td>***** ***** ****</td>
+          <td>{{ order.order_id }}</td>
         </tr>
         <tr>
           <td>วันที่สั่งซื้อ</td>

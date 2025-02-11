@@ -11,5 +11,6 @@ urlpatterns = [
     path('receipt/', include('receipt.urls')), # URL สำหรับ receipt
     path('tracking/', include('tracking.urls')), # URL สำหรับ tracking
     path('product/', include('product.urls')), # URL สำหรับ product
+    path('claim/', include('claim.urls')), # URL สำหรับ claim
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

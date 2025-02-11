@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'receipt',
     'tracking',
     'product',
+    'claim',
 ]
 
 JAZZMIN_SETTINGS = {

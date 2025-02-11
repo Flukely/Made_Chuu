@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>หน้าแรก</title>
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
@@ -13,9 +12,13 @@
     <nav>
         <ul>
             <li><a href="#">หน้าแรก</a></li>
-            <li><a href="#">เกี่ยวกับเรา</a></li>
-            <li><a href="#">บริการ</a></li>
-            <li><a href="#">ติดต่อเรา</a></li>
+            <li><a href="{% url 'product' %}">รายการสินค้า</a></li>
+            <li><a href="{% url 'product' %}">ตระกร้า</a></li>
+            <li><a href="{% url 'track' order_id=1 %}">คำสั่งซื้อ</a></li>
+            <li><a href="{% url 'payment:payment' %}">ชำระเงิน</a></li>
+            <li><a href="{% url 'receipt:receipt' receipt_id=1 %}">ดูใบเสร็จ</a></li>
+            <li><a href="{% url 'review_page' %}">รีวิวสินค้า</a></li>
+            <li><a href="{% url 'claim_request' order_id=1 %}">เคลมสินค้า</a></li>
         </ul>
     </nav>
     <main>

@@ -69,7 +69,7 @@
     <div class="offcanvas-body px-0">
         <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
             <li class = "box-sidebar">
-                <a href="" class="nav-link text-truncate ">
+                <a href="#" class="nav-link text-truncate ">
                     <i class="fs-5 bi bi-clipboard-data"></i><span class="ms-1 d-none d-sm-inline">Shop</span> 
                 </a>
             </li>
@@ -80,13 +80,13 @@
 
             </li>
             <li class = "box-sidebar">
-                <a href="" class="nav-link text-truncate ">
-                    <i class="fs-5 bi bi-megaphone-fill"></i><span class="ms-1 d-none d-sm-inline">Check My order</span>
+                <a href="{% url 'track' order_id=1 %}" class="nav-link text-truncate ">
+                    <i class="fs-5 bi bi-megaphone-fill"></i><span class="ms-1 d-none d-sm-inline">Check My Order</span>
                 </a>
             </li>
             <li class = "box-sidebar">
-                <a href="" class="nav-link text-truncate">
-                 <i class="fs-5 bi bi-chat-left-dots-fill"></i><span class="ms-1 d-none d-sm-inline">Comments</span>
+                <a href="{% url 'review_page' %}" class="nav-link text-truncate">
+                 <i class="fs-5 bi bi-chat-left-dots-fill"></i><span class="ms-1 d-none d-sm-inline">My Review</span>
                 </a>
             </li>
         </ul>
