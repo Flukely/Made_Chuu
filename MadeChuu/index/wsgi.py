@@ -1,4 +1,4 @@
-# filepath: /c:/Users/milk/OneDrive - Naresuan University/เดสก์ท็อป/MadeChuu/MadeChuu/MadeChuu/wsgi.py
+# filepath: /c:/Users/milk/OneDrive - Naresuan University/เดสก์ท็อป/MadeChuu/MadeChuu/index/wsgi.py
 import os
 from django.core.wsgi import get_wsgi_application
 

@@ -1,0 +1,51 @@
+.banner {
+    background-color: #ff9fc2;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.product-card img {
+    height: 150px; /* ปรับขนาดความสูงของรูปภาพ */
+    object-fit: cover;
+}
+
+.product-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.navbar a.nav-link {
+    color: white !important;
+}
+
+.navbar {
+    background-color: #ff8ab5 !important;
+}
+
+/* เพิ่ม CSS สำหรับ footer */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    flex: 1;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #ff8cb6;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+}
