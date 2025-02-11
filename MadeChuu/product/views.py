@@ -4,7 +4,7 @@ from .filters import ProductFilter, ShopFilter
 from .forms import CartForm
 from django.shortcuts import render , redirect ,get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-
+from django.db.models import Avg
 
 def product(request):
     categories = Category.objects.all()
@@ -53,3 +53,35 @@ def add_cart(request , product_id):
     cart.save()
     
     return redirect('product')
+
+def product_detail(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+    reviews = Review.objects.filter(product=product)
+    reviews_avg = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+    return render(request, 'product_detail.html', {"product": product, "reviews": reviews, "average_rating": reviews_avg})
+
+def add_cart(request , product_id):
+    # test user session
+    request.session['user_id'] = 17
+    ## end test user session
+    product = get_object_or_404(Product, product_id=product_id)
+    user_id = request.session.get('user_id')
+
+    if not user_id:
+        return redirect ('login')
+    
+    quantity = int(request.POST.get('quantity', 1))
+
+    cart, created = Cart.objects.get_or_create(user_id=user_id)
+    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product , quantity=quantity)
+
+    if not created:
+        cart_item.quantity += quantity
+    else:
+        cart_item.quantity = quantity
+    cart_item.save()
+
+    cart.save()
+    
+    return redirect('product_detail')
+    
