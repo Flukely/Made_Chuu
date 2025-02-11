@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>MadeChuu</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
     <title>Product Detail</title>
     {% load static %}
     <!-- CSS only -->
@@ -16,6 +19,7 @@
             const countElement = document.getElementById("count");
             const btnIncrease = document.getElementById("increase");
             const btnDecrease = document.getElementById("decrease");
+            const formQuantity = document.getElementById("form-quantity");
 
             let count = parseInt(countElement.value);
             const maxLimit = parseInt(countElement.getAttribute("data-max")); // ดึงค่า limit
@@ -24,6 +28,7 @@
                 if (count < maxLimit) {
                     count++;
                     countElement.value = count;
+                    formQuantity.value = count;
                 }
             });
 
@@ -31,6 +36,7 @@
                 if (count > 0) {
                     count--;
                     countElement.value = count;
+                    formQuantity.value = count;
                 }
             });
         });
@@ -74,8 +80,13 @@
                     </div>
                 </div>
                 <div class="mt-4 d-flex gap-2">
-                    <button id ="buy"class="btn btn-primary btn-lg">Buy</button>
-                    <button id ="add-to-cart"class="btn btn-outline-secondary btn-lg">Add to Cart</button>
+                    <button id ="buy"class="btn btn-primary btn-lg" onclick ="buyNow({{product.product_id}})">Buy</button>
+                    <form method="POST" action="{% url 'add_cart' product.product_id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                        <input type="hidden" name="quantity" id = "form-quantity" value="1">
+                        <button type="submit" class="btn btn-outline-secondary btn-lg" onclick ="addToCart({{product.product_id}})">Add to Cart</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -118,4 +129,13 @@
         </div>
     </div>
 </body>
+<script>
+    function addToCart(productId) {
+        alert("✅ Product " + productId + " added to cart!");
+    }
+
+    function buyNow(productId) {
+        alert("🚀 Purchased product " + productId + " successfully!");
+    }
+</script>
 </html>
