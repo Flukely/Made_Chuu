@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %} Order_Check {% endblock %}
+{% block content %}
+  <!-- Page Header Start -->
+  <div class="container mt-5">
+    <h1 class="text-center text-primary">Orders</h1>
+    <p class="text-center text-muted">ตรวจสอบออเดอร์ / การขอคืนเงิน</p>
+    </div>
+  <div class="container-xxl mb-5">
+    <div class="container-fluid">
+                <!-- this is a Orders_confirm group-->
+  <div class="container-xxl mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+        <div class = "d-flex ml-3 align-items-end">
+            <h1 class="display-6 mb-1 ml-2">Order </h1>
+            <h6 class="text-primary wow fadeInUp " id = "">
+                คำสั่งซื้อ | </h6>
+        </div>
+      <form method="GET" class="d-flex align-items-end width-100">
+          <div class="form-group flex-grow-1 mb-0">
+              {{ orders.form.as_p }}
+          </div>
+          <button type="submit" class="btn btn-primary ml-1 mb-2">
+              <i class="fas fa-search"></i>
+          </button>
+      </form>
+  </div>
+<hr class = 'wow fadeInUp'>
+<div class="row">
+  <div class="col-lg-12">
+      <div class="table-responsive">
+          <table class="table table-striped table-boredered text-center wow fadeInUp">
+              <thead>
+                  <tr class = "wow fadeInUp">
+                      <th>OrderID</th>
+                      <th>Username</th>
+                      <th>ยอดชำระ</th>
+                      <th>บริษัทขนส่ง</th>
+                      <th>สถานที่ส่ง</th>
+                      <th>สถานะ</th>
+                      <th>แก้ไขข้อมูล</th>
+                  </tr>
+              </thead>
+              <tbody>
+                {% for orders in page_obj %}
+                  <tr class = "wow fadeInUp">
+                      <td>{{orders.order_id}}</td>
+                      <td>{{orders.user.user_name}}</td>
+                      <td>{{orders.total_price}}</td>
+                      <td>{{orders.shipper.shipper_name}}</td>
+                      <td>{{orders.place_delivery}}</td>
+                      <td>{{orders.status_order.status_name}}</td>
+                      <td>
+                          <button class='btn btn-success' type='button' data-bs-toggle='modal' data-bs-target='#ShowCheckOrder'> 
+                              <i class='fa-solid fa-paper-plane'></i>
+                          </button>
+                      </td>
+                  </tr>
+                  {% endfor %}
+                  
+                  
+              </tbody>
+          </table>
+      </div>
+  </div>
+</div>
+    <!-- Pagination -->
+<div class="d-flex justify-content-center">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+<div>
+        <!-- modal-->
+        <div class="modal fade" id="ShowCheckOrder" tabindex="-1" aria-labelledby="ShowCheckOrder"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="ShowCheckOrder">Detail OrderID : <span id = "modalOrderID"> </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label for="Username">Username</label>
+                                    <input type="text" class="form-control" id="Username"value="{{Order.user.user_name}}" disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="product">ราคารวม</label>
+                                    <input type="text" class="form-control" id="ClaimProduct"value="" disabled>
+                                </div>
+                                    <img src="{{Payment.image_payment}}" class="img-fluid" style="width: 100%;">
+                                    <button type="cancel" class="btn btn-danger" style="width: 40%;">ไม่ยืนยัน</button>
+                                    <button type="submit" class="btn btn-primary" style="width: 40%;">ยืนยัน</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+    <!-- modal-->
+
+                <div class="modal fade" id="ShowDetailOrder" tabindex="-1" aria-labelledby="ShowDetailOrder"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="ShowDetailOrder">Detail OrderID : <span id = "modalOrderID"> </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="product">Product</label>
+                                <input type="text" class="form-control" id="ClaimProduct"value="" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+
+        
+</div>
+{% endblock%}

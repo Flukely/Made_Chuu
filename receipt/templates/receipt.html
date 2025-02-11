@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ใบเสร็จการชำระเงิน</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        header {
+            background-color: #fff0f9;
+            color: rgb(0, 0, 0);
+            padding: 10px;
+            text-align: center;
+        }
+        
+        main {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+        footer {
+            background-color: #fff0f9;
+            color: rgb(0, 0, 0);
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        .receipt-details {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+        .receipt-details h2, .receipt-details h3 {
+            text-align: center;
+        }
+        .receipt-details ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .receipt-details ul li {
+            border-bottom: 1px solid #ddd;
+            padding: 8px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .receipt-details ul li:last-child {
+            border-bottom: none;
+        }
+        .receipt-details .total {
+            font-weight: bold;
+            text-align: right;
+        }
+        .receipt-details .total-amount {
+            font-size: 1.2em;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .btn-back {
+            color: #ffffff;
+            background-color: #ff4e45;
+            border-color: #ff483f;
+        }
+        .btn-back:hover {
+            background-color: #ff382d;
+            border-color: #ff1f13;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <headerlogo>
+            <h1>MadeChuu</h1>
+        </headerlogo>
+        <h1>ใบเสร็จการชำระเงิน</h1>
+    </header>
+    <main>
+        <section class="receipt-details">
+            <h2>รายละเอียดการชำระเงิน</h2>
+            <p><strong>ร้านค้า:</strong> {{ store_name }}</p>
+            <p><strong>ลูกค้า:</strong> {{ user.user_name }}</p>
+            <p><strong>หมายเลขใบเสร็จ:</strong> {{ receipt.receipt_id }}</p>
+            <p><strong>หมายเลขการชำระเงิน:</strong> {{ receipt.payment_id }}</p>
+            <p><strong>หมายเลขคำสั่งซื้อ:</strong> {{ receipt.order_id }}</p>
+            <p><strong>วันที่ออกใบเสร็จ:</strong> {{ receipt.receipt_date }}</p>
+            <h3>รายการสินค้า</h3>
+            <ul>
+                {% for item in items_with_price %}
+                    <li>
+                        <span>{{ item.product_name }}</span>
+                        <span>{{ item.quantity }} x {{ item.price }} บาท</span>
+                    </li>
+                {% endfor %}
+            </ul>
+            <p class="total total-amount"><strong>รวมทั้งหมด:</strong> {{ receipt.order_id.total_price }} บาท</p>
+            <div class="btn-container">
+                <button class="btn btn-primary" onclick="window.print()">บันทึกใบเสร็จ</button>
+                <a href="#" class="btn btn-back">กลับ</a>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 MadeChuu</p>
+    </footer>
+</body>
+</html>

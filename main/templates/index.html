@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้าแรก</title>
+</head>
+<body>
+    <header>
+        <h1>ยินดีต้อนรับสู่เว็บไซต์ของเรา</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#">หน้าแรก</a></li>
+            <li><a href="{% url 'product' %}">รายการสินค้า</a></li>
+            <li><a href="{% url 'product' %}">ตระกร้า</a></li>
+            <li><a href="{% url 'track' order_id=1 %}">คำสั่งซื้อ</a></li>
+            <li><a href="{% url 'payment:payment' %}">ชำระเงิน</a></li>
+            <li><a href="{% url 'receipt:receipt' receipt_id=1 %}">ดูใบเสร็จ</a></li>
+            <li><a href="{% url 'review_page' %}">รีวิวสินค้า</a></li>
+            <li><a href="{% url 'claim_request' order_id=1 %}">เคลมสินค้า</a></li>
+        </ul>
+    </nav>
+    <main>
+        <section>
+            <h2>หัวข้อหลัก</h2>
+            <p>นี่คือเนื้อหาหลักของหน้าเว็บ</p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2023 เว็บไซต์ของเรา</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,140 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Made Chuu</title>
+    <!-- นำเข้า Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* กำหนดสไตล์พื้นหลังและฟอนต์ */
+        body {
+            background-color: #ffedf7;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* ตกแต่ง container ให้ดูโดดเด่น */
+        .container {
+            background-color: rgb(255, 249, 252);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: auto;
+        }
+
+        h2 {
+            color: #0056b3;
+        }
+
+        .text-center {
+            margin-top: 10px;
+        }
+
+        .text-danger {
+            font-size: 1.2rem;
+        }
+
+        ul {
+            font-size: 1rem;
+        }
+
+        /* ปรับสีปุ่มให้เป็นโทนเขียว */
+        .btn-primary {
+            background-color: #28a745;
+            border-color: #28a745;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+
+        .form-label {
+            font-weight: bold;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+        }
+
+        .mt-4 {
+            margin-top: 40px;
+        }
+
+        .img-fluid {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .mb-3 {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">ชำระเงิน</h2>
+
+        <div class="text-center">
+            {% if messages %}
+            {% for message in messages %}
+            <!-- แสดงข้อความแจ้งเตือนหลังจากอัปโหลดสลิปสำเร็จ -->
+            <div class="text-center mt-3">
+                <img src="{% static 'images/correct.png' %}" alt="QR Code" class="img-fluid" width="200"
+                    height="auto" />
+                <p class="text-danger">{{ message|linebreaksbr }}</p>
+                <br>
+                <!-- ปุ่มไปยังหน้ารายการสั่งซื้อ -->
+                <a href="#" class="btn btn-success">ไปที่หน้ารายการสั่งซื้อ</a>
+            </div>
+            {% endfor %}
+
+            {% else %}
+
+            <!-- แสดง QR Code และรายละเอียดการชำระเงิน -->
+            <div class="mt-4">
+                <h4>สแกน QR Code เพื่อชำระเงิน</h4>
+                <img src="{% static 'images/qr_code.jpg' %}" alt="QR Code" class="img-fluid" width="200"
+                    height="auto" />
+
+                <h4>วิธีการชำระเงิน</h4>
+                <ul>
+                    <li>บัญชีธนาคาร: ธนาคาร กรุงไทย</li>
+                    <li>เลขที่บัญชี(PromptPay): 0980456747</li>
+                    <li>ชื่อบัญชี: นายสองปนนท์ คำตื้อ</li>
+                    <br>
+                    <li>กรุณาชำระเงินและอัปโหลดสลิปการชำระเงินในฟอร์มด้านล่าง</li>
+                </ul>
+            </div>
+
+            <!-- ฟอร์มสำหรับอัปโหลดหลักฐานการโอน -->
+            <form action="{% url 'payment:payment' %}" method="POST" enctype="multipart/form-data" class="mt-3">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="{{ form.order_id.id_for_label }}" class="form-label">รายละเอียดคำสั่งซื้อ</label>
+                    {{ form.order_id }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.payment_image.id_for_label }}" class="form-label">อัปโหลดหลักฐานการโอน</label>
+                    {{ form.payment_image }}
+                </div>
+
+                <!-- ปุ่มยืนยันการชำระเงิน -->
+                <button type="submit" class="btn btn-primary">ยืนยันการชำระเงิน</button>
+            </form>
+
+            {% endif %}
+        </div>
+    </div>
+</body>
+
+</html>
