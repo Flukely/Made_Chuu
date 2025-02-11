@@ -31,12 +31,23 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
+        .product-card .card-title,
+        .product-card .card-text {
+            color: #EF8CB0; /* เปลี่ยนสีข้อความ */
+            text-decoration: none; /* เอาขีดออก */
+        }
+
         .navbar a.nav-link {
             color: white !important;
         }
 
         .navbar {
             background-color: #EF8CB0 !important;
+        }
+
+        /* Custom CSS to remove dropdown arrow */
+        .navbar .dropdown-toggle::after {
+            display: none;
         }
 
         /* เพิ่ม CSS สำหรับ footer */
@@ -102,11 +113,13 @@
             {% for product in products %}
             <div class="col-md-3">
                 <div class="card product-card h-100 text-center">
-                    <img src="{{ product.product_image.url }}" class="card-img-top" alt="{{ product.product_name }}">
-                    <div class="card-body">
-                        <h5 class="card-title fw-bold">{{ product.product_name }}</h5>
-                        <p class="card-text text-muted">{{ product.price }} ฿</p>
-                    </div>
+                    <a href="{{ product.product_url }}">
+                        <img src="{{ product.product_image.url }}" class="card-img-top" alt="{{ product.product_name }}">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">{{ product.product_name }}</h5>
+                            <p class="card-text text-muted">{{ product.price }} ฿</p>
+                        </div>
+                    </a>
                 </div>
             </div>
             {% endfor %}

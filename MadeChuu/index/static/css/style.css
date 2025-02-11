@@ -26,7 +26,12 @@
 }
 
 .navbar {
-    background-color: #ff8ab5 !important;
+    background-color: #EF8CB0 !important;
+}
+
+/* Custom CSS to remove dropdown arrow */
+.navbar .dropdown-toggle::after {
+    display: none;
 }
 
 /* เพิ่ม CSS สำหรับ footer */
