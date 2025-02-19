@@ -220,3 +220,77 @@ class Admin(models.Model):
         return f"{self.admin_name}, {self.shop.shop_id if self.shop else 'No Shop'}, {self.password}, {self.admin_id}"
     class Meta:
         db_table = 'Admin'
+
+class Promotion(models.Model):
+    promotion_id = models.AutoField(primary_key=True)
+    promotion_name = models.CharField(max_length=255)
+    promotion_type = models.CharField(max_length=255)
+    discount = models.FloatField()
+    description = models.CharField(max_length=255)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    promotion_image = models.ImageField(upload_to='promotion_image/', blank=True, null=True)
+
+    def __str__(self):
+        return f"Promotion ID: {self.promotion_id}, Promotion Name: {self.promotion_name}"
+
+    class Meta:
+        db_table = 'Promotion'
+
+class PromotionProduct(models.Model):
+    promotion_id = models.ForeignKey('Promotion', on_delete=models.CASCADE)
+    product_id = models.ForeignKey('Product', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Promotion ID: {self.promotion_id.promotion_id if self.promotion_id else 'No Promotion'}, Product ID: {self.product_id.product_id if self.product_id else 'No Product'}"
+
+    class Meta:
+        db_table = 'PromotionProduct'
+
+class RecommendedProduct(models.Model):
+    recommended_product_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey('User', on_delete=models.CASCADE)
+    product_id = models.ForeignKey('Product', on_delete=models.CASCADE)
+    recommended_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"User ID: {self.user_id.user_id if self.user_id else 'No User'}, Product ID: {self.product_id.product_id if self.product_id else 'No Product'}"
+
+    class Meta:
+        db_table = 'RecommendedProduct'
+
+class FavoriteProduct(models.Model):
+    favorite_product_id = models.AutoField(primary_key=True)
+    product_id = models.ForeignKey('Product', on_delete=models.CASCADE)
+    user_id = models.ForeignKey('User', on_delete=models.CASCADE)
+    favorite_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"User ID: {self.user_id.user_id if self.user_id else 'No User'}, Product ID: {self.product_id.product_id if self.product_id else 'No Product'}"
+
+    class Meta:
+        unique_together = (('product_id', 'user_id'),)
+        db_table = 'FavoriteProduct'
+
+class Transaction(models.Model):
+    transaction_id = models.AutoField(primary_key=True)
+    order_id = models.ForeignKey('Order', on_delete=models.CASCADE)
+    transaction_type_id = models.ForeignKey('TransactionType', on_delete=models.CASCADE)
+    transaction_date = models.DateTimeField(auto_now_add=True)
+    admin_id = models.ForeignKey('Admin',on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Transaction ID: {self.transaction_id}, Order ID: {self.order_id.order_id if self.order_id else 'No Order'}, Admin ID: {self.admin_id.admin_id if self.admin_id else 'No Admin'}"
+
+    class Meta:
+        db_table = 'Transaction'
+
+class TransactionType(models.Model):
+    transaction_type_id = models.AutoField(primary_key=True)
+    transaction_name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.transaction_name
+
+    class Meta:
+        db_table = 'TransactionType'
