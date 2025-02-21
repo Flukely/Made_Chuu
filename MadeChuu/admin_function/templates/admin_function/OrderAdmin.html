@@ -52,21 +52,24 @@
                       <td>{{orders.place_delivery}}</td>
                       <td>{{orders.status_order.status_name}}</td>
                       <td>
-                        {% if orders.status_order.status_order_id == 1 %} <!-- status_wait // รอจ่ายเงินจริงๆ ไม่ต้องแสดง-->
+                        {% if orders.status_order.status_order_id == 1 %} <!-- status_wait // รอจ่ายเงินจริงๆ ไม่ต้องแสดง // ถ้าค้างในระบบนานเกิน 3 วันจะถูกเอาออก-->
+                        <button class='btn btn-danger' type='button' data-bs-toggle='modal' data-bs-target='#ShowCheckOrder'> 
+                            <i class='fa-solid fa-trash'></i>
+                        </button>
                         {% elif orders.status_order.status_order_id == 2 %} <!-- status_Paid // จ่ายเงินแล้วรอยืนยัน-->
-                          <button class='btn btn-success' type='button' data-bs-toggle='modal' data-bs-target='#ShowCheckOrder'> 
+                          <button class='btn btn-warning' type='button' data-bs-toggle='modal' data-bs-target='#ShowCheckOrder'> 
                               <i class='fa-solid fa-money-check-dollar'></i>
                           </button>
                         {% elif orders.status_order.status_order_id == 3 %}<!-- status_Packing //จัดเตรียมสินค้า-->
-                        <button class='btn btn-success' type='button' data-bs-toggle='modal' data-bs-target='#ShowCheckOrder'> 
+                        <button class='btn btn-primary' type='button' data-bs-toggle='modal' data-bs-target='#ShowCheckOrder'> 
                             <i class='fa-solid fa-box'></i>
                         </button>
                         {% elif orders.status_order.status_order_id == 4 %}<!-- status_Prepare // รอส่ง-->
-                        <button class='btn btn-success' type='button' data-bs-toggle='modal' data-bs-target='#ShowCheckOrder'> 
+                        <button class='btn btn-secondary' type='button' data-bs-toggle='modal' data-bs-target='#ShowCheckOrder'> 
                             <i class='fa-solid fa-truck-loading'></i>
                         </button>
                         {% elif orders.status_order.status_order_id == 5 %}<!-- status_Delivery // กำลังจัดส่ง-->
-                        <button class='btn btn-success' type='button' data-bs-toggle='modal' data-bs-target='#ShowCheckOrder'> 
+                        <button class='btn btn-info' type='button' data-bs-toggle='modal' data-bs-target='#ShowCheckOrder'> 
                             <i class='fa-solid fa-truck'></i>
                         </button>
                         {% elif orders.status_order.status_order_id == 6 %}<!-- status_Ordersuccess // ส่งสินค้าสำเร็จ-->
@@ -74,7 +77,7 @@
                             <i class='fa-solid fa-check-circle'></i>
                         </button>
                         {% elif orders.status_order.status_order_id == 7 %}<!-- status_Claim // เมื่อสินค้ามีการชำรุดเสียหาย-->
-                        <button class='btn btn-success' type='button' data-bs-toggle='modal' data-bs-target='#ShowCheckOrder'> 
+                        <button class='btn btn-dark' type='button' data-bs-toggle='modal' data-bs-target='#ShowCheckOrder'> 
                             <i class='fa-solid fa-exclamation-triangle'></i>
                         </button>
                         {% endif %}
