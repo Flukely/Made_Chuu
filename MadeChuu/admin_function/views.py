@@ -16,7 +16,7 @@ def ChatAdmin(request):
 def OrderAdmin(request):
     #Query from model Order
     order_filter = OrderFilter(request.GET, queryset=Order.objects.all())
-    paginator = Paginator(order_filter.qs, 10)
+    paginator = Paginator(order_filter.qs, 5)
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)

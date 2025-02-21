@@ -14,8 +14,15 @@ class ProductFilter(django_filters.FilterSet):
         fields = ["category"]
 
 class OrderFilter(django_filters.FilterSet):
-    status_order = django_filters.ModelChoiceFilter(
-        queryset=StatusOrder.objects.all(), 
+    status_order = django_filters.ChoiceFilter(
+        choices = [
+            (2, "จ่ายเงินแล้ว"),  
+            (3, "กำลังแพ็คของ"),  
+            (4, "เตรียมส่ง"),  
+            (5, "กำลังจัดส่ง"),  
+            (6, "ส่งสำเร็จ"),  
+            (7, "เคลมสินค้า"), 
+        ],
         label="Status Order",
         empty_label="ทั้งหมด",
     )
