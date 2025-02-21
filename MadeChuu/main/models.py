@@ -1,27 +1,80 @@
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.conf import settings
 
-class User(models.Model):
+# Manager สำหรับสร้าง User และ Superuser
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError("The Email field must be set")
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        return self.create_user(email, password, **extra_fields)
+
+# โมเดลผู้ใช้หลัก
+class User(AbstractBaseUser, PermissionsMixin):
     user_id = models.AutoField(primary_key=True)
+    email = models.EmailField(unique=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
     user_name = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     district = models.CharField(max_length=255)
     province = models.CharField(max_length=255)
     postal_code = models.CharField(max_length=255)
     gender = models.CharField(max_length=10)
-    birth_date = models.CharField(max_length=30)
-    birth_month = models.CharField(max_length=30)
-    birth_year = models.CharField(max_length=30)
-    age = models.IntegerField()
-    email = models.EmailField()
+    birth_date = models.DateField(null=True) # อนุญาตให้เป็นค่า null ได้
     phone_num = models.CharField(max_length=10)
     join_date = models.DateField(auto_now=True)
-    password = models.CharField(max_length=255)
+    user_role = models.ForeignKey('UserRole', on_delete=models.CASCADE, null=True)
+
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['user_name']
+    
+    def __str__(self):
+        return f"User: {self.email}"
+
+# โมเดลสำหรับบทบาท
+class UserRole(models.Model):
+    user_role_id = models.AutoField(primary_key=True)
+    user_role_name = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
-        return f"User ID: {self.user_id if self.user_id else 'No User'}, User Name: {self.user_name if self.user_name else 'No User'}"
-    
+        return self.user_role_name
+
     class Meta:
-        db_table = 'User'
+        db_table = 'UserRole'
+
+# โมเดลสำหรับบทบาทแอดมิน
+class AdminRole(models.Model):
+    admin_role_id = models.AutoField(primary_key=True)
+    admin_role_name = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return self.admin_role_name
+
+    class Meta:
+        db_table = 'AdminRole'
+
+# โมเดลสำหรับ Admin
+class Admin(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    shop = models.ForeignKey('Shop', on_delete=models.CASCADE)
+    admin_role = models.ForeignKey('AdminRole', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Admin: {self.user.email}, Shop: {self.shop.shop_name}, Role: {self.admin_role.admin_role_name}"
 
 class Product(models.Model):
     product_id = models.AutoField(primary_key=True)
@@ -150,15 +203,6 @@ class Receipt(models.Model):
     class Meta:
         db_table = 'Receipt'
 
-class DeliveryStatus(models.Model):
-    delivery_status_id = models.AutoField(primary_key=True)
-    delivery_status_name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f"Delivery ID: {self.delivery_status_id if self.delivery_status_id else 'No Delivery'}, Delivery Name: {self.delivery_status_name if self.delivery_status_name else 'No Delivery'}"
-    class Meta:
-        db_table = 'DeliveryStatus'
-
 class Review(models.Model):
     review_id = models.AutoField(primary_key=True)
     order = models.ForeignKey('Order', on_delete=models.CASCADE)
@@ -190,36 +234,6 @@ class Claim(models.Model):
         return f"Claim ID: {self.claim_id}, Order ID: {self.order.order_id if self.order else 'No Order'}, User ID: {self.order.user.user_id if self.order else 'No User'}"
     class Meta:
         db_table = 'Claim'
-
-class Chat(models.Model):
-    chat_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey('User', on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"Chat ID: {self.chat_id}, User ID: {self.user.user_id if self.user else 'No User'}"
-    class Meta:
-        db_table = 'Chat'
-
-class ChatMessage(models.Model):
-    chat = models.ForeignKey('Chat', on_delete=models.CASCADE)
-    message = models.CharField(max_length=255)
-    created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Chat ID: {self.chat.chat_id if self.chat else 'No Chat'}, Message: {self.message if self.message else 'No Message'}"
-    class Meta:
-        db_table = 'ChatMessage'
-
-class Admin(models.Model):
-    admin_id = models.AutoField(primary_key=True)
-    admin_name = models.CharField(max_length=255, default='default_admin_name')
-    shop = models.ForeignKey('Shop', on_delete=models.CASCADE)
-    password = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f"{self.admin_name}, {self.shop.shop_id if self.shop else 'No Shop'}, {self.password}, {self.admin_id}"
-    class Meta:
-        db_table = 'Admin'
 
 class Promotion(models.Model):
     promotion_id = models.AutoField(primary_key=True)
@@ -271,26 +285,3 @@ class FavoriteProduct(models.Model):
     class Meta:
         unique_together = (('product_id', 'user_id'),)
         db_table = 'FavoriteProduct'
-
-class Transaction(models.Model):
-    transaction_id = models.AutoField(primary_key=True)
-    order_id = models.ForeignKey('Order', on_delete=models.CASCADE)
-    transaction_type_id = models.ForeignKey('TransactionType', on_delete=models.CASCADE)
-    transaction_date = models.DateTimeField(auto_now_add=True)
-    admin_id = models.ForeignKey('Admin',on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"Transaction ID: {self.transaction_id}, Order ID: {self.order_id.order_id if self.order_id else 'No Order'}, Admin ID: {self.admin_id.admin_id if self.admin_id else 'No Admin'}"
-
-    class Meta:
-        db_table = 'Transaction'
-
-class TransactionType(models.Model):
-    transaction_type_id = models.AutoField(primary_key=True)
-    transaction_name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.transaction_name
-
-    class Meta:
-        db_table = 'TransactionType'
