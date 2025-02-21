@@ -36,6 +36,7 @@ class Product(models.Model):
 
     def __str__(self):
         return f"Product ID: {self.product_id if self.product_id else 'No Product'}, Product Name: {self.product_name if self.product_name else 'No Product'}"
+    
     class Meta:
         db_table = 'Product'
 
@@ -46,6 +47,7 @@ class Category(models.Model):
 
     def __str__(self):
         return self.category_name
+    
     class Meta:
         db_table = 'Category'
 
@@ -57,7 +59,8 @@ class Shop(models.Model):
     phone_num = models.CharField(max_length=10)
 
     def __str__(self):
-        return self.shop_name 
+        return self.shop_name
+    
     class Meta:
         db_table = 'Shop'
 
@@ -68,6 +71,7 @@ class Cart(models.Model):
 
     def __str__(self):
         return f"Cart ID: {self.cart_id if self.cart_id else 'No Cart'}, User ID: {self.user.user_id if self.user else 'No User'}"
+    
     class Meta:
         db_table = 'Cart'
 
@@ -79,6 +83,7 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f"Cart ID: {self.cart.cart_id if self.cart else 'No Cart'}, Product ID: {self.product.product_id if self.product else 'No Product'}"
+    
     class Meta:
         db_table = 'CartItem'
 
@@ -95,6 +100,7 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order ID: {self.order_id if self.order_id else 'No Order'}, User ID: {self.user.user_id if self.user else 'No User'}"
+    
     class Meta:
         db_table = 'Order'
 
@@ -105,6 +111,7 @@ class OrderProduct(models.Model):
 
     def __str__(self):
         return f"Order ID: {self.order.order_id if self.order else 'No Order'}, Product ID: {self.product.product_id if self.product else 'No Product'}"
+    
     class Meta:
         db_table = 'OrderProduct'
 
@@ -114,6 +121,7 @@ class StatusOrder(models.Model):
 
     def __str__(self):
         return self.status_name
+    
     class Meta:
         db_table = 'StatusOrder'
 
@@ -124,6 +132,7 @@ class ShippingBrand(models.Model):
 
     def __str__(self):
         return f"Shipper ID: {self.shipper_id if self.shipper_id else 'No Shipper'}, Shipper Name: {self.shipper_name if self.shipper_name else 'No Shipper'}"
+    
     class Meta:
         db_table = 'ShippingBrand'
 
@@ -136,6 +145,7 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Payment ID: {self.payment_id}, Order ID: {self.order.order_id if self.order else 'No Order'}, User ID: {self.order.user.user_id if self.order else 'No User'}"
+    
     class Meta:
         db_table = 'Payment'
 
@@ -147,6 +157,7 @@ class Receipt(models.Model):
 
     def __str__(self):
         return f"Receipt ID: {self.receipt_id}, Order ID: {self.order.order_id if self.order else 'No Order'}, User ID: {self.order.user.user_id if self.order else 'No User'}"
+    
     class Meta:
         db_table = 'Receipt'
 
@@ -156,6 +167,7 @@ class DeliveryStatus(models.Model):
 
     def __str__(self):
         return f"Delivery ID: {self.delivery_status_id if self.delivery_status_id else 'No Delivery'}, Delivery Name: {self.delivery_status_name if self.delivery_status_name else 'No Delivery'}"
+    
     class Meta:
         db_table = 'DeliveryStatus'
 
@@ -171,6 +183,7 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review ID: {self.review_id}, User ID: {self.order.user.user_id if self.order else 'No User'}, Product ID: {self.product.product_id if self.product else 'No Product'}"
+    
     class Meta:
         db_table = 'Review'
 
@@ -188,6 +201,7 @@ class Claim(models.Model):
 
     def __str__(self):
         return f"Claim ID: {self.claim_id}, Order ID: {self.order.order_id if self.order else 'No Order'}, User ID: {self.order.user.user_id if self.order else 'No User'}"
+    
     class Meta:
         db_table = 'Claim'
 
@@ -197,6 +211,7 @@ class Chat(models.Model):
 
     def __str__(self):
         return f"Chat ID: {self.chat_id}, User ID: {self.user.user_id if self.user else 'No User'}"
+    
     class Meta:
         db_table = 'Chat'
 
@@ -207,6 +222,7 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f"Chat ID: {self.chat.chat_id if self.chat else 'No Chat'}, Message: {self.message if self.message else 'No Message'}"
+    
     class Meta:
         db_table = 'ChatMessage'
 
@@ -218,5 +234,80 @@ class Admin(models.Model):
 
     def __str__(self):
         return f"{self.admin_name}, {self.shop.shop_id if self.shop else 'No Shop'}, {self.password}, {self.admin_id}"
+    
     class Meta:
         db_table = 'Admin'
+
+class Promotion(models.Model):
+    promotion_id = models.AutoField(primary_key=True)
+    promotion_name = models.CharField(max_length=255)
+    promotion_type = models.CharField(max_length=255)
+    discount = models.FloatField()
+    description = models.CharField(max_length=255)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    promotion_image = models.ImageField(upload_to='promotion_image/', blank=True, null=True)
+
+    def __str__(self):
+        return f"Promotion ID: {self.promotion_id}, Promotion Name: {self.promotion_name}"
+    
+    class Meta:
+        db_table = 'Promotion'
+
+class PromotionProduct(models.Model):
+    promotion_id = models.ForeignKey('Promotion', on_delete=models.CASCADE)
+    product_id = models.ForeignKey('Product', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Promotion ID: {self.promotion_id.promotion_id if self.promotion_id else 'No Promotion'}, Product ID: {self.product_id.product_id if self.product_id else 'No Product'}"
+    
+    class Meta:
+        db_table = 'PromotionProduct'
+
+class RecommendedProduct(models.Model):
+    recommended_product_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey('User', on_delete=models.CASCADE)
+    product_id = models.ForeignKey('Product', on_delete=models.CASCADE)
+    recommended_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"User ID: {self.user_id.user_id if self.user_id else 'No User'}, Product ID: {self.product_id.product_id if self.product_id else 'No Product'}"
+    
+    class Meta:
+        db_table = 'RecommendedProduct'
+
+class FavoriteProduct(models.Model):
+    favorite_product_id = models.AutoField(primary_key=True)
+    product_id = models.ForeignKey('Product', on_delete=models.CASCADE)
+    user_id = models.ForeignKey('User', on_delete=models.CASCADE)
+    favorite_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"User ID: {self.user_id.user_id if self.user_id else 'No User'}, Product ID: {self.product_id.product_id if self.product_id else 'No Product'}"
+    
+    class Meta:
+        unique_together = (('product_id', 'user_id'),)
+        db_table = 'FavoriteProduct'
+
+class Transaction(models.Model):
+    transaction_id = models.AutoField(primary_key=True)
+    order_id = models.ForeignKey('Order', on_delete=models.CASCADE)
+    transaction_type_id = models.ForeignKey('TransactionType', on_delete=models.CASCADE)
+    transaction_date = models.DateTimeField(auto_now_add=True)
+    admin_id = models.ForeignKey('Admin', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Transaction ID: {self.transaction_id}, Order ID: {self.order_id.order_id if self.order_id else 'No Order'}, Admin ID: {self.admin_id.admin_id if self.admin_id else 'No Admin'}"
+    
+    class Meta:
+        db_table = 'Transaction'
+
+class TransactionType(models.Model):
+    transaction_type_id = models.AutoField(primary_key=True)
+    transaction_name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.transaction_name
+    
+    class Meta:
+        db_table = 'TransactionType'

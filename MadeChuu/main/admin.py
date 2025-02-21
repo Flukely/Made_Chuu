@@ -1,6 +1,5 @@
 from django.contrib import admin
-from main.models import User, Product, Category, Shop, Cart, Order, OrderProduct, StatusOrder, ShippingBrand, Payment, Receipt, DeliveryStatus, Review, Claim, Chat, ChatMessage, Admin
-
+from main.models import *
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('user_id', 'user_name', 'email', 'phone_num', 'join_date')
@@ -87,3 +86,38 @@ class ChatMessageAdmin(admin.ModelAdmin):
 class AdminAdmin(admin.ModelAdmin):
     list_display = ('admin_id', 'admin_name', 'shop')
     search_fields = ('admin_name', 'shop__shop_name')
+
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ('cart', 'product', 'quantity')
+    search_fields = ('cart__cart_id', 'product__product_name')
+
+@admin.register(Promotion)
+class PromotionAdmin(admin.ModelAdmin):
+    list_display = ('promotion_id', 'promotion_name', 'discount', 'description', 'start_date', 'end_date')
+    search_fields = ('promotion_name', 'description')
+
+@admin.register(PromotionProduct)
+class PromotionProductAdmin(admin.ModelAdmin):
+    list_display = ('promotion_id', 'product_id')
+    search_fields = ('promotion__promotion_name', 'product__product_name')
+
+@admin.register(RecommendedProduct)
+class RecommendedProductAdmin(admin.ModelAdmin):
+    list_display = ('recommended_product_id', 'user_id', 'product_id','recommended_date')
+    search_fields = ('user__user_name', 'product__product_name')
+    
+@admin.register(FavoriteProduct)
+class FavoriteProductAdmin(admin.ModelAdmin):
+    list_display = ('favorite_product_id', 'user_id', 'product_id','favorite_date')
+    search_fields = ('user__user_name', 'product__product_name')
+
+@admin.register(Transaction)
+class TransactionAdmin(admin.ModelAdmin):
+    list_display = ('transaction_id', 'order_id', 'transaction_type_id', 'transaction_date', 'admin_id')
+    search_fields = ('order__order_id', 'transaction_type__transaction_type_name', 'admin__admin_name')
+
+@admin.register(TransactionType)
+class TransactionAdmin(admin.ModelAdmin):
+    list_display = ('transaction_type_id', 'transaction_name')
+    search_fields = ('transaction_name',)
