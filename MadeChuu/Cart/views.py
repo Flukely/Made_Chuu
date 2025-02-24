@@ -7,7 +7,7 @@ from main.models import Cart, Product, User, Order, OrderProduct , CartItem
 
 
 def AddCart(request):
-    user_id = request.session.get('user_id', 1)
+    user_id = request.session.get('user_id')
     if not user_id:
         return redirect('login')  
 
@@ -51,7 +51,7 @@ def delete(request, id):                  #ลบสินค้าในตะ�
 
 @csrf_exempt
 def place_order(request):
-    user_id = request.session.get('user_id', 1)
+    user_id = request.session.get('user_id')
     if request.method == 'POST':
         order_data = json.loads(request.POST.get('order_data'))
         items = order_data.get('items', [])

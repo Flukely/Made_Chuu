@@ -25,4 +25,12 @@ urlpatterns = [
 
     path('delete_product/<int:product_id>/', views.delete_product, name='delete_product'),
 
+    path('status/wait/<int:order_id>/', views.status_wait, name='status_wait'),
+    path('status/paid/<int:order_id>/', views.status_paid, name='status_paid'),
+    path('status/packing/<int:order_id>/', views.status_packing, name='status_packing'),
+    path('status/prepare/<int:order_id>/', views.status_prepare, name='status_prepare'),
+    path('status/delivery/<int:order_id>/', views.status_delivery, name='status_delivery'),
+    path('status/ordersuccess/<int:order_id>/', views.status_ordersuccess, name='status_ordersuccess'),
+    path('status/claim/<int:order_id>/', views.status_claim, name='status_claim'),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -102,4 +102,32 @@ def add_reply(request):
 
     return redirect('admin_comment')
 
+def status_wait(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/status_wait.html', {'order': order})
+
+def status_paid(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/status_paid.html', {'order': order})
+
+def status_packing(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/status_packing.html', {'order': order})
+
+def status_prepare(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/status_prepare.html', {'order': order})
+
+def status_delivery(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/status_delivery.html', {'order': order})
+
+def status_ordersuccess(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/status_ordersuccess.html', {'order': order})
+
+def status_claim(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/status_claim.html', {'order': order})
+
 
