@@ -1,29 +1,55 @@
 from django.shortcuts import render, get_object_or_404
-from main.models import Receipt, OrderProduct, User, Order, Product, Shop  # นำเข้าโมเดล Shop
+from django.contrib.auth.decorators import login_required
+from main.models import Receipt, OrderProduct, Order, Payment, Product, Shop, User
 
-def receipt(request, receipt_id):
-    receipt = get_object_or_404(Receipt, pk=receipt_id)  # แก้ไขการค้นหา
-    order_items = OrderProduct.objects.filter(order_id=receipt.order_id)  # ดึงรายการสินค้าในคำสั่งซื้อ
-    order = get_object_or_404(Order, pk=receipt.order_id)  # ดึงข้อมูลคำสั่งซื้อ
-    user = get_object_or_404(User, user_id=order.user_id)  # ดึงข้อมูลผู้ใช้
-    first_item = order_items.first()
-    product = get_object_or_404(Product, pk=first_item.product_id) if first_item else None
-    store_name = get_object_or_404(Shop, pk=product.shop_id).shop_name if product else 'No Shop'  # ดึงชื่อร้านค้า
-    
-    # สร้างรายการสินค้าพร้อมราคา
-    items_with_price = []
-    for item in order_items:
-        product = get_object_or_404(Product, pk=item.product_id)
-        items_with_price.append({
-            'product_name': product.product_name,  # ใช้ product_name แทน name
-            'quantity': item.quantity,
-            'price': product.price,
+@login_required
+def check_receipt(request):
+    """ หน้าตรวจสอบใบเสร็จ แสดงการชำระเงินของผู้ใช้ที่ล็อกอิน """
+    user_payments = Payment.objects.filter(order__user=request.user).order_by('-payment_date')
+    payments_with_items = []
+
+    for payment in user_payments:
+        order_items = OrderProduct.objects.filter(order=payment.order)
+        items_with_price = [
+            {
+                'product_name': item.product.product_name,
+                'quantity': item.quantity,
+                'price': item.product.price,
+            }
+            for item in order_items
+        ]
+        payments_with_items.append({
+            'payment': payment,
+            'items_with_price': items_with_price,
         })
-    
+
+    return render(request, 'check_receipt.html', {'payments_with_items': payments_with_items})
+
+@login_required
+def receipt(request, order_id):
+    """ แสดงรายละเอียดใบเสร็จ หรือแจ้งเตือนหากยังไม่มีใบเสร็จ """
+    order = get_object_or_404(Order, pk=order_id, user=request.user)
+    receipt = Receipt.objects.filter(order=order).first()
+
+    if not receipt:
+        return render(request, 'receipt.html', {'message': "กำลังดำเนินการ", 'order': order})
+
+    order_items = OrderProduct.objects.filter(order=order)
+    items_with_price = [
+        {
+            'product_name': item.product.product_name,
+            'quantity': item.quantity,
+            'price': item.product.price,
+        }
+        for item in order_items
+    ]
+
+    store_name = order_items.first().product.shop.shop_name if order_items else "ไม่พบร้านค้า"
+
     return render(request, 'receipt.html', {
         'receipt': receipt,
-        'order_items': order_items,
-        'user': user,
+        'order': order,
         'store_name': store_name,
-        'items_with_price': items_with_price,  # ส่งรายการสินค้าพร้อมราคาไปยังเทมเพลต
+        'items_with_price': items_with_price,
+        'logged_in_user': request.user,
     })

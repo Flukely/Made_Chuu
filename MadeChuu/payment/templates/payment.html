@@ -126,14 +126,14 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="#">หน้าแรก</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'product' %}">รายการสินค้า</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'AddCart' %}">ตระกร้า</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'track' order_id=1 %}">คำสั่งซื้อ</a></li>
-                <li class="nav-item"><a class="nav-link active" href="{% url 'payment:payment' %}">ชำระเงิน</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'receipt:receipt' receipt_id=3 %}">ดูใบเสร็จ</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'review_page' %}">รีวิวสินค้า</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'claim_request' order_id=1 %}">เคลมสินค้า</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'chat' %}">ติดต่อผู้ขาย</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">รายการสินค้า</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">ตระกร้า</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">คำสั่งซื้อ</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">ชำระเงิน</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">ดูใบเสร็จ</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">รีวิวสินค้า</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">เคลมสินค้า</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">ติดต่อผู้ขาย</a></li>
             </ul>
         </div>
     </nav>
@@ -152,7 +152,7 @@
                 <p class="text-danger">{{ message|linebreaksbr }}</p>
                 <br>
                 <!-- ปุ่มไปยังหน้ารายการสั่งซื้อ -->
-                <a href="{% url 'receipt:receipt' receipt_id=3 %}" class="btn btn-success">ใบเสร็จของคุณ</a>
+                <a href="{% url 'receipt:check_receipt' %}" class="btn btn-success">ตรวจสอบใบเสร็จของคุณ</a>
             </div>
             {% endfor %}
 
@@ -166,11 +166,13 @@
 
                 <h4>วิธีการชำระเงิน</h4>
                 <ul>
-                    <li>บัญชีธนาคาร: ธนาคาร กรุงไทย</li>
-                    <li>เลขที่บัญชี(PromptPay): 0980456747</li>
-                    <li>ชื่อบัญชี: นายสองปนนท์ คำตื้อ</li>
+                    บัญชีธนาคาร: ธนาคาร กรุงไทย
                     <br>
-                    <li>กรุณาชำระเงินและอัปโหลดสลิปการชำระเงินในฟอร์มด้านล่าง</li>
+                    เลขที่บัญชี(PromptPay): 0980456747
+                    <br>
+                    ชื่อบัญชี: นายสองปนนท์ คำตื้อ
+                    <br>
+                    กรุณาชำระเงินและอัปโหลดสลิปการชำระเงินในฟอร์มด้านล่าง
                 </ul>
             </div>
 
@@ -179,8 +181,8 @@
                 {% csrf_token %}
 
                 <div class="mb-3">
-                    <label for="{{ form.order_id.id_for_label }}" class="form-label">รายละเอียดคำสั่งซื้อ</label>
-                    {{ form.order_id }}
+                    <label for="{{ form.order_details.id_for_label }}" class="form-label">รายละเอียดคำสั่งซื้อ</label>
+                    {{ form.order_details }}
                 </div>
 
                 <div class="mb-3">

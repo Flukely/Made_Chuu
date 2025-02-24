@@ -4,5 +4,6 @@ from receipt import views
 app_name = "receipt"
 
 urlpatterns = [
-    path('<int:receipt_id>/', views.receipt, name='receipt'),  # ใช้ receipt_id ใน URL
+    path('check/', views.check_receipt, name='check_receipt'),  # หน้าตรวจสอบใบเสร็จ
+    path('<int:order_id>/', views.receipt, name='receipt'),  # ตรวจสอบใบเสร็จจาก order_id
 ]
