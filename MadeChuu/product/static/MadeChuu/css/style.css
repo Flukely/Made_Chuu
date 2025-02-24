@@ -7,6 +7,12 @@
   --dark: #353535;
 }
 
+body {
+  background: #F5F5F5
+} /*   สีพื้นหลัง  */
+
+
+
 .fw-medium {
   font-weight: 500 !important;
 }
@@ -916,9 +922,7 @@ Single Page Style
   color: white;
 }
 
-body {
-  background: linear-gradient(to right, #ffe6f2, #ffccff);
-}
+
 .header {
   background: linear-gradient(45deg, #FF99CC, #FF66B2);
   padding: 20px;
