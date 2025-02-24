@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from main.models import Order, Claim, OrderProduct  # นำเข้าโมเดลจาก main.models
 from .forms import ClaimForm
 
-def claim_request(request, order_id=1):  # รองรับทั้ง /claim/ และ /claim/1/
+def claim_request(request, order_id=1):
+    user_id = request.session.get('user_id')  # รองรับทั้ง /claim/ และ /claim/1/
     order = get_object_or_404(Order, order_id=order_id)
     orderproduct = get_object_or_404(OrderProduct, order=order)  # ใช้ get_object_or_404 แทน OrderProduct.objects.get
     if request.method == "POST":
@@ -19,7 +20,8 @@ def claim_request(request, order_id=1):  # รองรับทั้ง /claim
 
     return render(request, 'claim_form.html', {'form': form, 'order': order, 'orderproduct': orderproduct})
 
-def claim_status(request, claim_id=2):
+def claim_status(request, claim_id=1):
+    user_id = request.session.get('user_id')
     claim = get_object_or_404(Claim, claim_id=claim_id)  # ใช้ get_object_or_404 แทน Claim.objects.get
     orderproduct = get_object_or_404(OrderProduct, order_id=claim.order.order_id)  # ใช้ get_object_or_404 แทน OrderProduct.objects.get
     context = {
@@ -36,5 +38,7 @@ def claim_status(request, claim_id=2):
     return render(request, 'claim_status.html', context)
 
 def claim_success(request, claim_id=3):
+    user_id = request.session.get('user_id')
     claim = get_object_or_404(Claim, claim_id=claim_id)
     return render(request, 'claim_success.html', {'claim': claim})
+

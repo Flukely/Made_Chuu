@@ -54,7 +54,7 @@
             padding: 10px;
             text-align: center;
         }
-        body { background-color: #f8f9fa; font-family: 'Arial', sans-serif; }
+        body { background-color: #ffffff; font-family: 'Arial', sans-serif; }
         .container { max-width: 600px; margin-top: 50px; }
         .card { border-radius: 12px; padding: 25px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); background-color: #ffffff; }
         .product-img { max-width: 100px; border-radius: 10px; }
@@ -90,10 +90,16 @@
         <hr>
 
         <div class="d-flex align-items-center">
-            <img src="{{ orderproduct.product.product_image.url }}" alt="สินค้า" class="product-img me-3">
+            {% if orderproduct.product.product_image and orderproduct.product.product_image.url %}
+                <img src="{{ orderproduct.product.product_image.url }}" alt="สินค้า" class="product-img me-3">
+            {% else %}
+                <img src="/static/images/default_product.png" alt="ไม่มีรูปสินค้า" class="product-img me-3">
+            {% endif %}
             <div>
-                <p class="mb-0"><strong>{{ order.product.product_name }}</strong></p>
-                <p class="text-muted mb-0">สินค้า: {{ orderproduct.product.product_name }} | ราคา: <strong>฿{{ order.total_price }}</strong></p>
+                <p class="mb-0"><strong>{{ orderproduct.product.product_name }}</strong></p>
+                <p class="text-muted mb-0">
+                    สินค้า: {{ orderproduct.product.product_name }} | ราคา: <strong>฿{{ order.total_price }}</strong>
+                </p>
                 <p class="text-success fw-bold">จัดส่งสำเร็จ</p>
             </div>
         </div>
@@ -127,8 +133,8 @@
                 <label class="form-label fw-bold">ช่องทางการคืนเงิน *</label>
                 {{ form.promtpay_number }}
             </div>
-            <a href="{% url 'claim-status' claim_id=2 %}" class="btn btn-primary w-100">✅ ส่งคำขอ</a>
-            <a href="{% url 'track' order_id=1 %}" class="btn btn-secondary w-100 mt-2">❌ ยกเลิก</a>
+            <button type="submit" class="btn btn-primary w-100">✅ ส่งคำขอ</button>
+            <a href="/" class="btn btn-secondary w-100 mt-2">❌ ยกเลิก</a>
         </form>
     </div>
 </div>
