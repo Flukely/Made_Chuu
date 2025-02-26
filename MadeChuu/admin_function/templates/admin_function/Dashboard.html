@@ -13,7 +13,7 @@
         <div class="card p-3">Card 2</div>
     </div>
     <div class="col-md-3">
-        <div class="card p-3">Card 3</div>
+        <div class="card p-3">จำนวน Category : {{countProduct}}</div>
     </div>
     <div class="col-md-3">
         <div class="card p-3">Card 4</div>
@@ -30,22 +30,23 @@
         var myChart = new Chart(ctx, {
           type: 'bar',
           data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            labels: [{% for category in categories %} '{{ category.category_name }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
             datasets: [{
-              label: '# of products',
-              data: [12, 19, 3, 5, 2, 3],
-              backgroundColor: [
-              'rgba(255, 99, 132, 0.6)',
-              'rgba(255, 159, 64, 0.6)',
-              'rgba(255, 205, 86, 0.6)',
-              'rgba(75, 192, 192, 0.6)',
-              'rgba(54, 162, 235, 0.6)',
-              'rgba(153, 102, 255, 0.6)',
-              'rgba(201, 203, 207, 0.6)'
-            ],
-              borderWidth: 1
+                label: 'Categories',
+                data: [{% for category in category_counts %} {{ category.total }} {% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(255, 159, 64, 0.6)',
+                    'rgba(255, 205, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(201, 203, 207, 0.6)'
+                ],
+                borderWidth: 1
             }]
-          },
+        }
+        ,
           options: {
             scales: {
               y: {
@@ -60,6 +61,53 @@
     <div class="col-md-4">
         <div class="card p-4">Large Card 2</div>
     </div>
+</div>
+<!-- แสดงยอดขาย-->
+<div class="row g-3 mt-3">
+  <div class="col-md-10">
+      <canvas id="orderChart"></canvas>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var ctx = document.getElementById('orderChart').getContext('2d');
+            var orderChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [{% for label in labels %} '{{ label }}' {% if not forloop.last %}, {% endif %} {% endfor %}],
+                    datasets: [{
+                        label: 'ยอดคำสั่งซื้อ (บาท)',
+                        data: [{% for data in order_data %} {{ data }} {% if not forloop.last %}, {% endif %} {% endfor %}],
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+  </script>
+  </div>
+  <div class="col-md-2">
+    <form method="get" action="{% url 'Dashboard' %}">
+      <label for="filter" class="form-label">เลือกช่วงเวลา</label>
+      <select name="filter" id="filter" class="form-select">
+        <option value="5days" {% if filter_type == '5days' %}selected{% endif %}>5 วันล่าสุด</option>
+        <option value="1month" {% if filter_type == '1month' %}selected{% endif %}>1 เดือนล่าสุด</option>
+        <option value="3months" {% if filter_type == '3months' %}selected{% endif %}>3 เดือนล่าสุด</option>
+        <option value="6months" {% if filter_type == '6months' %}selected{% endif %}>6 เดือนล่าสุด</option>
+        <option value="1year" {% if filter_type == '1year' %}selected{% endif %}>1 ปีล่าสุด</option>
+      </select>
+      <button type="submit" class="btn btn-primary mt-3">แสดงข้อมูล</button>
+    </form>
+  </div>
 </div>
     
   </div>

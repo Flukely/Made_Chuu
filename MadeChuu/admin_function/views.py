@@ -5,13 +5,16 @@ from .filters import *
 from .forms import ProductForm 
 from main.models import *
 from django.core.paginator import Paginator
+from django.db.models import Count
+from datetime import datetime, timedelta
+from django.db.models import Sum
+from django.utils.timezone import now
 
 def admin_function(request):
     return render(request, 'admin_function/Dashboard.html')
 
 def Dashboard(request):
-    product_of_shop = Product
-    return render(request, 'admin_function/Dashboard.html')
+    return render(request , 'admin_function/Dashboard.html')
 
 def ChatAdmin(request):
     return render(request, 'admin_function/ChatsAdmin.html')
@@ -76,9 +79,72 @@ def delete_product(request, product_id):
         return redirect('ProductsAdmin')
     
 
+from datetime import timedelta
+from django.db.models import Sum
+
 @staff_member_required
 def dashboard_admin(request):
-    return render(request, 'admin_function/Dashboard.html')
+    shop_id = request.session['shop_id'] = 1
+    product_of_shop_all = Product.objects.filter(shop_id=shop_id).count()
+    product_of_shop = Product.objects.filter(shop_id=shop_id)
+    category = Category.objects.filter(shop_id=shop_id)
+    category_counts = Product.objects.filter(shop_id=shop_id) \
+        .values('category__category_name') \
+        .annotate(total=Count('product_id'))
+
+    filter_type = request.GET.get('filter', 'month')  # เลือกช่วงเวลาที่ต้องการ เช่น day, month, year, 3 months, 6 months, 1 year
+    today = now().date()
+
+    # กำหนด start_date ตาม filter_type ที่เลือก
+    if filter_type == '5days':
+        start_date = today - timedelta(days=5)
+        labels = [(start_date + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(6)]  # 5 วันล่าสุด
+
+    elif filter_type == '1month':
+        start_date = today.replace(day=1)
+        labels = [(start_date + timedelta(days=i)).strftime('%Y-%m-%d') for i in range((today - start_date).days + 1)]  # 1 เดือนล่าสุด
+
+    elif filter_type == '3months':
+        start_date = today - timedelta(days=90)  # 3 เดือนล่าสุด
+        labels = [(start_date + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(91)]
+
+    elif filter_type == '6months':
+        start_date = today - timedelta(days=180)  # 6 เดือนล่าสุด
+        labels = [(start_date + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(181)]
+
+    elif filter_type == '1year':
+        start_date = today.replace(month=1, day=1)  # 1 ปีล่าสุด
+        labels = [f"{i+1}" for i in range(12)]  # แสดงเป็นเดือน 1-12
+
+    else:  # default to month filter
+        start_date = today.replace(day=1)
+        labels = [(start_date + timedelta(days=i)).strftime('%Y-%m-%d') for i in range((today - start_date).days + 1)]
+
+    # กรองข้อมูล Order ตามช่วงเวลาที่เลือก
+    orders = Order.objects.filter(order_date__date__gte=start_date)
+
+    # รวมยอดสั่งซื้อตามช่วงเวลาที่เลือก
+    order_data = []
+    for label in labels:
+        if filter_type == '1year':
+            # สำหรับกรณีปี (เดือน)
+            total = orders.filter(order_date__month=int(label)).aggregate(Sum('total_price'))['total_price__sum'] or 0
+        else:
+            # สำหรับกรณีอื่นๆ (วัน)
+            total = orders.filter(order_date__date=label).aggregate(Sum('total_price'))['total_price__sum'] or 0
+        order_data.append(total)
+
+    context = {
+        'products': product_of_shop,
+        'categories': category,
+        'countProduct': product_of_shop_all,
+        'category_counts': category_counts,
+        'filter_type': filter_type,
+        'labels': labels,
+        'order_data': order_data
+    }
+    return render(request, 'admin_function/Dashboard.html', context)
+
 
 @staff_member_required
 def comment_admin(request):
