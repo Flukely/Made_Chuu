@@ -4,14 +4,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
 from main.models import Cart, Product, User, Order, OrderProduct , CartItem
+from django.contrib.auth.decorators import login_required
 
-
+@login_required
 def AddCart(request ):
     user_id = request.session.get('user_id')
-    if not user_id:
-        return redirect('login')
-
-    request.session['user_id'] = user_id
+   
     detail_product = Product.objects.all()
     detail_cart = Cart.objects.filter(user_id=user_id)  
     detail_user = User.objects.filter(user_id=user_id)
