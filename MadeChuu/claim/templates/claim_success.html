@@ -58,7 +58,7 @@
         <p class="fw-bold">หมายเลขคำขอ: <span class="text-danger">#{{ claim.claim_id }}</span></p>
         <p class="text-muted">ทีมงานของเราจะตรวจสอบและติดต่อกลับภายใน 3-5 วันทำการ</p>
         <a href="/" class="btn btn-primary mt-3">กลับไปหน้าหลัก</a>
-        <a href="{% url 'claim_status' claim.claim_id %}" class="btn btn-secondary mt-2">ดูสถานะคำขอ</a>
+        <a href="{% url 'claim_status' claim_id=claim.claim_id %}" class="btn btn-secondary mt-2">ดูสถานะคำขอ</a>
     </div>
 </div>
 
