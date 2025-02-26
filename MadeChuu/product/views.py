@@ -4,8 +4,9 @@ from .filters import ProductFilter, ShopFilter
 from .forms import CartForm
 from django.shortcuts import render , redirect ,get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
-
+@login_required
 def product(request):
     categories = Category.objects.all()
 
@@ -29,6 +30,7 @@ def product(request):
     
     return render(request, 'product.html', context)
 
+@login_required
 def add_cart(request , product_id):
     # test user session
     request.session['user_id'] = 17

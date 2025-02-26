@@ -106,14 +106,21 @@
                     <div class="team-item h-100">
                         <div class="overflow-hidden position-relative rounded-3">
                             {% if product.product_image %}
-                            <img class="img-fluid" src="{{ product.product_image.url }}" style="width: 100%;">
+                            <a href="{% url 'product_detail' product.product_id %}">
+                                <img class="img-fluid" src="{{ product.product_image.url }}" style="width: 100%;">
+                            </a>
                             {% else %}
-                            <img class="img-fluid" src="{% static 'MadeChuu/images/default.png' %}"
-                                style="width: 100%;">
+                            <a href="{% url 'product_detail' product.product_id %}">
+                                <img class="img-fluid" src="{% static 'MadeChuu/images/default.png' %}" style="width: 100%;">
+                            </a>
                             {% endif %}
                         </div>
                         <div class="text-center p-4">
-                            <h5 class="mb-0">{{product.product_id}} : {{product.product_name}}</h5>
+                            <h5 class="mb-0">
+                                <a href="{% url 'product_detail' product.product_id %}">
+                                    {{product.product_id}} : {{product.product_name}}
+                                </a>
+                            </h5>
                             <small>{{product.category.category_name}}</small><br>
                             <small>{{product.price}}</small><br>
                             <small></small>
