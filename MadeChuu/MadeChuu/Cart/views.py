@@ -1,0 +1,111 @@
+from django.shortcuts import render, redirect
+from django.http import Http404
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
+from main.models import Cart, Product, User, Order, OrderProduct , CartItem
+
+
+def AddCart(request ):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+
+    request.session['user_id'] = user_id
+    detail_product = Product.objects.all()
+    detail_cart = Cart.objects.filter(user_id=user_id)  
+    detail_user = User.objects.filter(user_id=user_id)
+    detail_cartitem = CartItem.objects.filter(cart__user_id=user_id)  
+
+    for item in detail_cartitem:
+        item.total_price = item.quantity * item.product.price  
+
+    return render(request, 'AddCart.html', {
+        "detail_cart": detail_cart,
+        "detail_product": detail_product,
+        "detail_user": detail_user,
+        "detail_cartitem": detail_cartitem 
+    })
+
+def Confirm_Cart(request):                     #หน้ายืนยันการสั่งซื้อ
+    user_id = request.session.get('user_id')
+    
+    detail_product = Product.objects.all()
+    detail_cart = Cart.objects.all()
+    detail_user = User.objects.filter(user_id=user_id)
+    detail_cartitem = CartItem.objects.all()
+    
+    return render(request, 'Confirm_Cart.html', {
+        "detail_cart": detail_cart,
+        "detail_product": detail_product,
+        "detail_user": detail_user ,
+        "detail_cartitem": detail_cartitem
+    })
+
+def delete(request, id):                  #ลบสินค้าในตะกร้า อันนี้ปุ่มลบนะในหน้า AddCart
+    try:
+        cart_item = CartItem.objects.get(id=id)   
+        cart_item.delete()
+        message = "ลบสินค้าเรียบร้อยแล้ว"
+    except CartItem.DoesNotExist: 
+        raise Http404("ไม่มีสินค้าในตะกร้า")
+    return redirect('AddCart')
+
+@csrf_exempt
+def place_order(request):
+    user_id = request.session.get('user_id', 1)
+    if request.method == 'POST':
+        order_data = json.loads(request.POST.get('order_data'))
+        items = order_data.get('items', [])
+        total_price = order_data.get('total_price', 0)
+
+        if not items:
+            return JsonResponse({'success': False, 'message': 'ไม่มีสินค้าที่เลือก'})
+
+        user = User.objects.get(user_id=user_id)
+
+        order = Order.objects.create(
+            user=user,
+            total_price=total_price,
+            place_delivery=user.address,
+            status_order=None,
+            shipper=None,
+            tracking_num='',
+            delivery_date=None
+        )
+
+        for item in items:
+            product = Product.objects.get(product_id=item['product_id'])
+            OrderProduct.objects.create(
+                order=order,
+                product=product,
+                quantity=item['quantity']
+            )
+
+        # ลบสินค้าที่เลือกในฐานข้อมูล
+        item_ids = [item['product_id'] for item in items]
+        CartItem.objects.filter(cart__user_id=user_id, product_id__in=item_ids).delete()
+
+        return redirect('payment:payment')
+    return redirect('payment:payment')
+   
+
+@csrf_exempt          
+def delete_cart_items(request):                   #กดสั่งซื้อสินค้าแล้วลบสินค้าในตะกร้าที่เลือกไว้
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        items = data.get('items', [])
+
+        if items:  
+            item_ids = [item['id'] for item in items]  
+            CartItem.objects.filter(id__in=item_ids).delete()  
+
+        return JsonResponse({'status': 'success'})
+
+    return JsonResponse({'status': 'failed'}, status=400)
+
+
+
+
+
+
