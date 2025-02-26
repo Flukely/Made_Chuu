@@ -5,7 +5,7 @@ from .filters import *
 from .forms import ProductForm 
 from main.models import *
 from django.core.paginator import Paginator
-from django.db.models import Count
+from django.db.models import Count ,Q
 from datetime import datetime, timedelta
 from django.db.models import Sum
 from django.utils.timezone import now
@@ -121,17 +121,20 @@ def dashboard_admin(request):
         labels = [(start_date + timedelta(days=i)).strftime('%Y-%m-%d') for i in range((today - start_date).days + 1)]
 
     # กรองข้อมูล Order ตามช่วงเวลาที่เลือก
-    orders = Order.objects.filter(order_date__date__gte=start_date)
+
+
+    orders = Order.objects.filter(order_date__date__gte=start_date).exclude(status_order__status_order_id__in=[1, 2])
+
 
     # รวมยอดสั่งซื้อตามช่วงเวลาที่เลือก
     order_data = []
     for label in labels:
         if filter_type == '1year':
             # สำหรับกรณีปี (เดือน)
-            total = orders.filter(order_date__month=int(label)).aggregate(Sum('total_price'))['total_price__sum'] or 0
+            total = orders.filter(order_date__month=int(label)).exclude(status_order__status_order_id__in=[1, 2]).aggregate(Sum('total_price'))['total_price__sum'] or 0
         else:
             # สำหรับกรณีอื่นๆ (วัน)
-            total = orders.filter(order_date__date=label).aggregate(Sum('total_price'))['total_price__sum'] or 0
+            total = orders.filter(order_date__date=label).exclude(status_order__status_order_id__in=[1, 2]).aggregate(Sum('total_price'))['total_price__sum'] or 0
         order_data.append(total)
 
     context = {
