@@ -10,3 +10,8 @@ class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ['user', 'total_price', 'status_order', 'place_delivery', 'shipper', 'tracking_num', 'delivery_date']
+        
+class PromotionForm(forms.ModelForm):
+    class Meta:
+        model = Promotion
+        fields = ['promotion_name', 'discount', 'description', 'start_date', 'end_date', 'promotion_image']

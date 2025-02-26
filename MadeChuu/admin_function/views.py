@@ -2,9 +2,10 @@ from django.shortcuts import render , redirect ,get_object_or_404
 from django.views.decorators.csrf import csrf_exempt 
 from django.contrib.admin.views.decorators import staff_member_required
 from .filters import *
-from .forms import ProductForm 
+from .forms import ProductForm , PromotionForm
 from main.models import *
 from django.core.paginator import Paginator
+from django.contrib import messages
 
 def admin_function(request):
     return render(request, 'admin_function/Dashboard.html')
@@ -30,9 +31,6 @@ def CommentAdmin(request):
 
 def ProductAdmin(request):
     return render(request, 'admin_function/ProductsAdmin.html')
-
-def PromotionsAdmin(request):
-    return render(request, 'admin_function/PromotionsAdmin.html')
 
 def product_list(request):
     request.session['shop_id'] = 1
@@ -102,4 +100,44 @@ def add_reply(request):
 
     return redirect('admin_comment')
 
+#Promotions
+def PromotionsAdmin(request):
+    return render(request, 'admin_function/PromotionsAdmin.html')
 
+def promotions_list(request):
+    promotions = Promotion.objects.all()
+    if request.method == 'POST':
+        add_form = PromotionForm(request.POST, request.FILES)
+        if add_form.is_valid():
+            product = add_form.save(commit=False)
+            product.save()
+            return redirect('PromotionsAdmin')
+    else:
+        add_form = PromotionForm()
+    return render(request, "admin_function/PromotionsAdmin.html", 
+                  {'promotions': promotions ,})
+    
+@csrf_exempt
+def edit_promotion(request, promotion_id):
+    promotion = get_object_or_404(Promotion, pk=promotion_id)
+    if request.method == 'POST':
+        form = PromotionForm(request.POST, request.FILES, instance=promotion)
+        if form.is_valid():
+            form.save()
+            return redirect('PromotionsAdmin')
+    else:
+        form = PromotionForm(instance=promotion)
+    return render(request, 'admin_function/Edit_Promotions.html', {'form': form, 'promotion': promotion})
+
+def delete_promotions(request, promotion_id):
+    # ตรวจสอบว่าวิธีการของคำขอเป็น POST หรือไม่
+    if request.method == 'POST':
+        # ดึงข้อมูลสินค้าที่ต้องการลบจากฐานข้อมูล
+        promotion = get_object_or_404(Promotion, promotion_id=promotion_id)
+        # ลบสินค้าที่เลือก
+        promotion.delete()
+        # เปลี่ยนเส้นทางผู้ใช้กลับไปยังหน้า ProductsAdmin
+        return redirect('PromotionsAdmin')
+    else:
+        # ถ้าวิธีการของคำขอไม่ใช่ POST, เปลี่ยนเส้นทางกลับไปยังหน้า ProductsAdmin
+        return redirect('PromotionsAdmin')

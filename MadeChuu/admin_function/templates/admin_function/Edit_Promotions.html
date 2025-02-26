@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Edit Product {% endblock %}
+{% block content %}
+<div class="container">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Promotion</h5>
+                <a href="{% url 'PromotionsAdmin' %}"><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></a>
+            </div>
+            <div class="modal-body">
+                <form id="edit-products-form" class="p-2" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="display-block">
+                        <center>
+                            {% if promotions.promotion_image %}
+                                <img class="img-fluid" src="{{ promotions.promotion_image.url }}" style="width: 50%;">
+                            {% else %}
+                                <img class="img-fluid" src="{% static 'MadeChuu/images/default.png' %}" style="width: 50%;">
+                            {% endif %}
+                            <br><label>Promotion Image</label>
+                        </center>
+                    </div>
+                    <input type="hidden" name="promotion_id" id="promotion_id" value="{{ promotions.promotion_id }}">
+                    
+                    <div class="mb-3">
+                        <label for="product_name">Promotion Name</label>
+                        <input type="text" name="Promotion_name" class="form-control" id="Promotion_name" value="{{ form.promotion_name.value }}" required>
+                    </div>
+                    
+                    <div class="mb=3">
+                        <label for="description">Description</label>
+                        <textarea class="form-control" id="description" name="description">{{ form.description.value|default_if_none:''  }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="price">Discount</label>
+                        <input type="number" class="form-control" id="discount" name="discount" value="{{ form.discount.value }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="start_date">Start Date:</label>
+                        <input type="date" id="start_date" name="start_date" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="end_date">End Date:</label>
+                        <input type="date" id="end_date" name="end_date" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="promotion_image" class="form-label">Add new Image</label>
+                        <center>
+                        <input type="file" class="form-control-file image-input" id="promotion_image" name="promotion_image">
+                        <img class="preview-img mt-3" style="width: 50%;">
+                        </center>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <input type="submit" value="Edit Product" class="btn btn-primary btn-block">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        document.querySelectorAll('.image-input').forEach(input => {
+            input.addEventListener('change', function (event) {
+                let reader = new FileReader();
+                let preview = this.nextElementSibling;
+                reader.onload = function () {
+                    preview.src = reader.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(event.target.files[0]);
+            });
+        });
+</script>
+{% endblock %}
