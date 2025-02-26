@@ -9,9 +9,12 @@ from django.core.paginator import Paginator
 def admin_function(request):
     return render(request, 'admin_function/Dashboard.html')
 
+def Dashboard(request):
+    product_of_shop = Product
+    return render(request, 'admin_function/Dashboard.html')
+
 def ChatAdmin(request):
     return render(request, 'admin_function/ChatsAdmin.html')
-
 
 def OrderAdmin(request):
     #Query from model Order
@@ -21,9 +24,6 @@ def OrderAdmin(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return render(request, 'admin_function/OrderAdmin.html',{'orders':order_filter , 'page_obj': page_obj}) 
-
-def Dashboard(request):
-    return render(request, 'admin_function/Dashboard.html')
 
 def CommentAdmin(request):
     return render(request, 'admin_function/CommentAdmin.html')
