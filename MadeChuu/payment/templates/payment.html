@@ -120,23 +120,30 @@
 
 <body>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top p-3 shadow-sm">
-        <h1 class="text-pink">Made Chuu</h1>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="#">หน้าแรก</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">รายการสินค้า</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">ตระกร้า</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">คำสั่งซื้อ</a></li>
-                <li class="nav-item"><a class="nav-link active" href="#">ชำระเงิน</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">ดูใบเสร็จ</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">รีวิวสินค้า</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">เคลมสินค้า</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">ติดต่อผู้ขาย</a></li>
-            </ul>
-        </div>
-    </nav>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top p-3 shadow-sm">
+    <h1 class="text-pink">Made Chuu</h1>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">หน้าแรก</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'product' %}">รายการสินค้า</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'AddCart' %}">ตระกร้า</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">ติดตามคำสั่งซื้อ</a></li>
+            <li class="nav-item"><a class="nav-link active" href="{% url 'payment:payment' %}">ชำระเงิน</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'receipt:check_receipt' %}">ดูใบเสร็จ</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'review_page' %}">รีวิวสินค้า</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'review_page' %}">เคลมสินค้า</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">ติดต่อผู้ขาย</a></li>
+            {% if user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="#">{{ user.username }}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+<!-- End Navbar -->
 
 
     <div class="container mt-5">
@@ -145,15 +152,24 @@
         <div class="text-center">
             {% if messages %}
             {% for message in messages %}
-            <!-- แสดงข้อความแจ้งเตือนหลังจากอัปโหลดสลิปสำเร็จ -->
-            <div class="text-center mt-3">
-                <img src="{% static 'images/correct.png' %}" alt="QR Code" class="img-fluid" width="200"
-                    height="auto" />
-                <p class="text-danger">{{ message|linebreaksbr }}</p>
-                <br>
-                <!-- ปุ่มไปยังหน้ารายการสั่งซื้อ -->
-                <a href="{% url 'receipt:check_receipt' %}" class="btn btn-success">ตรวจสอบใบเสร็จของคุณ</a>
-            </div>
+                {% if message.tags == 'success' %}
+                <!-- แสดงข้อความแจ้งเตือนหลังจากอัปโหลดสลิปสำเร็จ -->
+                <div class="text-center mt-3">
+                    <img src="{% static 'images/correct.png' %}" alt="QR Code" class="img-fluid" width="200"
+                        height="auto" />
+                    <p class="text-success">{{ message|linebreaksbr }}</p>
+                    <br>
+                    <!-- ปุ่มไปยังหน้ารายการสั่งซื้อ -->
+                    <a href="{% url 'receipt:check_receipt' %}" class="btn btn-success">ตรวจสอบใบเสร็จของคุณ</a>
+                </div>
+                {% else %}
+                <!-- แสดงข้อความแจ้งเตือนเมื่ออัปโหลดสลิปไม่สำเร็จ -->
+                <div class="text-center mt-3">
+                    <p class="text-danger">{{ message|linebreaksbr }}</p>
+                    <br>
+                    <a href="{% url 'payment:payment' %}" class="btn btn-success">กลับ</a>
+                </div>
+                {% endif %}
             {% endfor %}
 
             {% else %}

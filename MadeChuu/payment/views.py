@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.timezone import now
-from .form import PaymentForm
+from .form import PaymentForm  # Ensure the correct import
 from main.models import Order, Receipt
 
+@login_required
 def payment(request):
     if request.method == "POST":
         form = PaymentForm(request.POST, request.FILES, user=request.user)  # Pass the user to the form
@@ -19,6 +21,8 @@ def payment(request):
             payment.save()
             messages.success(request, "อัปโหลดสลิปสำเร็จ!\nร้านค้ากำลังตรวจสอบคำสั่งซื้อ และแจ้งผลผ่านทางหน้าติดตามสถานะคำสั่งซื้อ")
             return redirect('payment:payment')
+        else:
+            messages.error(request, "กรุณากรอกข้อมูลการชำระเงินให้ครบถ้วน")
     else:
         form = PaymentForm(user=request.user)  # Pass the user to the form
 

@@ -42,8 +42,8 @@
     <link href="https://example.com/img/favicon.ico" rel="icon">
 
     <!-- Template Stylesheet -->
-    <link href="css/style.css" rel="stylesheet">
-    <link href="css/Style_Admin.css" rel="stylesheet">
+    <link href="MadeChuu/css/style.css" rel="stylesheet">
+    <link href="MadeChuu/css/Style_Admin.css" rel="stylesheet">
 
     <!-- Css style -->
     <link rel="stylesheet" href="{% static 'MadeChuu/css/style_Admin.css' %}">
@@ -68,12 +68,12 @@
                 <li class="nav-item"><a class="nav-link" href="#">หน้าแรก</a></li>
                 <li class="nav-item"><a class="nav-link active" href="{% url 'product' %}">รายการสินค้า</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'AddCart' %}">ตระกร้า</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'track' order_id=1 %}">คำสั่งซื้อ</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'payment:payment' %}">ชำระเงิน</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'receipt:receipt' receipt_id=3 %}">ดูใบเสร็จ</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'review_page' %}">รีวิวสินค้า</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'claim_request' order_id=1 %}">เคลมสินค้า</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'chat' %}">ติดต่อผู้ขาย</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">คำสั่งซื้อ</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">ชำระเงิน</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">ดูใบเสร็จ</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">รีวิวสินค้า</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">เคลมสินค้า</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">ติดต่อผู้ขาย</a></li>
             </ul>
         </div>
     </nav>

@@ -35,6 +35,18 @@ class PaymentForm(forms.ModelForm):
             else:
                 self.order = None  # No orders available for the user
 
+    def clean(self):
+        cleaned_data = super().clean()
+        payment_image = cleaned_data.get("payment_image")
+
+        if not payment_image:
+            raise forms.ValidationError("กรุณาอัปโหลดสลิปการชำระเงิน")
+
+        if not self.order:
+            raise forms.ValidationError("ไม่พบคำสั่งซื้อ กรุณาลองใหม่อีกครั้ง")
+
+        return cleaned_data
+
     def save(self, commit=True):
         payment = super().save(commit=False)
         if self.order:

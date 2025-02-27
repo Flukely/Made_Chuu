@@ -54,7 +54,7 @@
             padding: 10px;
             text-align: center;
         }
-        body { background-color: #f8f9fa; font-family: 'Arial', sans-serif; }
+        body { background-color: #ffffff; font-family: 'Arial', sans-serif; }
         .container { max-width: 600px; margin-top: 50px; }
         .card { border-radius: 12px; padding: 25px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); background-color: #ffffff; }
         .product-img { max-width: 100px; border-radius: 10px; }
@@ -64,23 +64,30 @@
     </style>
 </head>
 <body>
- <!-- Navbar -->
- <nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top p-3 shadow-sm">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top p-3 shadow-sm">
     <h1 class="text-pink">Made Chuu</h1>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link" href="#">หน้าแรก</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">หน้าแรก</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'product' %}">รายการสินค้า</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'AddCart' %}">ตระกร้า</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'track' order_id=1 %}">คำสั่งซื้อ</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">ติดตามคำสั่งซื้อ</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'payment:payment' %}">ชำระเงิน</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'receipt:receipt' receipt_id=3 %}">ดูใบเสร็จ</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'receipt:check_receipt' %}">ดูใบเสร็จ</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'review_page' %}">รีวิวสินค้า</a></li>
-            <li class="nav-item"><a class="nav-link  active" href="#">เคลมสินค้า</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'chat' %}">ติดต่อผู้ขาย</a></li>
+            <li class="nav-item"><a class="nav-link active" href="#">เคลมสินค้า</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">ติดต่อผู้ขาย</a></li>
+            {% if user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="#">{{ user.username }}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+            {% endif %}
         </ul>
     </div>
 </nav>
+<!-- End Navbar -->
 <header>
     <h1>เคลมสินค้า</h1>
 </header>
@@ -90,10 +97,16 @@
         <hr>
 
         <div class="d-flex align-items-center">
-            <img src="{{ orderproduct.product.product_image.url }}" alt="สินค้า" class="product-img me-3">
+            {% if orderproduct.product.product_image and orderproduct.product.product_image.url %}
+                <img src="{{ orderproduct.product.product_image.url }}" alt="สินค้า" class="product-img me-3">
+            {% else %}
+                <img src="/static/images/default_product.png" alt="ไม่มีรูปสินค้า" class="product-img me-3">
+            {% endif %}
             <div>
-                <p class="mb-0"><strong>{{ order.product.product_name }}</strong></p>
-                <p class="text-muted mb-0">สินค้า: {{ orderproduct.product.product_name }} | ราคา: <strong>฿{{ order.total_price }}</strong></p>
+                <p class="mb-0"><strong>{{ orderproduct.product.product_name }}</strong></p>
+                <p class="text-muted mb-0">
+                    สินค้า: {{ orderproduct.product.product_name }} | ราคา: <strong>฿{{ order.total_price }}</strong>
+                </p>
                 <p class="text-success fw-bold">จัดส่งสำเร็จ</p>
             </div>
         </div>
@@ -107,7 +120,7 @@
 
             <div class="mb-3">
                 <label class="form-label fw-bold">ช่องทางการติดต่อ *</label>
-                {{ form.contact_method }}
+                {{ form.claim_contact }}
             </div>
 
             <div class="mb-3">
@@ -127,8 +140,8 @@
                 <label class="form-label fw-bold">ช่องทางการคืนเงิน *</label>
                 {{ form.promtpay_number }}
             </div>
-            <a href="{% url 'claim-status' claim_id=2 %}" class="btn btn-primary w-100">✅ ส่งคำขอ</a>
-            <a href="{% url 'track' order_id=1 %}" class="btn btn-secondary w-100 mt-2">❌ ยกเลิก</a>
+            <button type="submit" class="btn btn-primary w-100">✅ ส่งคำขอ</button>
+            <a href="/" class="btn btn-secondary w-100 mt-2">❌ ยกเลิก</a>
         </form>
     </div>
 </div>
