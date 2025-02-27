@@ -287,3 +287,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'main.User'  # ใช้โมเดลที่เราจะสร้างแทน Django User
 LOGIN_URL = 'login'
+
+TIME_ZONE = 'Asia/Bangkok'
+USE_TZ = True

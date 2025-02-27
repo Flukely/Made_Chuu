@@ -130,16 +130,23 @@
       }
       ,
       options: {
-        scales: {
-          y: {
-            beginAtZero: true
+        responsive: true,
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(tooltipItem) {
+                // Calculate the percentage
+                var total = tooltipItem.dataset.data.reduce((a, b) => a + b, 0);  // Sum of all data points
+                var percentage = ((tooltipItem.raw / total) * 100).toFixed(2);  // Calculate percentage
+                return tooltipItem.label + ': ' + percentage + '%';  // Return percentage in tooltip
+              }
+            }
           }
         }
       }
-      
-      });
     });
-  </script>
+  });
+</script>
     </div>
 </div>
 <!-- แสดงยอดขาย-->
@@ -161,7 +168,7 @@
                         backgroundColor: 'rgba(54, 162, 235, 0.2)',
                         borderWidth: 2,
                         fill: true,
-                        tension: 0.4
+                        tension: 0.3
                     }]
                 },
                 options: {
@@ -196,7 +203,7 @@
   <div class="col-md-3 d-flex flex-column">
       <div class="card mb-2 flex-grow-1">Box 1</div>
       <div class="card mb-2 flex-grow-1">Box 2</div>
-      <div class="card flex-grow-1">Box 3</div>
+      <div class="card mb-2 flex-grow-1">Box 3</div>
   </div>
   <div class="col-md-9">
     <canvas id="Product-Chart" class = 'card'></canvas>
@@ -224,6 +231,7 @@
               data: { labels: labels, datasets: datasets },
               options: {
                   responsive: true,
+                  tension: 0.5,
                   plugins: {
                       legend: { position: 'top' }
                   },

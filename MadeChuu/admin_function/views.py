@@ -8,7 +8,7 @@ from django.core.paginator import Paginator
 from django.db.models import Count ,Q
 from datetime import datetime, timedelta
 from django.db.models import Sum , F
-from django.utils.timezone import now
+from django.utils import timezone
 
 def admin_function(request):
     return render(request, 'admin_function/Dashboard.html')
@@ -84,7 +84,7 @@ from django.db.models import Sum
 
 @staff_member_required
 def dashboard_admin(request):
-    today = now().date()
+    today = timezone.localtime(timezone.now()).date()
     shop_id = request.session['shop_id'] = 1
     product_of_shop_all = Product.objects.filter(shop_id=shop_id).count()
     product_of_shop = Product.objects.filter(shop_id=shop_id)
@@ -92,13 +92,12 @@ def dashboard_admin(request):
     category_counts = Product.objects.filter(shop_id=shop_id) \
         .values('category__category_name') \
         .annotate(total=Count('product_id'))
-    gender_counts = User.objects.values('gender').annotate(total = Count('user_id'))
     orders_all = Order.objects.filter(shop_id=shop_id).count()
     orders_today = Order.objects.filter(order_date__date=today, shop_id=shop_id).count()
     users_all = User.objects.all().count()
     users_today = User.objects.filter(join_date=today).count()
     
-
+    gender_counts = User.objects.values('gender').annotate(total = Count('user_id'))
     gender_data = { 'male': 0, 'female': 0, 'other': 0 }
     for item in gender_counts:
         gender_data[item['gender'].lower()] = item['total']
@@ -178,7 +177,7 @@ def dashboard_admin(request):
                     index = labels.index(label)
                     total_price = item['total_quantity'] * unit_price
                     product_data[product_name][index] += total_price
-    print(product_data)
+    
 
     context = {
         'products': product_of_shop,
