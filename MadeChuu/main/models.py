@@ -117,7 +117,6 @@ class Shop(models.Model):
 class Cart(models.Model):
     cart_id = models.AutoField(primary_key=True)
     user = models.ForeignKey('User', on_delete=models.CASCADE)
-    total_price = models.FloatField()
 
     def __str__(self):
         return f"Cart ID: {self.cart_id if self.cart_id else 'No Cart'}, User ID: {self.user.user_id if self.user else 'No User'}"

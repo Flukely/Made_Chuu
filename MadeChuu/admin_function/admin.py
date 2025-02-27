@@ -8,7 +8,7 @@ class ShopAdmin(admin.ModelAdmin):
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ('cart_id', 'user', 'total_price')
+    list_display = ('cart_id', 'user')
     search_fields = ('user__user_name', )
 
 @admin.register(StatusOrder)
