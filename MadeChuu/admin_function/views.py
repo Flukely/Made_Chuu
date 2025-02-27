@@ -8,6 +8,7 @@ from django.core.paginator import Paginator
 from django.db.models import Count ,Q
 from datetime import datetime, timedelta
 from django.db.models import Sum , F
+from django.utils.timezone import now
 from django.utils import timezone
 
 def admin_function(request):
@@ -121,10 +122,6 @@ def dashboard_admin(request):
         start_date = today - timedelta(days=180)  # 6 เดือนล่าสุด
         labels = [(start_date + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(181)]
 
-    elif filter_type == '1year':
-        start_date = today.replace(month=1, day=1)  # 1 ปีล่าสุด
-        labels = [f"{i+1}" for i in range(12)]  # แสดงเป็นเดือน 1-12
-
     else:  # default to month filter
         start_date = today.replace(day=1)
         labels = [(start_date + timedelta(days=i)).strftime('%Y-%m-%d') for i in range((today - start_date).days + 1)]
@@ -138,18 +135,21 @@ def dashboard_admin(request):
     # รวมยอดสั่งซื้อตามช่วงเวลาที่เลือก
     order_data = []
     for label in labels:
-        if filter_type == '1year':
-            # สำหรับกรณีปี (เดือน)
-            total = orders.filter(order_date__month=int(label)).exclude(status_order__status_order_id__in=[1, 2]).aggregate(Sum('total_price'))['total_price__sum'] or 0
-        else:
-            # สำหรับกรณีอื่นๆ (วัน)
-            total = orders.filter(order_date__date=label).exclude(status_order__status_order_id__in=[1, 2]).aggregate(Sum('total_price'))['total_price__sum'] or 0
+        # Convert label string to datetime, then make it timezone-aware
+        label_date = timezone.make_aware(datetime.strptime(label, '%Y-%m-%d'), timezone.get_current_timezone())
+
+        # ใช้ label_date.date() เพื่อให้ตรงกับ order_date__date
+        total = orders.filter(order_date__date=label_date.date()).exclude(
+            status_order__status_order_id__in=[1, 2]
+        ).aggregate(Sum('total_price'))['total_price__sum'] or 0
+
         order_data.append(total)
 
     order_products = OrderProduct.objects.filter(order__shop_id=shop_id) \
     .values('product__product_name', 'order__order_date') \
     .annotate(total_quantity=Sum('quantity'))
 
+    
     # สร้าง product_data และเก็บข้อมูลวันที่
     product_data = {}
     for label in labels:
@@ -159,10 +159,7 @@ def dashboard_admin(request):
 
             product = Product.objects.get(product_name=product_name, shop_id=shop_id)  # Assuming product_name is unique
             unit_price = product.price  # Assuming 'unit_price' is the field storing the product price
-
-            if filter_type == '1year':
-                order_date = str(order_date.month)  # แสดงเป็นเดือน 1-12
-
+            
             if product_name not in product_data:
                 product_data[product_name] = [0] * len(labels)
 

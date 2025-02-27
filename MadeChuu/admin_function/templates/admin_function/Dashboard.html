@@ -152,37 +152,43 @@
 <!-- แสดงยอดขาย-->
 <div class="row g-3 mt-3">
   <div class="col-md-10">
-    <p class="text-center text-primary"> ยอดขายโดยรวม</p>
-      <canvas id="orderChart" class = "card"></canvas>
-      <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var ctx = document.getElementById('orderChart').getContext('2d');
-            var orderChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [{% for label in labels %} '{{ label }}' {% if not forloop.last %}, {% endif %} {% endfor %}],
-                    datasets: [{
-                        label: 'ยอดคำสั่งซื้อ (บาท)',
-                        data: [{% for data in order_data %} {{ data }} {% if not forloop.last %}, {% endif %} {% endfor %}],
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        });
-  </script>
+    <p class="text-center text-primary">ยอดขายโดยรวม</p>
+    <canvas id="orderChart" class="card"></canvas>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          var ctx = document.getElementById('orderChart').getContext('2d');
+
+          var labels = {{ labels|safe }};  // ใช้ safe เพื่อให้ Django สร้าง JSON ที่ถูกต้อง
+          var orderData = {{ order_data|default:"[]"|safe }};  // ป้องกัน None และรูปแบบผิดพลาด
+
+          var orderChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                  labels: labels,
+                  datasets: [{
+                      label: 'ยอดคำสั่งซื้อ (บาท)',
+                      data: orderData,
+                      borderColor: 'rgba(54, 162, 235, 1)',
+                      backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                      borderWidth: 2,
+                      fill: true,
+                      tension: 0.3
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  scales: {
+                      y: {
+                          beginAtZero: true
+                      }
+                  }
+              }
+          });
+      });
+    </script>
   </div>
+
+
   <div class="col-md-2">
     <form method="get" action="{% url 'Dashboard' %}">
       <label for="filter" class="form-label">เลือกช่วงเวลา</label>
@@ -191,7 +197,6 @@
         <option value="1month" {% if filter_type == '1month' %}selected{% endif %}>1 เดือนล่าสุด</option>
         <option value="3months" {% if filter_type == '3months' %}selected{% endif %}>3 เดือนล่าสุด</option>
         <option value="6months" {% if filter_type == '6months' %}selected{% endif %}>6 เดือนล่าสุด</option>
-        <option value="1year" {% if filter_type == '1year' %}selected{% endif %}>1 ปีล่าสุด</option>
       </select>
       <button type="submit" class="btn btn-primary mt-3">แสดงข้อมูล</button>
     </form>

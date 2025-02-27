@@ -257,7 +257,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Bangkok'
 
 USE_I18N = True
 
@@ -287,6 +287,3 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'main.User'  # ใช้โมเดลที่เราจะสร้างแทน Django User
 LOGIN_URL = 'login'
-
-TIME_ZONE = 'Asia/Bangkok'
-USE_TZ = True
