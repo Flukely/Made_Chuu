@@ -145,7 +145,7 @@ class Order(models.Model):
     shipper = models.ForeignKey('ShippingBrand', on_delete=models.CASCADE, blank=True, null=True)
     tracking_num = models.CharField(max_length=255, blank=True, null=True)
     delivery_date = models.DateTimeField(blank=True, null=True)
-    shop = models.ForeignKey()
+    shop = models.ForeignKey('Shop' , on_delete=models.CASCADE ,blank= True , null=True)
 
     def __str__(self):
         return f"Order ID: {self.order_id if self.order_id else 'No Order'}, User ID: {self.user.user_id if self.user else 'No User'}"
