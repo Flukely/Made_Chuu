@@ -158,6 +158,9 @@ def dashboard_admin(request):
             product_name = item['product__product_name']
             order_date = item['order__order_date'].date()  # เปลี่ยนให้เป็น date object
 
+            product = Product.objects.get(product_name=product_name, shop_id=shop_id)  # Assuming product_name is unique
+            unit_price = product.price  # Assuming 'unit_price' is the field storing the product price
+
             if filter_type == '1year':
                 order_date = str(order_date.month)  # แสดงเป็นเดือน 1-12
 
@@ -168,11 +171,13 @@ def dashboard_admin(request):
             if isinstance(label, str):
                 if order_date.strftime('%Y-%m-%d') == label:  # Compare dates in string format
                     index = labels.index(label)
-                    product_data[product_name][index] += item['total_quantity']
+                    total_price = item['total_quantity'] * unit_price
+                    product_data[product_name][index] += total_price
             elif isinstance(label, int):
                 if order_date == label:  # Compare with month number in the case of the '1year' filter
                     index = labels.index(label)
-                    product_data[product_name][index] += item['total_quantity']
+                    total_price = item['total_quantity'] * unit_price
+                    product_data[product_name][index] += total_price
     print(product_data)
 
     context = {
