@@ -57,10 +57,6 @@
         }
         
         .card:hover {
-<<<<<<< HEAD
-         
-=======
->>>>>>> 58b4cca340e448b974db83eedc3522695a97cd3c
             box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
         }
         
@@ -246,7 +242,6 @@
             <h3 class="fw-bold text-center top fancy">🛒 ตะกร้าสินค้า</h3>
         </div>
         
-        
         <!-- แสดงสินค้าทั้งหมดในตะกร้า -->
         <div class="container mt-4">
            {% regroup detail_cartitem by product.shop.shop_id as shop_list %}
@@ -356,10 +351,7 @@
                         );
                         otherItemCheckboxes.forEach((itemCheckbox) => {
                             itemCheckbox.checked = false;
-<<<<<<< HEAD
-=======
                             itemCheckbox.disabled = true; // Disable checkboxes from other shops
->>>>>>> 58b4cca340e448b974db83eedc3522695a97cd3c
                         });
                     }
                 });
@@ -379,10 +371,7 @@
                     // เลือกหรือยกเลิก checkbox ทั้งหมดในร้านค้านี้
                     itemCheckboxesInShop.forEach((checkbox) => {
                         checkbox.checked = selectAllCheckbox.checked;
-<<<<<<< HEAD
-=======
                         checkbox.disabled = false; // Enable checkboxes from the same shop
->>>>>>> 58b4cca340e448b974db83eedc3522695a97cd3c
                     });
         
                     updateTotal();
