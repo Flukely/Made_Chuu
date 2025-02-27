@@ -3,18 +3,20 @@ from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
-from main.models import Cart, Product, User, Order, OrderProduct , CartItem
+from main.models import Cart, Product, User, Order, OrderProduct , CartItem , Shop
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
 @login_required
 def AddCart(request ):
-    user_id = request.session.get('user_id')
+    user_id = request.session.get('user_id',1)
+    request.session['user_id'] = user_id
    
     detail_product = Product.objects.all()
     detail_cart = Cart.objects.filter(user_id=user_id)  
     detail_user = User.objects.filter(user_id=user_id)
     detail_cartitem = CartItem.objects.filter(cart__user_id=user_id)  
-
+  
     for item in detail_cartitem:
         item.total_price = item.quantity * item.product.price  
 
@@ -22,7 +24,8 @@ def AddCart(request ):
         "detail_cart": detail_cart,
         "detail_product": detail_product,
         "detail_user": detail_user,
-        "detail_cartitem": detail_cartitem 
+        "detail_cartitem": detail_cartitem ,
+       
     })
 
 def Confirm_Cart(request):                     #หน้ายืนยันการสั่งซื้อ
