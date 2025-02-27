@@ -6,18 +6,60 @@
   <h1 class="text-center text-primary">Dashboard</h1>
   <p class="text-center text-muted">กราฟ และข้อมูลการสั่งซื้อของลูกค้า</p>
   <div class="row g-3">
-    <div class="col-md-3">
-        <div class="card p-3">Card 1</div>
+    <div class="col-md-6">
+      <div class="card p-3" >
+        <div class="overview__inner">
+            <div class="overview-box clearfix d-flex justify-content-center">
+                <div class="text">
+                    <h2><i class="fa-solid fa-user"></i>
+                      {{orders_all}}
+                    </h2>
+                    <span>Orders </span>
+                </div>
+                {% if orders_today == 0 %} 
+                <div>
+                  <p class = "text-muted"><i class = "fas fa-caret-up"></i>
+                    {{orders_today}}
+                  </p>
+                </div>
+                {% else %}
+                <div>
+                  <p class = "text-success"><i class = "fas fa-caret-up"></i>
+                    {{orders_today}}
+                  </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+      </div>
     </div>
-    <div class="col-md-3">
-        <div class="card p-3">Card 2</div>
-    </div>
-    <div class="col-md-3">
-        <div class="card p-3">จำนวน Product ทั้งหมด : {{countProduct}}</div>
-    </div>
-    <div class="col-md-3">
-        <div class="card p-3">Card 4</div>
-    </div>
+    <div class="col-md-6">
+      <div class="card p-3" >
+        <div class="overview__inner">
+            <div class="overview-box clearfix d-flex justify-content-center">
+                <div class="text">
+                    <h2><i class="fa-solid fa-user"></i>
+                      {{users_all}}
+                    </h2>
+                    <span>members </span>
+                </div>
+                {% if users_today == 0 %} 
+                <div>
+                  <p class = "text-muted"><i class = "fas fa-caret-up"></i>
+                    {{users_today}}
+                  </p>
+                </div>
+                {% else %}
+                <div>
+                  <p class = "text-success"><i class = "fas fa-caret-up"></i>
+                    {{users_today}}
+                  </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+      </div>
+  </div>
 </div>
 
 <!-- Bottom Row: 2 Large Cards -->
@@ -76,7 +118,7 @@
         data: {
           labels: ['Male' , 'Female' , 'Others'],
           datasets: [{
-              label: 'Categories',
+              label: 'Gender',
               data: [{{ gender_data.male }}, {{ gender_data.female }}, {{ gender_data.other }}],
               backgroundColor: [
                   'rgba(254 , 0 , 174 , 0.6)',

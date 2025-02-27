@@ -84,6 +84,7 @@ from django.db.models import Sum
 
 @staff_member_required
 def dashboard_admin(request):
+    today = now().date()
     shop_id = request.session['shop_id'] = 1
     product_of_shop_all = Product.objects.filter(shop_id=shop_id).count()
     product_of_shop = Product.objects.filter(shop_id=shop_id)
@@ -92,13 +93,17 @@ def dashboard_admin(request):
         .values('category__category_name') \
         .annotate(total=Count('product_id'))
     gender_counts = User.objects.values('gender').annotate(total = Count('user_id'))
+    orders_all = Order.objects.filter(shop_id=shop_id).count()
+    orders_today = Order.objects.filter(order_date=today).filter(shop_id=shop_id).count()
+    users_all = User.objects.all().count()
+    users_today = User.objects.filter(join_date=today).count()
+    
 
     gender_data = { 'male': 0, 'female': 0, 'other': 0 }
     for item in gender_counts:
         gender_data[item['gender'].lower()] = item['total']
 
     filter_type = request.GET.get('filter', 'month')  # เลือกช่วงเวลาที่ต้องการ เช่น day, month, year, 3 months, 6 months, 1 year
-    today = now().date()
 
     # กำหนด start_date ตาม filter_type ที่เลือก
     if filter_type == '5days':
@@ -128,7 +133,7 @@ def dashboard_admin(request):
     # กรองข้อมูล Order ตามช่วงเวลาที่เลือก
 
 
-    orders = Order.objects.filter(order_date__date__gte=start_date).exclude(status_order__status_order_id__in=[1, 2])
+    orders = Order.objects.filter(order_date__date__gte=start_date).exclude(status_order__status_order_id__in=[1, 2]).filter(orderproduct__product__shop_id=shop_id)
 
 
     # รวมยอดสั่งซื้อตามช่วงเวลาที่เลือก
@@ -150,7 +155,12 @@ def dashboard_admin(request):
         'filter_type': filter_type,
         'labels': labels,
         'order_data': order_data,
-        'gender_data' : gender_data
+        'gender_data' : gender_data,
+        'users_all' : users_all,
+        'users_today' : users_today,
+        'orders_all' : orders_all,
+        'orders_today' : orders_today
+
     }
     return render(request, 'admin_function/Dashboard.html', context)
 
