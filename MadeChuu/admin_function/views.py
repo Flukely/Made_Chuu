@@ -91,6 +91,11 @@ def dashboard_admin(request):
     category_counts = Product.objects.filter(shop_id=shop_id) \
         .values('category__category_name') \
         .annotate(total=Count('product_id'))
+    gender_counts = User.objects.values('gender').annotate(total = Count('user_id'))
+
+    gender_data = { 'male': 0, 'female': 0, 'other': 0 }
+    for item in gender_counts:
+        gender_data[item['gender'].lower()] = item['total']
 
     filter_type = request.GET.get('filter', 'month')  # เลือกช่วงเวลาที่ต้องการ เช่น day, month, year, 3 months, 6 months, 1 year
     today = now().date()
@@ -144,7 +149,8 @@ def dashboard_admin(request):
         'category_counts': category_counts,
         'filter_type': filter_type,
         'labels': labels,
-        'order_data': order_data
+        'order_data': order_data,
+        'gender_data' : gender_data
     }
     return render(request, 'admin_function/Dashboard.html', context)
 

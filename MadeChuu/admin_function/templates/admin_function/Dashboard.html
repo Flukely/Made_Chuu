@@ -23,6 +23,7 @@
 <!-- Bottom Row: 2 Large Cards -->
 <div class="row g-3 mt-3">
     <div class="col-md-8">
+        <p class="text-center text-primary"> จำนวน Products แต่ละ Categories</p>
         <canvas id="myChart1"></canvas>
     <script>
       window.addEventListener('DOMContentLoaded', function() {
@@ -47,24 +48,62 @@
             }]
         }
         ,
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true
-              }
+        options: {
+          plugins: {
+            customCanvasBackgroundColor: {
+              color: 'lightGreen'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
             }
           }
+        }
+        
         });
       });
     </script>
     </div>
     <div class="col-md-4">
-        <div class="card p-4">Large Card 2</div>
+      <p class="text-center text-primary"> จำนวน ชาย : หญิง : อื่นๆ</p>
+      <canvas id="GenderChart-customer"></canvas>
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      var ctx = document.getElementById('GenderChart-customer').getContext('2d');
+      var myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Male' , 'Female' , 'Others'],
+          datasets: [{
+              label: 'Categories',
+              data: [{{ gender_data.male }}, {{ gender_data.female }}, {{ gender_data.other }}],
+              backgroundColor: [
+                  'rgba(254 , 0 , 174 , 0.6)',
+                  'rgba(0, 60, 255, 0.6)',
+                  'rgba(147, 112, 219, 0.6)'
+              ],
+              borderWidth: 1
+          }]
+      }
+      ,
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+      
+      });
+    });
+  </script>
     </div>
 </div>
 <!-- แสดงยอดขาย-->
 <div class="row g-3 mt-3">
   <div class="col-md-10">
+    <p class="text-center text-primary"> ยอดขาย</p>
       <canvas id="orderChart"></canvas>
       <script>
         document.addEventListener('DOMContentLoaded', function() {
