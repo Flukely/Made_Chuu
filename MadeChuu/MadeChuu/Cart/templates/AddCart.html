@@ -262,42 +262,42 @@
         
         <!-- แสดงสินค้าทั้งหมดในตะกร้า -->
         <div class="container mt-4">
-           {% regroup detail_cartitem by product.shop.shop_id as shop_list %}
-        
-        {% for shop in shop_list %}
-            <div class="shop-block">
-                <div class="shop-header">
-                    <input type="checkbox" class="form-check-input me-2 select-all-shop" data-shop-id="{{ shop.grouper }}">
-                    {{ shop.list.0.product.shop.shop_name }} <!-- แสดงชื่อร้านค้า -->
-                </div>
-                {% for Item in shop.list %}
-                    <div class="card product-card mb-2">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <div class="d-flex align-items-center">
-                                <input type="checkbox" class="form-check-input me-2 item-checkbox" 
-                                    data-id="{{ Item.product.product_id }}"
-                                    data-name="{{ Item.product.product_name }}" 
-                                    data-price="{{ Item.product.price }}" 
-                                    data-image="{{ Item.product.product_image.url }}" 
-                                    data-quantity="{{ Item.quantity }}"
-                                    data-shop-id="{{ Item.product.shop.shop_id }}"
-                                >   
-                                <h5 class="m-0">{{ Item.product.product_name }}</h5>
-                            </div>
-                            <a href="{% url 'delete' Item.id %}" class="btn btn-danger ms-2">ลบ</a>
-                        </div>
-                        <div class="card-body d-flex align-items-center">
-                            <img src="{{ Item.product.product_image.url }}" class="rounded" alt="product" height="90">
-                            <div class="ms-3">
-                                <p class="mb-1 " style="font-weight:; text-align: left;">{{ Item.product.product_name }}: {{ Item.product.description }}</p>
-                                <p class="text-muted" style="text-align: left;">จำนวน: {{ Item.quantity }}</p>
-                                <p class="text-danger fw-bold mb-0" style="text-align: left;">฿{{ Item.total_price }}</p>
-                            </div>
-                        </div>
+            {% regroup detail_cartitem by product.shop.shop_id as shop_list %}
+
+            {% for shop in shop_list %}
+                <div class="shop-block">
+                    <div class="shop-header">
+                        <input type="checkbox" class="form-check-input me-2 select-all-shop" data-shop-id="{{ shop.grouper }}">
+                        {{ shop.list.0.product.shop.shop_name }} <!-- แสดงชื่อร้านค้า -->
                     </div>
-                {% endfor %}
-            </div>
-        {% endfor %}
+                    {% for Item in shop.list %}
+                        <div class="card product-card mb-2">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <input type="checkbox" class="form-check-input me-2 item-checkbox" 
+                                        data-id="{{ Item.product.product_id }}"
+                                        data-name="{{ Item.product.product_name }}" 
+                                        data-price="{{ Item.product.price }}" 
+                                        data-image="{{ Item.product.product_image.url }}" 
+                                        data-quantity="{{ Item.quantity }}"
+                                        data-shop-id="{{ Item.product.shop.shop_id }}"
+                                    >   
+                                    <h5 class="m-0">{{ Item.product.product_name }}</h5>
+                                </div>
+                                <a href="{% url 'delete' Item.id %}" class="btn btn-danger ms-2">ลบ</a>
+                            </div>
+                            <div class="card-body d-flex align-items-center">
+                                <img src="{{ Item.product.product_image.url }}" class="rounded" alt="product" height="90">
+                                <div class="ms-3">
+                                    <p class="mb-1 " style="font-weight:; text-align: left;">{{ Item.product.product_name }}: {{ Item.product.description }}</p>
+                                    <p class="text-muted" style="text-align: left;">จำนวน: {{ Item.quantity }}</p>
+                                    <p class="text-danger fw-bold mb-0" style="text-align: left;">฿{{ Item.total_price }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
                 </div>
         
 

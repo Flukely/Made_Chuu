@@ -7,6 +7,8 @@ from main.models import Cart, Product, User, Order, OrderProduct , CartItem , Sh
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 
+
+
 @login_required
 def AddCart(request ):
     user_id = request.session.get('user_id',1)
@@ -15,7 +17,7 @@ def AddCart(request ):
     detail_product = Product.objects.all()
     detail_cart = Cart.objects.filter(user_id=user_id)  
     detail_user = User.objects.filter(user_id=user_id)
-    detail_cartitem = CartItem.objects.filter(cart__user_id=user_id)  
+    detail_cartitem = CartItem.objects.filter(cart__user_id=user_id).select_related('product__shop')  
   
     for item in detail_cartitem:
         item.total_price = item.quantity * item.product.price  
