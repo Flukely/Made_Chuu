@@ -971,3 +971,22 @@ body {
 .btn-buy-now:hover {
   background: linear-gradient(to right, #FF0066, #CC0052);
 }
+.team-item {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  transition: all 0.3s ease-in-out;
+}
+
+.team-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.card-footer button {
+  transition: all 0.3s ease-in-out;
+}
+
+.card-footer button:hover {
+  background-color: #ff4081 !important;
+  border-color: #ff4081 !important;
+}
