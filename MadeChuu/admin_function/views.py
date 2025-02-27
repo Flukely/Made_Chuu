@@ -7,7 +7,7 @@ from main.models import *
 from django.core.paginator import Paginator
 from django.db.models import Count ,Q
 from datetime import datetime, timedelta
-from django.db.models import Sum
+from django.db.models import Sum , F
 from django.utils.timezone import now
 
 def admin_function(request):
@@ -94,7 +94,7 @@ def dashboard_admin(request):
         .annotate(total=Count('product_id'))
     gender_counts = User.objects.values('gender').annotate(total = Count('user_id'))
     orders_all = Order.objects.filter(shop_id=shop_id).count()
-    orders_today = Order.objects.filter(order_date=today).filter(shop_id=shop_id).count()
+    orders_today = Order.objects.filter(order_date__date=today, shop_id=shop_id).count()
     users_all = User.objects.all().count()
     users_today = User.objects.filter(join_date=today).count()
     
@@ -147,6 +147,34 @@ def dashboard_admin(request):
             total = orders.filter(order_date__date=label).exclude(status_order__status_order_id__in=[1, 2]).aggregate(Sum('total_price'))['total_price__sum'] or 0
         order_data.append(total)
 
+    order_products = OrderProduct.objects.filter(order__shop_id=shop_id) \
+    .values('product__product_name', 'order__order_date') \
+    .annotate(total_quantity=Sum('quantity'))
+
+    # สร้าง product_data และเก็บข้อมูลวันที่
+    product_data = {}
+    for label in labels:
+        for item in order_products:
+            product_name = item['product__product_name']
+            order_date = item['order__order_date'].date()  # เปลี่ยนให้เป็น date object
+
+            if filter_type == '1year':
+                order_date = str(order_date.month)  # แสดงเป็นเดือน 1-12
+
+            if product_name not in product_data:
+                product_data[product_name] = [0] * len(labels)
+
+            # เปรียบเทียบ order_date กับ labels (เพื่อแยกข้อมูล)
+            if isinstance(label, str):
+                if order_date.strftime('%Y-%m-%d') == label:  # Compare dates in string format
+                    index = labels.index(label)
+                    product_data[product_name][index] += item['total_quantity']
+            elif isinstance(label, int):
+                if order_date == label:  # Compare with month number in the case of the '1year' filter
+                    index = labels.index(label)
+                    product_data[product_name][index] += item['total_quantity']
+    print(product_data)
+
     context = {
         'products': product_of_shop,
         'categories': category,
@@ -159,7 +187,8 @@ def dashboard_admin(request):
         'users_all' : users_all,
         'users_today' : users_today,
         'orders_all' : orders_all,
-        'orders_today' : orders_today
+        'orders_today' : orders_today,
+        'product_data' : product_data,
 
     }
     return render(request, 'admin_function/Dashboard.html', context)
