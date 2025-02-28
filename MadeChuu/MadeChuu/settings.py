@@ -47,8 +47,9 @@ INSTALLED_APPS = [
     'tracking',
     'product',
     'claim',
-    'chat',
+    #'chat',
     'Cart',
+    'accounts',
     'allauth',
     'ProductDetail',
     'allauth.account',
@@ -200,7 +201,8 @@ ROOT_URLCONF = 'MadeChuu.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'accounts', 'templates'),  # ไดเรกทอรีเทมเพลตของแอป accounts
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -282,3 +284,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # ...existing code...
+
+AUTH_USER_MODEL = 'main.User'  # ใช้โมเดลที่เราจะสร้างแทน Django User
+LOGIN_URL = 'login'
