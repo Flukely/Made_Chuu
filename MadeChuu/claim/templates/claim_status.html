@@ -1,12 +1,8 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สถานะการพิจารณาการคืนเงิน</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% extends 'main/base.html' %}
+
+{% block title %}สถานะการพิจารณาการคืนเงิน{% endblock %}
+
+{% block styleCustom %}
     <style>
         body {
             background-color: #ffffff;
@@ -62,19 +58,28 @@
             color: #dc3545;
         }
     </style>
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
     <div class="container mt-5 text-center">
         {% if status == "กำลังดำเนินการ" %}
             <i class="fas fa-spinner fa-spin status-icon processing"></i>
             <h1 class="text-pink">กำลังพิจารณาคำขอ</h1>
            
-            <div class="info-row">
-                <strong>ชื่อสินค้า:</strong>
-                <span>{{ product_name }}</span>
+            <div class="product-list">
+                <strong>รายการสินค้า:</strong>
+                {% for product in orderproduct %}
+                    <div class="product-item">
+                        - {{ product.product.product_name }}
+                    </div>
+                    {% empty %}
+                    <div class="product-item">
+                        - ไม่มีสินค้า
+                    </div>
+                {% endfor %}
             </div>
             <div class="info-row">
-                <strong>ราคาสินค้า:</strong>
+                <strong>ราคารวมทั้งหมด:</strong>
                 <span>{{ product_price }} บาท</span>
             </div>
             <div class="info-row">
@@ -98,15 +103,23 @@
                 <span>{{ reason }}</span>
             </div>
             <div class="d-flex justify-content-between mt-4">
-                <a href="{% url 'track' order_id=1 %}" class="btn btn-pastel w-45">กลับ</a>
-                <a href="{% url 'cancel_claim' claim_id=request_id %}" class="btn btn-outline-danger w-45">ยกเลิกคำขอ</a>
+                <a href="{% url 'tracking:tracking' order_id %}" class="btn btn-pastel w-45">กลับ</a>
+                <a href="{% url 'claim:cancel_claim' claim_id=request_id %}" class="btn btn-outline-danger w-45">ยกเลิกคำขอ</a>
             </div>
         {% elif status == "ผ่าน" %}
             <i class="fas fa-check-circle status-icon approved"></i>
             <h1 class="text-success">คำขอคืนเงินได้รับการอนุมัติแล้ว</h1>
-            <div class="info-row">
-                <strong>ชื่อสินค้า:</strong>
-                <span>{{ product_name }}</span>
+            <div class="product-list">
+                <strong>รายการสินค้า:</strong>
+                {% for product in orderproduct %}
+                    <div class="product-item">
+                        - {{ product.product.product_name }}
+                    </div>
+                    {% empty %}
+                    <div class="product-item">
+                        - ไม่มีสินค้า
+                    </div>
+                {% endfor %}
             </div>
             <div class="info-row">
                 <strong>ราคาสินค้า:</strong>
@@ -133,15 +146,23 @@
                 <span>{{ reason }}</span>
             </div>
             <div class="d-flex justify-content-between mt-4">
-                <a href="{% url 'track' order_id=1 %}" class="btn btn-pastel w-45">กลับ</a>
+                <a href="{% url 'tracking:tracking' order_id %}" class="btn btn-pastel w-45">กลับ</a>
                 
             </div>
         {% elif status == "ไม่ผ่าน" %}
             <i class="fas fa-times-circle status-icon rejected"></i>
             <h1 class="text-danger">คำขอของคุณไม่ผ่านเงื่อนไข</h1>
-            <div class="info-row">
-                <strong>ชื่อสินค้า:</strong>
-                <span>{{ product_name }}</span>
+            <div class="product-list">
+                <strong>รายการสินค้า:</strong>
+                {% for product in orderproduct %}
+                    <div class="product-item">
+                        - {{ product.product.product_name }}
+                    </div>
+                    {% empty %}
+                    <div class="product-item">
+                        - ไม่มีสินค้า
+                    </div>
+                {% endfor %}
             </div>
             <div class="info-row">
                 <strong>ราคาสินค้า:</strong>
@@ -168,12 +189,9 @@
                 <span>{{ reason }}</span>
             </div>
             <div class="d-flex justify-content-between mt-4">
-                <a href="{% url 'track' order_id=1 %}" class="btn btn-pastel w-45">กลับ</a>
+                <a href="{% url 'tracking:tracking' order_id %}" class="btn btn-pastel w-45">กลับ</a>
                
             </div>
         {% endif %}
-       
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}

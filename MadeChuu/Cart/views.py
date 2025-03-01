@@ -1,21 +1,22 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
-from main.models import Cart, Product, User, Order, OrderProduct , CartItem
+from main.models import Cart, Product, User, Order, OrderProduct , CartItem , Shop, StatusOrder
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
-
-def AddCart(request):
-    user_id = request.session.get('user_id', 1)
-    if not user_id:
-        return redirect('login')  
-
+@login_required
+def AddCart(request ):
+    user_id = request.session.get('user_id')
+    request.session['user_id'] = user_id
+   
     detail_product = Product.objects.all()
     detail_cart = Cart.objects.filter(user_id=user_id)  
     detail_user = User.objects.filter(user_id=user_id)
-    detail_cartitem = CartItem.objects.filter(cart__user_id=user_id)  
-
+    detail_cartitem = CartItem.objects.filter(cart__user_id=user_id).select_related('product__shop')
+  
     for item in detail_cartitem:
         item.total_price = item.quantity * item.product.price  
 
@@ -23,14 +24,16 @@ def AddCart(request):
         "detail_cart": detail_cart,
         "detail_product": detail_product,
         "detail_user": detail_user,
-        "detail_cartitem": detail_cartitem 
+        "detail_cartitem": detail_cartitem ,
+       
     })
 
-    
 def Confirm_Cart(request):                     #หน้ายืนยันการสั่งซื้อ
+    user_id = request.session.get('user_id')
+    
     detail_product = Product.objects.all()
     detail_cart = Cart.objects.all()
-    detail_user = User.objects.all()
+    detail_user = User.objects.filter(user_id=user_id)
     detail_cartitem = CartItem.objects.all()
     
     return render(request, 'Confirm_Cart.html', {
@@ -47,38 +50,53 @@ def delete(request, id):                  #ลบสินค้าในตะ�
         message = "ลบสินค้าเรียบร้อยแล้ว"
     except CartItem.DoesNotExist: 
         raise Http404("ไม่มีสินค้าในตะกร้า")
-    return redirect('AddCart')
+    return redirect('Cart:AddCart')
 
 @csrf_exempt
 def place_order(request):
-    user_id = request.session.get('user_id', 1)
+    user_id = request.session.get('user_id')
     if request.method == 'POST':
         order_data = json.loads(request.POST.get('order_data'))
+        print(order_data)
         items = order_data.get('items', [])
         total_price = order_data.get('total_price', 0)
-
         if not items:
             return JsonResponse({'success': False, 'message': 'ไม่มีสินค้าที่เลือก'})
 
         user = User.objects.get(user_id=user_id)
-
+        
+        for item in items:
+            product = Product.objects.get(product_id=item['product_id'])
+            shop_id = product.shop.shop_id  # Assuming a ForeignKey relationship
+            shop_instance = product.shop
+            break
+        
         order = Order.objects.create(
             user=user,
             total_price=total_price,
             place_delivery=user.address,
-            status_order=None,
+            shop=shop_instance,
+            status_order= StatusOrder.objects.get(status_name="รอจ่ายเงิน"),
             shipper=None,
             tracking_num='',
             delivery_date=None
         )
+        
 
         for item in items:
             product = Product.objects.get(product_id=item['product_id'])
-            OrderProduct.objects.create(
-                order=order,
-                product=product,
-                quantity=item['quantity']
-            )
+            # Convert item['quantity'] to an integer
+            quantity_to_subtract = int(item['quantity'])
+            if product.quantity >= quantity_to_subtract:
+                product.quantity -= quantity_to_subtract
+                product.save()
+                OrderProduct.objects.create(
+                    order=order,
+                    product=product,
+                    quantity=quantity_to_subtract
+                )
+            else:
+                 raise ValueError("จำนวนสินค้าไม่เพียงพอ")
 
         # ลบสินค้าที่เลือกในฐานข้อมูล
         item_ids = [item['product_id'] for item in items]
@@ -101,9 +119,3 @@ def delete_cart_items(request):                   #กดสั่งซื้�
         return JsonResponse({'status': 'success'})
 
     return JsonResponse({'status': 'failed'}, status=400)
-    
-    
-
-
-
-

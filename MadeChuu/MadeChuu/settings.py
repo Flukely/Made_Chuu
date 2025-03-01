@@ -201,8 +201,7 @@ ROOT_URLCONF = 'MadeChuu.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'accounts', 'templates'),  # ไดเรกทอรีเทมเพลตของแอป accounts
-        ],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -224,7 +223,7 @@ WSGI_APPLICATION = 'MadeChuu.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # ใช้ MySQL เป็นฐานข้อมูล
-        'NAME': 'madechuu_db',  # ชื่อฐานข้อมูล
+        'NAME': 'test_db',  # ชื่อฐานข้อมูล
         'USER': 'root',  # ชื่อผู้ใช้ MySQL
         'PASSWORD': '12345678',  # รหัสผ่านของ MySQL
         'HOST': 'localhost',  # ที่อยู่ของ MySQL server
@@ -257,7 +256,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Bangkok'
 
 USE_I18N = True
 
@@ -270,7 +269,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
-    BASE_DIR / "product" / "static",
 ]
 
 # Default primary key field type

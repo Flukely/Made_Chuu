@@ -1,6 +1,6 @@
 
-.body{
-    background-color: #fcd7ff;
+.body {
+    background-color: #e785a9;
     font-family: Arial, sans-serif;
 }
 .row1{
@@ -12,6 +12,7 @@
 .row-mt-5{
     margin: 5px;
     padding: 5px;
+    border-radius: 10px;
 }
 .review-section{
     background-color: white;
@@ -46,6 +47,25 @@
 #product-name{
     font-size: 30px;
     font-weight: bolder;
+}
+#product-price{
+    display: inline-block;
+    padding: 5px 10px;
+    border: 2px solid #000; /* Border color */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #f2c5d6; /* Background color */
+    font-size: 24px; /* Font size */
+    font-weight: bold; /* Font weight */
+    color: #000; /* Text color */
+}
+#product-description{
+    display: inline-block;
+    padding: 5px 10px;
+    border: 0.5px solid #000; /* Border color */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 20px; /* Font size */
+    font-weight: bold; /* Font weight */
+    color: #000; /* Text color */
 }
 #shop-made{
     font-size: 22px;

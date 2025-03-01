@@ -1,29 +1,35 @@
+from django.views.decorators.csrf import csrf_protect
+from django.http import JsonResponse
 from django.shortcuts import render , redirect ,get_object_or_404
-from django.views.decorators.csrf import csrf_exempt 
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.admin.views.decorators import staff_member_required
 from .filters import *
 from .forms import ProductForm 
 from main.models import *
 from django.core.paginator import Paginator
+from django.db.models import Count ,Q
+from datetime import datetime, timedelta
+from django.db.models import Sum , F
+from django.utils.timezone import now
+from django.utils import timezone
 
 def admin_function(request):
     return render(request, 'admin_function/Dashboard.html')
 
+def Dashboard(request):
+    return render(request , 'admin_function/Dashboard.html')
+
 def ChatAdmin(request):
     return render(request, 'admin_function/ChatsAdmin.html')
-
 
 def OrderAdmin(request):
     #Query from model Order
     order_filter = OrderFilter(request.GET, queryset=Order.objects.all())
-    paginator = Paginator(order_filter.qs, 10)
+    paginator = Paginator(order_filter.qs, 5)
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return render(request, 'admin_function/OrderAdmin.html',{'orders':order_filter , 'page_obj': page_obj}) 
-
-def Dashboard(request):
-    return render(request, 'admin_function/Dashboard.html')
 
 def CommentAdmin(request):
     return render(request, 'admin_function/CommentAdmin.html')
@@ -76,9 +82,120 @@ def delete_product(request, product_id):
         return redirect('ProductsAdmin')
     
 
+from datetime import timedelta
+from django.db.models import Sum
+
 @staff_member_required
 def dashboard_admin(request):
-    return render(request, 'admin_function/Dashboard.html')
+    today = timezone.localtime(timezone.now()).date()
+    shop_id = request.session['shop_id']=1
+    product_of_shop_all = Product.objects.filter(shop_id=shop_id).count()
+    product_of_shop = Product.objects.filter(shop_id=shop_id)
+    category = Category.objects.filter(shop_id=shop_id)
+    category_counts = Product.objects.filter(shop_id=shop_id) \
+        .values('category__category_name') \
+        .annotate(total=Count('product_id'))
+    orders_all = Order.objects.filter(shop_id=shop_id).count()
+    orders_today = Order.objects.filter(order_date__date=today, shop_id=shop_id).count()
+    users_all = User.objects.all().count()
+    users_today = User.objects.filter(join_date=today).count()
+    
+    gender_counts = User.objects.values('gender').annotate(total = Count('user_id'))
+    gender_data = { 'male': 0, 'female': 0, 'other': 0 }
+    for item in gender_counts:
+        gender_data[item['gender'].lower()] = item['total']
+
+    filter_type = request.GET.get('filter', 'month')  # เลือกช่วงเวลาที่ต้องการ เช่น day, month, year, 3 months, 6 months, 1 year
+
+    # กำหนด start_date ตาม filter_type ที่เลือก
+    if filter_type == '5days':
+        start_date = today - timedelta(days=5)
+        labels = [(start_date + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(6)]  # 5 วันล่าสุด
+
+    elif filter_type == '1month':
+        start_date = today.replace(day=1)
+        labels = [(start_date + timedelta(days=i)).strftime('%Y-%m-%d') for i in range((today - start_date).days + 1)]  # 1 เดือนล่าสุด
+
+    elif filter_type == '3months':
+        start_date = today - timedelta(days=90)  # 3 เดือนล่าสุด
+        labels = [(start_date + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(91)]
+
+    elif filter_type == '6months':
+        start_date = today - timedelta(days=180)  # 6 เดือนล่าสุด
+        labels = [(start_date + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(181)]
+
+    else:  # default to month filter
+        start_date = today.replace(day=1)
+        labels = [(start_date + timedelta(days=i)).strftime('%Y-%m-%d') for i in range((today - start_date).days + 1)]
+
+    # กรองข้อมูล Order ตามช่วงเวลาที่เลือก
+
+
+    orders = Order.objects.filter(order_date__date__gte=start_date).exclude(status_order__status_order_id__in=[1, 2]).filter(orderproduct__product__shop_id=shop_id)
+
+
+    # รวมยอดสั่งซื้อตามช่วงเวลาที่เลือก
+    order_data = []
+    for label in labels:
+        # Convert label string to datetime, then make it timezone-aware
+        label_date = timezone.make_aware(datetime.strptime(label, '%Y-%m-%d'), timezone.get_current_timezone())
+
+        # ใช้ label_date.date() เพื่อให้ตรงกับ order_date__date
+        total = orders.filter(order_date__date=label_date.date()).exclude(
+            status_order__status_order_id__in=[1, 2]
+        ).aggregate(Sum('total_price'))['total_price__sum'] or 0
+
+        order_data.append(total)
+
+    order_products = OrderProduct.objects.filter(order__shop_id=shop_id) \
+    .values('product__product_name', 'order__order_date') \
+    .annotate(total_quantity=Sum('quantity'))
+
+    
+    # สร้าง product_data และเก็บข้อมูลวันที่
+    product_data = {}
+    for label in labels:
+        for item in order_products:
+            product_name = item['product__product_name']
+            order_date = item['order__order_date'].date()  # เปลี่ยนให้เป็น date object
+
+            product = Product.objects.get(product_name=product_name, shop_id=shop_id)  # Assuming product_name is unique
+            unit_price = product.price  # Assuming 'unit_price' is the field storing the product price
+            
+            if product_name not in product_data:
+                product_data[product_name] = [0] * len(labels)
+
+            # เปรียบเทียบ order_date กับ labels (เพื่อแยกข้อมูล)
+            if isinstance(label, str):
+                if order_date.strftime('%Y-%m-%d') == label:  # Compare dates in string format
+                    index = labels.index(label)
+                    total_price = item['total_quantity'] * unit_price
+                    product_data[product_name][index] += total_price
+            elif isinstance(label, int):
+                if order_date == label:  # Compare with month number in the case of the '1year' filter
+                    index = labels.index(label)
+                    total_price = item['total_quantity'] * unit_price
+                    product_data[product_name][index] += total_price
+    
+
+    context = {
+        'products': product_of_shop,
+        'categories': category,
+        'countProduct': product_of_shop_all,
+        'category_counts': category_counts,
+        'filter_type': filter_type,
+        'labels': labels,
+        'order_data': order_data,
+        'gender_data' : gender_data,
+        'users_all' : users_all,
+        'users_today' : users_today,
+        'orders_all' : orders_all,
+        'orders_today' : orders_today,
+        'product_data' : product_data,
+
+    }
+    return render(request, 'admin_function/Dashboard.html', context)
+
 
 @staff_member_required
 def comment_admin(request):
@@ -86,20 +203,50 @@ def comment_admin(request):
     products = Product.objects.all()
     return render(request, 'admin_function/CommentAdmin.html', {'reviews': reviews, 'products': products})
 
-@csrf_exempt
+@csrf_protect
 def add_reply(request):
     if request.method == 'POST':
         review_id = request.POST.get('review_id')
         reply_text = request.POST.get('reply_text')
 
+        if not review_id or not reply_text:
+            return JsonResponse({'success': False, 'error': 'Missing data'})
+
         try:
-            review = models.Review.objects.get(review_id=review_id)
+            review = Review.objects.get(review_id=review_id)
             review.review_text_admin = reply_text
             review.save()
-            return redirect('admin_comment')
-        except models.Review.DoesNotExist:
-            return redirect('admin_comment')
+            return JsonResponse({'success': True, 'reply_text': reply_text})
+        except Review.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Review not found'})
 
-    return redirect('admin_comment')
+    return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)
+def status_wait(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/status_wait.html', {'order': order})
+
+def status_paid(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/status_paid.html', {'order': order})
+
+def status_packing(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/status_packing.html', {'order': order})
+
+def status_prepare(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/status_prepare.html', {'order': order})
+
+def status_delivery(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/status_delivery.html', {'order': order})
+
+def status_ordersuccess(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/status_ordersuccess.html', {'order': order})
+
+def status_claim(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/status_claim.html', {'order': order})
 
 

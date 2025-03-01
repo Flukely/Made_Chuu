@@ -32,7 +32,7 @@ def review_page(request):
     if not data:
         print("❌ ไม่พบสินค้าที่รีวิวได้!")
 
-    return render(request, 'review/review.html', {'product_orders': product_orders})
+    return render(request, 'review.html', {'product_orders': product_orders})
 
 @login_required
 def submit_review(request, product_id, order_id):

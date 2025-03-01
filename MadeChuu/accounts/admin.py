@@ -165,7 +165,7 @@ class CategoryAdmin(admin.ModelAdmin):
         return False
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('order_id', 'order_date', 'status_order', 'get_user_name', 'total_price', 'place_delivery', 'shipper', 'tracking_num', 'delivery_date')
+    list_display = ('order_id', 'order_date', 'shop_id', 'status_order', 'get_user_name', 'total_price', 'place_delivery', 'shipper', 'tracking_num', 'delivery_date')
     search_fields = ('user__user_name', 'status_order__status_name', 'shipper__shipper_name')
     list_filter = ('status_order', 'shipper')
     
@@ -301,14 +301,17 @@ class PaymentAdmin(admin.ModelAdmin):
         if change:  # ตรวจสอบว่าเป็นการแก้ไข record
             old_obj = Payment.objects.get(pk=obj.pk)
             if old_obj.payment_status != obj.payment_status:  # ตรวจสอบว่ามีการเปลี่ยนแปลงสถานะ
-                if obj.payment_status == 'ตรวจสอบแล้ว':  # เงื่อนไขในการตรวจสอบค่า status
+                if obj.payment_status.payment_status_name == 'ตรวจสอบแล้ว':
                     # เพิ่ม record ในตาราง Receipt
                     Receipt.objects.create(
                         order=obj.order,
                         payment=obj,
                         receipt_date=now()
                     )
+                    Order.objects.filter(order_id=obj.order.order_id).update(status_order=StatusOrder.objects.get(status_name='เตรียมของ'))
         super().save_model(request, obj, form, change)
+    
+    
     
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -791,6 +794,64 @@ class FavoriteProductAdmin(admin.ModelAdmin):
                 return True
         return False
 
+class RefundAdmin(admin.ModelAdmin):
+    list_display = ('order','refund_type', 'bank_name', 'refund_number', 'account_name')
+    search_fields = ('bank_name', 'account_name')
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        if request.user.is_authenticated:
+            admin = Admin.objects.filter(user=request.user).first()
+            if admin:
+                return qs.filter(shop=admin.shop)
+        return qs.none()
+
+    def has_module_permission(self, request):
+        if request.user.is_superuser:
+            return True
+        if request.user.is_authenticated:
+            admin = Admin.objects.filter(user=request.user).first()
+            if admin and admin.admin_role.admin_role_name == 'Sales staff':
+                return True
+        return False
+
+    def has_view_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        if request.user.is_authenticated:
+            admin = Admin.objects.filter(user=request.user).first()
+            if admin and admin.admin_role.admin_role_name == 'Sales staff':
+                return True
+        return False
+
+    def has_add_permission(self, request):
+        if request.user.is_superuser:
+            return True
+        if request.user.is_authenticated:
+            admin = Admin.objects.filter(user=request.user).first()
+            if admin and admin.admin_role.admin_role_name == 'Sales staff':
+                return True
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        if request.user.is_authenticated:
+            admin = Admin.objects.filter(user=request.user).first()
+            if admin and admin.admin_role.admin_role_name == 'Sales staff':
+                return True
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        if request.user.is_authenticated:
+            admin = Admin.objects.filter(user=request.user).first()
+            if admin and admin.admin_role.admin_role_name == 'Sales staff':
+                return True
+        return False
 
 
 admin.site.register(User, CustomUserAdmin)
@@ -806,3 +867,7 @@ admin.site.register(Receipt, ReceiptAdmin)
 admin.site.register(Review, ReviewAdmin)
 admin.site.register(Claim, ClaimAdmin)
 admin.site.register(Promotion, PromotionAdmin)
+admin.site.register(PromotionProduct, PromotionProductAdmin)
+admin.site.register(RecommendedProduct, RecommendedProductAdmin)
+admin.site.register(FavoriteProduct, FavoriteProductAdmin)
+admin.site.register(Refund, RefundAdmin)

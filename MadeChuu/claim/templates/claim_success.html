@@ -1,14 +1,8 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>คำขอคืนสินค้าสำเร็จ</title>
+{% extends 'main/base.html' %}
 
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% block title %}คำขอคืนสินค้าสำเร็จ{% endblock %}
 
+    {% block styleCustom %}
     <style>
         body {
             background-color: #fff5f8;
@@ -46,9 +40,9 @@
             width: 100%;
         }
     </style>
-</head>
-<body>
+    {% endblock %}
 
+{% block content %}
 <div class="container">
     <div class="card">
         <div class="success-icon">✅</div>
@@ -57,10 +51,8 @@
 
         <p class="fw-bold">หมายเลขคำขอ: <span class="text-danger">#{{ claim.claim_id }}</span></p>
         <p class="text-muted">ทีมงานของเราจะตรวจสอบและติดต่อกลับภายใน 3-5 วันทำการ</p>
-        <a href="{% url 'index' %}" class="btn btn-primary mt-3">กลับไปหน้าหลัก</a>
-        <a href="{% url 'claim_status' claim_id=claim.claim_id %}" class="btn btn-secondary mt-2">ดูสถานะคำขอ</a>
+        <a href="{% url 'main:index' %}" class="btn btn-primary mt-3">กลับไปหน้าหลัก</a>
+        <a href="{% url 'claim:claim_status' claim_id=claim.claim_id %}" class="btn btn-secondary mt-2">ดูสถานะคำขอ</a>
     </div>
 </div>
-
-</body>
-</html>
+{% endblock %}

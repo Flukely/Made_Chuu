@@ -8,7 +8,7 @@ class ShopAdmin(admin.ModelAdmin):
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ('cart_id', 'user', 'total_price')
+    list_display = ('cart_id', 'user')
     search_fields = ('user__user_name', )
 
 @admin.register(StatusOrder)
@@ -25,18 +25,3 @@ class ShippingBrandAdmin(admin.ModelAdmin):
 class CartItemAdmin(admin.ModelAdmin):
     list_display = ('cart', 'product', 'quantity')
     search_fields = ('cart__cart_id', 'product__product_name')
-
-@admin.register(PromotionProduct)
-class PromotionProductAdmin(admin.ModelAdmin):
-    list_display = ('promotion_id', 'product_id')
-    search_fields = ('promotion__promotion_name', 'product__product_name')
-
-@admin.register(RecommendedProduct)
-class RecommendedProductAdmin(admin.ModelAdmin):
-    list_display = ('recommended_product_id', 'user_id', 'product_id','recommended_date')
-    search_fields = ('user__user_name', 'product__product_name')
-    
-@admin.register(FavoriteProduct)
-class FavoriteProductAdmin(admin.ModelAdmin):
-    list_display = ('favorite_product_id', 'user_id', 'product_id','favorite_date')
-    search_fields = ('user__user_name', 'product__product_name')
