@@ -1,3 +1,4 @@
+{% load product_filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -87,6 +88,36 @@
                         <input type="hidden" name="quantity" id = "form-quantity" value="1">
                         <button type="submit" class="btn btn-outline-secondary btn-lg" onclick ="add_Cart({{product.product_id}})">Add to Cart</button>
                     </form>
+                </div>
+            </div>
+        </div>
+        <!-- Promotion Section -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="promotion-section p-3 rounded">
+                    {% if active_promotion %}
+                        <h4>Promotion</h4>
+                        <div class="promotion-banner">
+                            <span class="promotion-name">{{ active_promotion.promotion_name }}</span>
+                            <span class="promotion-discount">-{{ active_promotion.discount }}%</span>
+                        </div>
+                        <div class="original-price">
+                            Original Price: ฿<span class="price-before">{{ product.price|floatformat:2 }}</span>
+                        </div>
+                        <div class="discounted-price">
+                            Discounted Price: ฿<span class="price-after">
+                                {{ product.price|multiply:100|subtract:active_promotion.discount|divide:100|floatformat:2 }}
+                            </span>
+                        </div>
+                        <div class="promotion-period">
+                            Valid until: {{ active_promotion.end_date|date:"d M Y" }}
+                        </div>
+                        <div class="promotion-description">
+                            {{ active_promotion.description }}
+                        </div>
+                    {% else %}
+                        <div class="no-promotion">No current promotions for this product</div>
+                    {% endif %}
                 </div>
             </div>
         </div>

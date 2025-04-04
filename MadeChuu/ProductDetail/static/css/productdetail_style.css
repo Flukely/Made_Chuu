@@ -118,3 +118,67 @@
     font-size: 20px;
     color: gold;
 }
+/* Promotion Section Styles */
+.promotion-section {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    margin-bottom: 20px;
+}
+
+.promotion-banner {
+    background-color: #ff6b6b;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    display: inline-block;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.promotion-name {
+    margin-right: 10px;
+}
+
+.promotion-discount {
+    background-color: white;
+    color: #ff6b6b;
+    padding: 2px 8px;
+    border-radius: 3px;
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.discounted-price {
+    color: #dc3545;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin: 5px 0;
+}
+
+.price-before {
+    margin-left: 5px;
+}
+
+.price-after {
+    margin-left: 5px;
+}
+
+.promotion-period {
+    color: #6c757d;
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+.promotion-description {
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+.no-promotion {
+    color: #6c757d;
+    font-style: italic;
+}

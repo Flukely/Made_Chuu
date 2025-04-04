@@ -971,3 +971,16 @@ body {
 .btn-buy-now:hover {
   background: linear-gradient(to right, #FF0066, #CC0052);
 }
+/* สไตล์เพิ่มเติม */
+.text-decoration-line-through {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+.text-danger.fw-bold {
+  font-size: 1.1em;
+}
+.text-success {
+  background-color: #f0fff4;
+  padding: 2px 5px;
+  border-radius: 3px;
+}

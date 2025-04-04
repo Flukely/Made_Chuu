@@ -1,4 +1,5 @@
 {% load static %}
+{% load product_tags %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -122,8 +123,25 @@
                                 </a>
                             </h5>
                             <small>{{product.category.category_name}}</small><br>
-                            <small>{{product.price}}</small><br>
-                            <small></small>
+                            <!-- ในส่วนแสดงราคา -->
+                            <small>
+                                {% if product|is_on_promotion %}
+                                    <span class="text-decoration-line-through">{{ product.price }}</span>
+                                    <span class="text-danger fw-bold">
+                                        {{ product|get_discounted_price }}  <!-- ใช้ tag คำนวณราคาลด -->
+                                    </span>
+                                    <br>
+                                    <small class="text-success">
+                                        <i class="fas fa-tag me-1"></i>
+                                        {{ product.promotionproduct_set.first.promotion_id.promotion_name }}
+                                        (ลด {{ product.promotionproduct_set.first.promotion_id.discount }}%)
+                                    </small>
+                                {% else %}
+                                    {{ product.price }}
+                                    <br>
+                                    <small class="text-muted">ไม่อยู่ใน Promotion</small>
+                                {% endif %}
+                            </small>
                             <br>
                             <div class="card-footer d-flex justify-content-around">
                                 <form method="POST" action="{% url 'add_cart1' product.product_id %}">

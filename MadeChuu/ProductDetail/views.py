@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.shortcuts import render, get_object_or_404, redirect
 from main.models import *
 from django.contrib.auth.decorators import login_required
@@ -11,7 +12,25 @@ def product_detail(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     reviews = Review.objects.filter(product_id=product.product_id)
     reviews_avg = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
-    return render(request, 'product_detail.html', {"product": product,"reviews": reviews,"average_rating": reviews_avg})
+    
+    # Get promotions for this product
+    promotions = Promotion.objects.filter(
+        promotionproduct__product_id=product_id,
+        start_date__lte=timezone.now(),
+        end_date__gte=timezone.now()
+    ).order_by('-discount')  # Show highest discount first
+    
+    # Get the first active promotion (if any)
+    active_promotion = promotions.first() if promotions.exists() else None
+    
+    context = {
+        'product': product,
+        'active_promotion': active_promotion,
+        "reviews": reviews,
+        "average_rating": reviews_avg,
+    }
+    
+    return render(request, 'product_detail.html' ,context)
 
 @login_required
 def add_cart(request , product_id):
