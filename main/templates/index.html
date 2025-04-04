@@ -1,0 +1,66 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block title %}Made Chuu{% endblock %}
+
+{% block styleCustom %}
+<style>
+    /* ทำให้รูปภาพขยายเมื่อชี้เมาส์ */
+    .product-img {
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .product-img:hover {
+        transform: scale(1.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="banner">
+    <h2 class="text-center text-pink mb-4">✨ ยินดีต้อนรับสู่เว็บไซต์ของเรา ✨</h2>
+    <h2 class="text-center mb-4">Creater</h2>
+    {% load static %}
+    <div class="container my-4">
+        <div class="row align-items-center text-center">
+            <!-- MomMam ด้านซ้าย และรูป -->
+            <div class="col-md-6 d-flex align-items-center justify-content-end">
+                <img src="{% static 'images/logo1.jpg' %}" alt="MomMam Image" class="img-fluid rounded shadow mx-3" style="width: 100px; height: auto;">
+                <h2 class="fw-bold me-3" style="color: rgb(255, 137, 167);">MomMam</h2> 
+            </div>
+    
+            <!-- KaJang ด้านขวา และรูป -->
+            <div class="col-md-6 d-flex align-items-center justify-content-start">
+                <img src="{% static 'images/logo-2.png' %}" alt="KaJang Image" class="img-fluid rounded shadow" style="width: 150px; height: auto;">
+                <h2 class="fw-bold ms-3" style="color: rgb(255, 137, 167);">KaJang</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-4">
+        {% for product in product|slice:":4" %}
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-lg rounded-3 p-3" style="background-color: #ffffff;">
+                <div class="overflow-hidden rounded-3">
+                    {% if product.product_image %}
+                    <img class="img-fluid rounded-3 product-img" src="{{ product.product_image.url }}" style="width: 100%;">
+                    {% else %}
+                    <img class="img-fluid rounded-3 product-img" src="{% static 'MadeChuu/images/default.png' %}" style="width: 100%;">
+                    {% endif %}
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="fw-bold">{{ product.id }} {{ product.product_name }}</h5>
+                    <p class="text-muted">{{ product.category.category_name }}</p>
+                    <h6 class="fw-bold">{{ product.price }}</h6>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>No products available.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

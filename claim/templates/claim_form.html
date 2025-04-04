@@ -1,0 +1,94 @@
+{% extends 'main/base.html' %}
+
+{% block title %}รายละเอียดการคืนเงิน/คืนสินค้า{% endblock %}
+
+    {%block styleCustom %}
+    <style>
+                header {
+            background-color: #fff0f9;
+            color: rgb(0, 0, 0);
+            padding: 10px;
+            text-align: center;
+        }
+        body { background-color: #ffffff; font-family: 'Arial', sans-serif; }
+        .container { max-width: 600px; margin-top: 50px; }
+        .card { border-radius: 12px; padding: 25px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); background-color: #ffffff; }
+        .product-img { max-width: 100px; border-radius: 10px; }
+        .btn-primary { background-color: #ff66a3; border: none; padding: 12px; font-size: 16px; }
+        .btn-primary:hover { background-color: #f55492; }
+        .btn-secondary { background-color: #a9abad; padding: 12px; font-size: 16px; }
+    </style>
+    {% endblock %}
+
+{% block content %}
+<header>
+    <h1>เคลมสินค้า</h1>
+</header>
+<div class="container">
+    <div class="card">
+        <h3 class="fw-bold">รายละเอียดการคืนเงิน/คืนสินค้า</h3>
+        <hr>
+
+        {% for item in orderproduct %}
+            <div class="card mb-3">
+                <div class="card-body d-flex align-items-center">
+                    {% if item.product.product_image and item.product.product_image.url %}
+                        <img src="{{ item.product.product_image.url }}" alt="สินค้า" class="product-img me-3" style="width: 80px; height: 80px; object-fit: cover;">
+                    {% else %}
+                        <img src="/static/images/default_product.png" alt="ไม่มีรูปสินค้า" class="product-img me-3" style="width: 80px; height: 80px; object-fit: cover;">
+                    {% endif %}
+                    <div>
+                        <p class="mb-0"><strong>{{ item.product.product_name }}</strong></p>
+                        <p class="text-muted mb-0">
+                            สินค้า: {{ item.product.product_name }} | ราคา: <strong>฿{{ item.product.price }}</strong>
+                        </p>
+                        <p class="text-success fw-bold">จัดส่งสำเร็จ</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label fw-bold">เหตุผล *</label>
+                {{ form.reason }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">ช่องทางการติดต่อ *</label>
+                {{ form.claim_contact }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">รายละเอียดเพิ่มเติม</label>
+                {{ form.comment }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">อัปโหลดรูปภาพ*</label>
+                {{ form.claim_image }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">อัปโหลดวิดีโอ*</label>
+                {{ form.claim_video }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">ช่องทางการคืนเงิน *</label>
+                {{ form.promtpay_number }}
+            </div>
+            <button type="submit" class="btn btn-primary w-100">✅ ส่งคำขอ</button>
+            <button type="button" class="btn btn-secondary w-100 mt-2" onclick="cancelForm()">❌ ยกเลิก</button>
+        </form>
+    </div>
+</div>
+<script>
+    function cancelForm() {
+        if (confirm("คุณแน่ใจหรือไม่ว่าต้องการยกเลิก? ข้อมูลที่กรอกจะไม่ถูกบันทึก")) {
+            window.location.href = "{% url 'main:index' %}";
+        }
+    }
+</script>
+{% endblock %}

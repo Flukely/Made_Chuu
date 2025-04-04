@@ -1,0 +1,357 @@
+{% extends 'main/base.html' %}
+
+{% block title %}ตะกร้าสินค้า{% endblock %}
+    
+{% block styleCustom %}
+    <style>
+        /* ปรับแต่งเล็กน้อยให้สวยงาม */
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #ffe6f2;
+        }
+        
+        .container {
+            max-width: 1000px;
+        }
+        
+        /* การ์ดสินค้า */
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ff99cc;
+            transition: transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out;
+            width: 100%;
+        }
+        
+        .card:hover {
+            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header {
+            background-color: rgb(255, 188, 255);
+            font-weight: bold;
+            border-bottom: 2px solid #ff66b2;
+            padding: 12px;
+        }
+        
+        /* รูปภาพสินค้า */
+        .card img {
+            border-radius: 8px;
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border: 2px solid #ff99cc;
+            transition: transform 0.3s ease;
+        }
+        
+        .card img:hover {
+            transform: scale(1.1);
+        }
+        
+        /* ตำแหน่งเนื้อหาในสินค้า */
+        .card-body {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+        }
+        
+        .card-body div {
+            flex-grow: 1;
+            padding-left: 15px;
+        }
+        
+        .card-body p {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #333;
+        }
+        
+        /* ราคาสินค้า */
+        .total-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #d1005c;
+        }
+        
+        /* ปุ่มต่าง ๆ */
+        .btn-danger {
+            border-radius: 25px;
+            background-color: #ff66b2;
+            border-color: #ff66b2;
+            transition: background-color 0.3s ease-in-out;
+        }
+        
+        .btn-danger:hover {
+            background-color: #e0559e;
+            border-color: #e0559e;
+        }
+        
+        .btn-checkout {
+            width: 150px;
+            background-color: rgb(194, 93, 144);
+            border-color: #ff66b2;
+            font-weight: bold;
+            transition: background-color 0.3s ease-in-out;
+        }
+        
+        .btn-checkout:hover {
+            background-color: #b04d80;
+        }
+        
+        /* หัวข้อ */
+        .top {
+            margin-top: -10px;
+        }
+        
+        .header-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 3px solid rgb(31, 7, 19);
+            height: 100px;
+        }
+        
+        /* แถบด้านล่าง */
+        .fixed-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #ffffff;
+            padding: 10px 20px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        .fancy {
+            font-size: 2rem;
+            text-shadow: 2px 2px 5px rgba(106, 106, 106, 0.5);
+            
+            letter-spacing: 1px;
+            font-weight: bold;
+            position: relative;
+           
+        }.shop-block {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .shop-header {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+            background-color: #ffccff;
+            padding: 10px;
+            border-radius: 8px;
+            border-bottom: 2px solid #ff66b2;
+        }
+        
+        
+        .product-card:hover {
+            transform: scale(1.02);
+            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .product-card .card-header {
+            background-color: #ffe6f2;
+            border-bottom: 1px solid #ff99cc;
+            padding: 10px;
+        }
+        
+        .product-card .card-body {
+            padding: 15px;
+        }
+        
+        .product-card img:hover {
+            transform: scale(1.1);
+        }
+        
+        .product-card .btn-danger {
+            border-radius: 25px;
+            background-color: #ff66b2;
+            border-color: #ff66b2;
+            transition: background-color 0.3s ease-in-out;
+        }
+        
+        .product-card .btn-danger:hover {
+            background-color: #e0559e;
+            border-color: #e0559e;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="header-container">
+        <h3 class="fw-bold text-center top fancy">🛒 ตะกร้าสินค้า</h3>
+    </div>
+    
+    
+    <!-- แสดงสินค้าทั้งหมดในตะกร้า -->
+    <div class="container mt-4">
+       {% regroup detail_cartitem by product.shop.shop_id as shop_list %}
+    
+    {% for shop in shop_list %}
+        <div class="shop-block">
+            <div class="shop-header">
+                <input type="checkbox" class="form-check-input me-2 select-all-shop" data-shop-id="{{ shop.grouper }}">
+                {{ shop.list.0.product.shop.shop_name }} <!-- แสดงชื่อร้านค้า -->
+            </div>
+            {% for Item in shop.list %}
+                <div class="card product-card mb-2">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <input type="checkbox" class="form-check-input me-2 item-checkbox" 
+                                data-id="{{ Item.product.product_id }}"
+                                data-name="{{ Item.product.product_name }}" 
+                                data-price="{{ Item.product.price }}" 
+                                data-image="{{ Item.product.product_image.url }}" 
+                                data-quantity="{{ Item.quantity }}"
+                                data-shop-id="{{ Item.product.shop.shop_id }}"
+                            >   
+                            <h5 class="m-0">{{ Item.product.product_name }}</h5>
+                        </div>
+                        <a href="{% url 'Cart:delete' Item.id %}" class="btn btn-danger ms-2">ลบ</a>
+                    </div>
+                    <div class="card-body d-flex align-items-center">
+                        <img src="{{ Item.product.product_image.url }}" class="rounded" alt="product" height="90">
+                        <div class="ms-3">
+                            <p class="mb-1 " style="font-weight:; text-align: left;">{{ Item.product.product_name }}: {{ Item.product.description }}</p>
+                            <p class="text-muted" style="text-align: left;">จำนวน: {{ Item.quantity }}</p>
+                            <p class="text-danger fw-bold mb-0" style="text-align: left;">฿{{ Item.total_price }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+            </div>
+    
+
+    <hr>
+</div>
+
+<!-- รวมและเลือกทั้งหมด -->
+<div class="fixed-footer d-flex justify-content-between align-items-center">
+    <div>
+       <!-- <input type="checkbox" id="select-all" class="form-check-input me-2"> 
+        <label>เลือกทั้งหมด</label> -->
+    </div>
+    <div>
+        <span class="fw-bold me-2">รวม: <span id="total-price" class="total-price">฿0.00</span></span>
+        <a href="{% url 'Cart:Confirm_Cart' %}" id="checkout-btn" class="btn btn-danger disabled btn-checkout">ยืนยัน</a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const selectAllCheckboxes = document.querySelectorAll(".select-all-shop");
+        const itemCheckboxes = document.querySelectorAll(".item-checkbox");
+        const checkoutBtn = document.getElementById("checkout-btn");
+    
+        // ฟังก์ชันสำหรับอัปเดตราคารวม
+        function updateTotal() {
+            let total = 0;
+            let hasSelectedItem = false;
+    
+            itemCheckboxes.forEach((checkbox) => {
+                if (checkbox.checked) {
+                    let price = parseFloat(checkbox.dataset.price) || 0;
+                    let quantity = parseInt(checkbox.dataset.quantity) || 0;
+                    total += price * quantity;
+                    hasSelectedItem = true;
+                }
+            });
+    
+            const totalPriceElement = document.getElementById("total-price");
+            totalPriceElement.innerText = "฿" + total.toFixed(2);
+    
+            checkoutBtn.classList.toggle("disabled", !hasSelectedItem);
+        }
+    
+        // ฟังก์ชันสำหรับบันทึกรายการที่เลือกไว้ใน localStorage
+        function saveSelectedItems() {
+            const selectedItems = Array.from(itemCheckboxes)
+                .filter(checkbox => checkbox.checked)
+                .map(checkbox => ({
+                    id: checkbox.dataset.id,
+                    name: checkbox.dataset.name,
+                    price: checkbox.dataset.price,
+                    image: checkbox.dataset.image,
+                    quantity: checkbox.dataset.quantity,
+                    shopId: checkbox.dataset.shopId
+                }));
+    
+            localStorage.setItem("selectedCartItems", JSON.stringify(selectedItems));
+        }
+    
+        // ฟังก์ชันสำหรับยกเลิกการเลือก checkbox ในร้านค้าอื่น
+        function uncheckOtherShops(currentShopId) {
+            selectAllCheckboxes.forEach((checkbox) => {
+                if (checkbox.dataset.shopId !== currentShopId) {
+                    checkbox.checked = false;
+                    const otherShopId = checkbox.dataset.shopId;
+                    const otherItemCheckboxes = document.querySelectorAll(
+                        `.item-checkbox[data-shop-id="${otherShopId}"]`
+                    );
+                    otherItemCheckboxes.forEach((itemCheckbox) => {
+                        itemCheckbox.checked = false;
+                    });
+                }
+            });
+        }
+    
+        // Event listener สำหรับ "เลือกทั้งหมด" ในแต่ละร้านค้า
+        selectAllCheckboxes.forEach((selectAllCheckbox) => {
+            selectAllCheckbox.addEventListener("change", function () {
+                const shopId = this.dataset.shopId;
+                const itemCheckboxesInShop = document.querySelectorAll(
+                    `.item-checkbox[data-shop-id="${shopId}"]`
+                );
+    
+                // ยกเลิกการเลือกในร้านค้าอื่น
+                uncheckOtherShops(shopId);
+    
+                // เลือกหรือยกเลิก checkbox ทั้งหมดในร้านค้านี้
+                itemCheckboxesInShop.forEach((checkbox) => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+    
+                updateTotal();
+                saveSelectedItems();
+            });
+        });
+    
+        // Event listener สำหรับ checkbox แต่ละรายการ
+        itemCheckboxes.forEach((checkbox) => {
+            checkbox.addEventListener("change", function () {
+                const shopId = this.dataset.shopId;
+    
+                // ยกเลิกการเลือกในร้านค้าอื่น
+                uncheckOtherShops(shopId);
+    
+                // ตรวจสอบว่าสินค้าในร้านค้านี้ถูกเลือกทั้งหมดหรือไม่
+                const allChecked = Array.from(
+                    document.querySelectorAll(`.item-checkbox[data-shop-id="${shopId}"]`)
+                ).every((cb) => cb.checked);
+    
+                const selectAllCheckbox = document.querySelector(
+                    `.select-all-shop[data-shop-id="${shopId}"]`
+                );
+                selectAllCheckbox.checked = allChecked;
+    
+                updateTotal();
+                saveSelectedItems();
+            });
+        });
+    
+        // อัปเดตราคารวมและสถานะปุ่ม checkout เมื่อโหลดหน้าเว็บ
+        updateTotal();
+    });
+</script>
+{% endblock %}

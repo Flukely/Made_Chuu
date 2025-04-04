@@ -1,0 +1,81 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block title %}Refund Information{% endblock %}
+
+{% block styleCustom %}
+<style>
+    .container {
+        max-width: 600px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    .hidden {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block scriptCustom %}
+<script src="{% static 'js/script.js' %}" defer></script>
+<script src="{% static 'js/order_status.js' %}" defer></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const refundTypeSelect = document.getElementById('refund_type');
+        const bankNameInput = document.getElementById('bank_name');
+        const refundNumberInput = document.getElementById('refund_number');
+        const accountNameInput = document.getElementById('account_name');
+
+        // Function to show or hide fields
+        function toggleFields() {
+            const selectedType = refundTypeSelect.value;
+
+            // Reset all fields to hidden initially
+            bankNameInput.parentElement.classList.add('hidden');
+            refundNumberInput.parentElement.classList.add('hidden');
+            accountNameInput.parentElement.classList.add('hidden');
+            
+            if (selectedType === 'bank') {
+                bankNameInput.parentElement.classList.remove('hidden');
+                refundNumberInput.parentElement.classList.remove('hidden');
+                accountNameInput.parentElement.classList.remove('hidden');
+            } else if (selectedType === 'promptpay') {
+                refundNumberInput.parentElement.classList.remove('hidden');
+                accountNameInput.parentElement.classList.remove('hidden');
+            } 
+            // If no type selected, all remains hidden. No need for an else block here.
+        }
+
+        // Initial call to set the correct display on page load
+        toggleFields();
+
+        // Event listener for changes in the select field
+        refundTypeSelect.addEventListener('change', toggleFields);
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Refund Information for Order {{ order.order_id }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+            <div class="text-danger">
+                {{ field.errors|striptags }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}

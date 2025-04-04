@@ -1,0 +1,253 @@
+<!-- templates/admin_function/edit_promotion.html -->
+{% extends 'admin_function/base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4"><i class="fas fa-edit me-2"></i>แก้ไขโปรโมชัน: {{ promotion.promotion_name }}</h2>
+    
+    <!-- ฟอร์มกรองสินค้า -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <input type="hidden" name="promotion_id" value="{{ promotion.promotion_id }}">
+                <div class="col-md-5">
+                    <label for="shop_id" class="form-label">เลือกร้านค้า:</label>
+                    <select name="shop_id" id="shop_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- ทุกร้านค้า --</option>
+                        {% for shop in shops %}
+                        <option value="{{ shop.shop_id }}" {% if selected_shop|add:"0" == shop.shop_id %}selected{% endif %}>
+                            {{ shop.shop_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label for="category_id" class="form-label">เลือกหมวดหมู่:</label>
+                    <select name="category_id" id="category_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- ทุกหมวดหมู่ --</option>
+                        {% for category in categories %}
+                        <option value="{{ category.category_id }}" {% if selected_category|add:"0" == category.category_id %}selected{% endif %}>
+                            {{ category.category_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <a href="{% url 'edit_promotion' promotion.promotion_id %}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-undo me-1"></i>ล้าง
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ฟอร์มหลักสำหรับแก้ไขโปรโมชัน -->
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- ส่วนรายละเอียดโปรโมชัน -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-info-circle me-2"></i>รายละเอียดโปรโมชัน
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">ชื่อโปรโมชัน</label>
+                        {{ promotion_form.promotion_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">ประเภทโปรโมชัน</label>
+                        {{ promotion_form.promotion_type }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">ส่วนลด (%)</label>
+                        {{ promotion_form.discount }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">วันที่เริ่ม</label>
+                        {{ promotion_form.start_date }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">วันที่สิ้นสุด</label>
+                        {{ promotion_form.end_date }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">คำอธิบาย</label>
+                        {{ promotion_form.description }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">รูปภาพโปรโมชัน</label>
+                        {{ promotion_form.promotion_image }}
+                        {% if promotion.promotion_image %}
+                        <div class="mt-2">
+                            <img src="{{ promotion.promotion_image.url }}" 
+                                 alt="Current image" 
+                                 style="max-height: 100px;"
+                                 class="img-thumbnail">
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" name="promotion_image-clear" id="promotion_image-clear">
+                                <label class="form-check-label" for="promotion_image-clear">
+                                    ลบรูปภาพปัจจุบัน
+                                </label>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ส่วนเลือกสินค้า -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-box-open me-2"></i>เลือกสินค้าในโปรโมชัน
+                <span class="badge bg-white text-primary ms-2">
+                    {{ product_form.products.field.queryset.count }} สินค้า
+                </span>
+            </div>
+            <div class="card-body">
+                {% if product_form.products.field.queryset.exists %}
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    
+                    {% for product in product_form.products.field.queryset %}
+                    
+                        <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <!-- รูปภาพสินค้า -->
+                            <div class="text-center p-2" style="height: 150px;">
+                            {% if product.product_image %}
+                                <img src="{{ product.product_image.url }}" 
+                                    alt="{{ product.product_name }}"
+                                    style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                            {% else %}
+                                <div class="h-100 d-flex align-items-center justify-content-center bg-light">
+                                <i class="fas fa-image fa-3x text-muted"></i>
+                                </div>
+                            {% endif %}
+                            </div>
+                            
+                            <!-- ชื่อและรายละเอียดสินค้า -->
+                            <div class="card-body">
+                            <h5 class="card-title">{{ product.product_name }}</h5>
+                            <p class="text-success">{{ product.price }} บาท</p>
+                            <p class="small text-muted">
+                                <i class="fas fa-store"></i> {{ product.shop.shop_name }}<br>
+                                <i class="fas fa-tag"></i> {{ product.category.category_name }}
+                            </p>
+                            </div>
+                            
+                            <!-- Checkbox -->
+                            <div class="card-footer bg-white text-center">
+                                <input type="checkbox" name="products" value="{{ product.product_id }}" id="product{{ product.product_id }}">
+                                <label for="product{{ product.product_id }}">เลือกสินค้า</label>
+                            </div>
+                        </div>
+                        </div>
+                    
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-warning mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>ไม่พบสินค้าตามเงื่อนไขที่กรอง
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ปุ่มดำเนินการ -->
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-lg me-2 px-4">
+                <i class="fas fa-save me-2"></i>อัปเดตโปรโมชัน
+            </button>
+            <a href="{% url 'promotion_list' %}" class="btn btn-outline-secondary btn-lg px-4">
+                <i class="fas fa-times me-2"></i>ยกเลิก
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    /* สไตล์การ์ดสินค้า */
+    .product-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: 2px solid transparent;
+    }
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    .product-card.selected {
+        border-color: var(--bs-primary);
+    }
+    
+    /* เอฟเฟกต์การเลือก */
+    .selection-overlay {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(13, 110, 253, 0.1);
+        border: 2px solid var(--bs-primary);
+        border-radius: 0.25rem;
+    }
+    .product-card.selected .selection-overlay {
+        display: block;
+    }
+    .selection-overlay i {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        color: var(--bs-primary);
+        font-size: 1.5rem;
+        background: white;
+        border-radius: 50%;
+    }
+    
+    /* ปรับแต่งรูปภาพ */
+    .product-image img {
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
+    }
+    .no-image-placeholder {
+        color: #ddd;
+    }
+    
+    /* ปรับแต่งฟอร์ม */
+    .form-control, .form-select {
+        border-radius: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ทำให้การคลิกที่การ์ดสินค้าเป็นการเลือก checkbox
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            if (!e.target.closest('a')) {
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                checkbox.checked = !checkbox.checked;
+                this.classList.toggle('selected', checkbox.checked);
+            }
+        });
+    });
+    
+    // ตั้งค่า DateTime picker
+    const startDate = document.getElementById('id_start_date');
+    const endDate = document.getElementById('id_end_date');
+    
+    if (startDate && endDate) {
+        startDate.type = 'datetime-local';
+        endDate.type = 'datetime-local';
+    }
+});
+</script>
+{% endblock %}

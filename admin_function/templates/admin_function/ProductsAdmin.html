@@ -1,0 +1,139 @@
+{% extends 'admin_function/base.html' %}
+{% load static %}
+{% block title %} Product {% endblock %}
+{% block content %}
+  <!-- Page Header Start -->
+  <div class="container mt-5">
+    <h1 class="text-center text-primary">Product</h1>
+    <p class="text-center text-muted">มีสินค้าใหม่ใช่ไหม ? ลงขายเลย!</p>
+    </div>
+    <!-- Page Header End-->
+
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <h1 class="display-6 mb-0">Products</h1>
+            <form method="GET" class="d-flex align-items-end">
+                <div class="form-group flex-grow-1 mb-0 col-md-6">
+                    {{ products.form.as_p }}
+                </div>
+                <button type="submit" class="btn btn-primary ml-2 mb-0">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+        <div class="row g-4">
+            <!-- Add product Button-->
+            <div class="col-lg-3 col-md-6 wow fadeInUp">
+                <div class="team-item h-100 addproductthing add-product" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                    <div class="overflow-hidden position-relative rounded-3 d-flex justify-content-center align-items-center mx-auto my-auto">
+                        <img class="img-fluid p-4 mx-auto my-auto" src="{% static 'MadeChuu/images/add.png' %}" style="width: 50%; ">
+                    </div>
+                    <div class="text-center p-4">
+                        <h5 class="mb-0">Add Products </h5>
+                        <h4 class="mb-0">Here </h4>
+                        <br><br>
+                    </div>
+                </div>
+            </div>
+            {% for product in products.qs %}
+            <div class="col-lg-3 col-md-6 wow fadeInUp">
+                <div class="team-item h-100">
+                    <div class="overflow-hidden position-relative rounded-3">
+                        {% if product.product_image %}
+                            <img class="img-fluid" src="{{ product.product_image.url }}" style="width: 100%;">
+                        {% else %}
+                            <img class="img-fluid" src="{% static 'MadeChuu/images/default.png' %}" style="width: 100%;">
+                        {% endif %}
+                    </div>
+                    <div class="text-center p-4">
+                        <h5 class="mb-0">{{product.product_id}} : {{product.product_name}}</h5>
+                        <small>{{product.category.category_name}}</small><br>
+                        <small>{{product.price}}</small><br>
+                        <small>in Stock : {{product.quantity}}</small>
+                        <br><br>
+                        <div class="button-edit-delete d-flex justify-content-center">
+                            <form method="GET" action="{% url 'edit_product' product.product_id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                                <button class='btn btn-warning btn-radius10' type='submit'>
+                                    <i class='fa-solid fa-wrench'></i>
+                                </button>
+                            </form>
+                            <form method="POST" action="{% url 'delete_product' product.product_id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                                <button class='btn btn-danger btn-radius10' type='submit' onclick="return confirm('คุณแน่ใจหรือว่าต้องการลบสินค้านี้?')">
+                                    <i class='fa-solid fa-trash-can'></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- Modal สำหรับเพิ่มสินค้า -->
+
+
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addProductModalLabel">เพิ่มสินค้า</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="product_name">Product Name</label>
+                            <input type="text" class="form-control" id="product_name" name="product_name" value="{{ form.product_name.value|default_if_none:''  }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea class="form-control" id="description" name="description">{{ form.description.value|default_if_none:''  }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="price">Price</label>
+                            <input type="number" class="form-control" id="price" name="price" value="{{ form.price.value }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="quantity">Quantity</label>
+                            <input type="number" class="form-control" id="quantity" name="quantity" value="{{ form.quantity.value }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select class="form-control" id="category" name="category">
+                                {% for category in form.category.field.queryset %}
+                                    <option value="{{ category.category_id }}" {% if category.category_id == form.category.value %}selected{% endif %}>{{ category.category_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="product_image">Product Image</label>
+                            <input type="file" class="form-control-file image-input" id="product_image" name="product_image">
+                            <img class="preview-img mt-3" style="width: 50%;">
+                        </div>
+                        <button type="submit" class="btn btn-success">บันทึก</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelectorAll('.image-input').forEach(input => {
+        input.addEventListener('change', function (event) {
+            let reader = new FileReader();
+            let preview = this.nextElementSibling;
+            reader.onload = function () {
+                preview.src = reader.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        });
+    });
+</script>
+{% endblock %}

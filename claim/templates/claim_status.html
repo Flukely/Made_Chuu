@@ -1,0 +1,197 @@
+{% extends 'main/base.html' %}
+
+{% block title %}สถานะการพิจารณาการคืนเงิน{% endblock %}
+
+{% block styleCustom %}
+    <style>
+        body {
+            background-color: #ffffff;
+            font-family: 'Prompt', sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+        .btn-pastel {
+            background-color: #ff90bc;
+            border: none;
+            color: white;
+        }
+        .btn-pastel:hover {
+            background-color: #ff73a5;
+        }
+        .text-pink {
+            color: #ff90bc;
+        }
+        .img-fluid {
+            max-height: 200px;
+            object-fit: cover;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .info-row strong {
+            flex: 1;
+            text-align: left;
+        }
+        .info-row span {
+            flex: 2;
+            text-align: right;
+        }
+        .status-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+        .status-icon.processing {
+            color: #ff90bc;
+        }
+        .status-icon.approved {
+            color: #28a745;
+        }
+        .status-icon.rejected {
+            color: #dc3545;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container mt-5 text-center">
+        {% if status == "กำลังดำเนินการ" %}
+            <i class="fas fa-spinner fa-spin status-icon processing"></i>
+            <h1 class="text-pink">กำลังพิจารณาคำขอ</h1>
+           
+            <div class="product-list">
+                <strong>รายการสินค้า:</strong>
+                {% for product in orderproduct %}
+                    <div class="product-item">
+                        - {{ product.product.product_name }}
+                    </div>
+                    {% empty %}
+                    <div class="product-item">
+                        - ไม่มีสินค้า
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="info-row">
+                <strong>ราคารวมทั้งหมด:</strong>
+                <span>{{ product_price }} บาท</span>
+            </div>
+            <div class="info-row">
+                <strong>จำนวนเงินคืน:</strong>
+                <span>{{ product_price }} บาท</span>
+            </div>
+            <div class="info-row">
+                <strong>คืนเงินไปยังพร้อมเพย์:</strong>
+                <span>{{promtpay_number}}</span>
+            </div>
+            <div class="info-row">
+                <strong>วันเวลาที่ส่งคำขอ:</strong>
+                <span>{{ request_datetime }}</span>
+            </div>
+            <div class="info-row">
+                <strong>รหัสคำขอ:</strong>
+                <span>{{ request_id }}</span>
+            </div>
+            <div class="info-row">
+                <strong>เหตุผล:</strong>
+                <span>{{ reason }}</span>
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'tracking:tracking' order_id %}" class="btn btn-pastel w-45">กลับ</a>
+                <a href="{% url 'claim:cancel_claim' claim_id=request_id %}" class="btn btn-outline-danger w-45">ยกเลิกคำขอ</a>
+            </div>
+        {% elif status == "ผ่าน" %}
+            <i class="fas fa-check-circle status-icon approved"></i>
+            <h1 class="text-success">คำขอคืนเงินได้รับการอนุมัติแล้ว</h1>
+            <div class="product-list">
+                <strong>รายการสินค้า:</strong>
+                {% for product in orderproduct %}
+                    <div class="product-item">
+                        - {{ product.product.product_name }}
+                    </div>
+                    {% empty %}
+                    <div class="product-item">
+                        - ไม่มีสินค้า
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="info-row">
+                <strong>ราคาสินค้า:</strong>
+                <span>{{ product_price }} บาท</span>
+            </div>
+            <div class="info-row">
+                <strong>จำนวนเงินคืน:</strong>
+                <span>{{ product_price }} บาท</span>
+            </div>
+            <div class="info-row">
+                <strong>คืนเงินไปยังพร้อมเพย์:</strong>
+                <span>{{ promtpay_number}}</span>
+            </div>
+            <div class="info-row">
+                <strong>วันเวลาที่ส่งคำขอ:</strong>
+                <span>{{ request_datetime }}</span>
+            </div>
+            <div class="info-row">
+                <strong>รหัสคำขอ:</strong>
+                <span>{{ request_id }}</span>
+            </div>
+            <div class="info-row">
+                <strong>เหตุผล:</strong>
+                <span>{{ reason }}</span>
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'tracking:tracking' order_id %}" class="btn btn-pastel w-45">กลับ</a>
+                
+            </div>
+        {% elif status == "ไม่ผ่าน" %}
+            <i class="fas fa-times-circle status-icon rejected"></i>
+            <h1 class="text-danger">คำขอของคุณไม่ผ่านเงื่อนไข</h1>
+            <div class="product-list">
+                <strong>รายการสินค้า:</strong>
+                {% for product in orderproduct %}
+                    <div class="product-item">
+                        - {{ product.product.product_name }}
+                    </div>
+                    {% empty %}
+                    <div class="product-item">
+                        - ไม่มีสินค้า
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="info-row">
+                <strong>ราคาสินค้า:</strong>
+                <span>{{ product_price }} บาท</span>
+            </div>
+            <div class="info-row">
+                <strong>จำนวนเงินคืน:</strong>
+                <span>{{ product_price }} บาท</span>
+            </div>
+            <div class="info-row">
+                <strong>คืนเงินไปยังพร้อมเพย์:</strong>
+                <span>{{ promtpay_number }}</span>
+            </div>
+            <div class="info-row">
+                <strong>วันเวลาที่ส่งคำขอ:</strong>
+                <span>{{ request_datetime }}</span>
+            </div>
+            <div class="info-row">
+                <strong>รหัสคำขอ:</strong>
+                <span>{{ request_id }}</span>
+            </div>
+            <div class="info-row">
+                <strong>เหตุผล:</strong>
+                <span>{{ reason }}</span>
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'tracking:tracking' order_id %}" class="btn btn-pastel w-45">กลับ</a>
+               
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

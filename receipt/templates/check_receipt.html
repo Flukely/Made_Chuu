@@ -1,0 +1,82 @@
+{% extends 'main/base.html' %}
+
+{% block title %} ตรวจสอบใบเสร็จ {% endblock %}
+
+{% block styleCustom %}
+    <style>
+        body {
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            margin-top: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .table thead {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        .table td a {
+            color: #fff;
+            background-color: #28a745;
+            padding: 6px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .table td a:hover {
+            background-color: #218838;
+        }
+        .message {
+            text-align: center;
+            font-size: 1.2em;
+            color: #dc3545;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4">ตรวจสอบใบเสร็จ</h2>
+
+    {% if payments_with_items %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover text-center">
+                <thead>
+                    <tr>
+                        <th>หมายเลขการชำระเงิน</th>
+                        <th>หมายเลขออเดอร์</th>
+                        <th>วันที่ชำระเงิน</th>
+                        <th>สินค้า</th>
+                        <th>ตรวจสอบใบเสร็จ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment_with_items in payments_with_items %}
+                    <tr>
+                        <td>{{ payment_with_items.payment.payment_id }}</td>
+                        <td>{{ payment_with_items.payment.order.order_id }}</td>
+                        <td>{{ payment_with_items.payment.payment_date|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <ul class="list-unstyled">
+                                {% for item in payment_with_items.items_with_price %}
+                                <li>{{ item.product_name }} - {{ item.quantity }} x {{ item.price }} บาท</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <a href="{% url 'receipt:receipt' payment_with_items.payment.order.order_id %}" class="btn btn-primary">ตรวจสอบ</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="message">คุณยังไม่มีการชำระเงินที่ต้องตรวจสอบ</p>
+    {% endif %}
+</div>
+{% endblock %}

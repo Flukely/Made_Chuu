@@ -1,0 +1,31 @@
+<!-- templates/admin_function/confirm_delete.html -->
+{% extends 'admin_function/base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <i class="fas fa-exclamation-triangle me-2"></i>ยืนยันการลบโปรโมชัน
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">คุณแน่ใจหรือไม่ที่จะลบโปรโมชันนี้?</h5>
+            <p class="card-text">
+                <strong>ชื่อโปรโมชัน:</strong> {{ promotion.promotion_name }}<br>
+                <strong>ส่วนลด:</strong> {{ promotion.discount }}%<br>
+                <strong>วันที่เริ่ม:</strong> {{ promotion.start_date|date:"d/m/Y" }}<br>
+                <strong>วันที่สิ้นสุด:</strong> {{ promotion.end_date|date:"d/m/Y" }}
+            </p>
+            
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger me-2">
+                    <i class="fas fa-trash me-2"></i>ลบ
+                </button>
+                <a href="{% url 'promotion_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i>ยกเลิก
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

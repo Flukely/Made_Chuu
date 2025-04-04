@@ -1,0 +1,71 @@
+<!-- templates/admin_function/confirm_delete.html -->
+{% extends 'admin_function/base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="card border-danger">
+        <div class="card-header bg-danger text-white">
+            <i class="fas fa-exclamation-triangle me-2"></i>ยืนยันการลบโปรโมชัน
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">คุณแน่ใจหรือไม่ที่จะลบโปรโมชันนี้?</h4>
+            
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5>{{ promotion.promotion_name }}</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><strong>ประเภท:</strong> {{ promotion.promotion_type }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>ส่วนลด:</strong> {{ promotion.discount }}%</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>สินค้าในโปรโมชัน:</strong> {{ promotion.promotionproduct_set.count }} รายการ</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>วันที่เริ่ม:</strong> {{ promotion.start_date|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>วันที่สิ้นสุด:</strong> {{ promotion.end_date|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-2"></i>ลบโปรโมชัน
+                    </button>
+                    <a href="{% url 'promotion_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>ยกเลิก
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .card {
+        border-radius: 0.5rem;
+    }
+    .card-header {
+        border-radius: 0.5rem 0.5rem 0 0 !important;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+</style>
+{% endblock %}
