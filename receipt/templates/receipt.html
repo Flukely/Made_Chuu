@@ -1,0 +1,93 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block title %} รายละเอียดใบเสร็จ {% endblock %}
+
+{% block styleCustom %}
+    <style>
+        body {
+        }
+        .receipt-container {
+            background-color: #fff;
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 800px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .receipt-header h1 {
+            font-size: 32px;
+            color: #333;
+        }
+        .receipt-header .store-name {
+            font-size: 24px;
+            color: #888;
+        }
+        .receipt-details p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .receipt-details .bold {
+            font-weight: bold;
+        }
+        .items-list {
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        .items-list .list-group-item {
+            font-size: 16px;
+            padding: 12px;
+            border: none;
+            border-bottom: 1px solid #ddd;
+        }
+        .total-price {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .btn-print, .btn-back {
+            margin-top: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 receipt-container">
+    <div class="receipt-header">
+        <h1>ใบเสร็จการซื้อสินค้า</h1>
+        <p class="store-name">Made Chuu</p>
+    </div>
+
+    {% if message %}
+        <p class="text-warning">{{ message }}</p>
+    {% else %}
+    <div class="receipt-details">
+        <p><span class="bold">ร้านค้า:</span> {{ store_name }}</p>
+        <p><span class="bold">หมายเลขใบเสร็จ:</span> {{ receipt.receipt_id }}</p>
+        <p><span class="bold">หมายเลขการชำระเงิน:</span> {{ receipt.payment_id }}</p>
+        <p><span class="bold">หมายเลขคำสั่งซื้อ:</span> {{ receipt.order_id }}</p>
+        <p><span class="bold">ชื่อผู้ใช้:</span> {{ logged_in_user.user_name }}</p>
+        <p><span class="bold">อีเมล:</span> {{ logged_in_user.email }}</p>
+        <p><span class="bold">วันที่ออกใบเสร็จ:</span> {{ receipt.receipt_date|date:"d/m/Y H:i" }}</p>
+    </div>
+
+    <h3 class="items-list">รายการสินค้า</h3>
+    <ul class="list-group">
+        {% for item in items_with_price %}
+            <li class="list-group-item">{{ item.product_name }} - {{ item.quantity }} x {{ item.price }} บาท</li>
+        {% endfor %}
+    </ul>
+
+    <p class="total-price"><span class="bold">รวมทั้งหมด:</span> {{ order.total_price }} บาท</p>
+
+    <button onclick="window.print()" class="btn btn-success btn-print">บันทึกใบเสร็จ</button>
+    <a href="{% url 'receipt:check_receipt' %}" class="btn btn-secondary btn-back">กลับ</a>
+    {% endif %}
+</div>
+{% endblock %}

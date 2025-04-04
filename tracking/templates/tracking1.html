@@ -1,0 +1,349 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block title %}Product Tracking{% endblock %}
+
+{% block scriptCustom %}
+  <script src="{% static 'js/script.js' %}" defer></script>
+  <script src="{% static 'js/order_status.js' %}" defer></script>
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const refundTypeSelect = document.getElementById('refund_type');
+          const bankNameInput = document.getElementById('bank_name');
+          const refundNumberInput = document.getElementById('refund_number');
+          const accountNameInput = document.getElementById('account_name');
+
+          // Function to show or hide fields
+          function toggleFields() {
+              const selectedType = refundTypeSelect.value;
+
+              if (selectedType === 'bank') {
+                  bankNameInput.style.display = 'block';
+                  refundNumberInput.style.display = 'block';
+                  accountNameInput.style.display = 'block';
+              } else if (selectedType === 'promptpay') {
+                  bankNameInput.style.display = 'none';
+                  refundNumberInput.style.display = 'block';
+                  accountNameInput.style.display = 'none';
+              }else{
+                  bankNameInput.style.display = 'none';
+                  refundNumberInput.style.display = 'none';
+                  accountNameInput.style.display = 'none';
+              }
+          }
+
+          // Initial call to set the correct display on page load
+          toggleFields();
+
+          // Event listener for changes in the select field
+          refundTypeSelect.addEventListener('change', toggleFields);
+      });
+  </script>
+{% endblock %}
+
+  {% block styleCustom %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f8f8;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            text-align: center;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        
+        nav button {
+            padding: 10px;
+            border: none;
+            background: #ddd;
+            cursor: pointer;
+        }
+        
+        nav button.active {
+            background: #ff5722;
+            color: white;
+        }
+        
+        .order-box {
+            background: rgb(255, 255, 255);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        
+        .order-card {
+            display: flex;
+            background: rgb(255, 255, 255);
+            height: 100%;
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .order-card img {
+            / width: auto; */
+            height: 300px;
+            border-radius: 10px;
+        
+        }
+        
+        .order-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-grow: 1;
+        }
+        
+        .order-details {
+            margin-left: 15px;
+            flex-grow: 1;
+        }
+        
+        .order-actions {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        button {
+            padding: 8px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .btn-detail {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .btn-buy {
+            background: #4CAF50;
+            color: white;
+        }
+    </style>
+  {% endblock %}
+
+
+
+{% block content %}
+<div class="bg-white">
+  <header class="p-0">
+    <h1 class="text_branner">สถานะคำสั่งซื้อ</h1>
+  </header>
+  <!-- ✅ Progress Bar -->
+{% if order.status_order.status_name != 'ยกเลิกคำสั่งซื้อ' and order.status_order.status_name != 'ดำเนินการคืนเงิน' and order.status_order.status_name != 'คืนเงินสำเร็จแล้ว' %}
+  <div class="progress-steps">
+    <div class="step {% if order.status_order.status_name == 'ตรวจสอบจ่ายเงิน' %} active {% endif %}">
+      <i class="fa-solid fa-box"></i>
+      <span>กำลังรอยีนยันชำระเงิน</span>
+    </div>
+    <div class="step {% if order.status_order.status_name == 'เตรียมของ' %} active {% endif %}">
+      <i class="fa-solid fa-cubes"></i>
+      <span>กำลังจัดเตรียมพัสดุ</span>
+    </div>
+    <div class="step {% if order.status_order.status_name == 'เตรียมจัดส่ง' %} active {% endif %}">
+      <i class="fa-solid fa-truck"></i>
+      <span>กำลังรอจัดส่ง</span>
+    </div>
+    <div class="step {% if order.status_order.status_name == 'กำลังจัดส่ง' %} active {% endif %}">
+      <i class="fa-solid fa-check-circle"></i>
+      <span>ส่งพัสดุแล้ว</span>
+    </div>
+    <div class="step {% if order.status_order.status_name == 'จัดส่งสำเร็จ' %} active {% endif %}">
+      <i class="fa-solid fa-check-circle"></i>
+      <span>จัดส่งสำเร็จ</span>
+    </div>
+  </div>
+{% else %}
+  <div class="progress-steps">
+    <div class="step {% if order.status_order.status_name == 'ยกเลิกคำสั่งซื้อ' %} active {% endif %}">
+      <i class="fa-solid fa-box"></i>
+      <span>ยกเลิกคำสั่งซื้อ</span>
+    </div>
+    <div class="step {% if order.status_order.status_name == 'ดำเนินการคืนเงิน' %} active {% endif %}">
+      <i class="fa-solid fa-box"></i>
+      <span>อยู่ระหว่างการคืนเงิน</span>
+    </div>
+    <div class="step {% if order.status_order.status_name == 'คืนเงินสำเร็จแล้ว' %} active {% endif %}">
+      <i class="fa-solid fa-box"></i>
+      <span>คืนเงินสำเร็จแล้ว</span>
+    </div>
+  </div>
+{% endif %}
+
+
+
+
+
+  <!-- รายการคำสั่งซื้อ -->
+  <section class="order-container">
+    <div class="order-card">
+      {% for orderproduct in orderproducts %}
+      <div class="order-item">
+        {% if orderproduct.product.product_image %}
+        <img src="{{ orderproduct.product.product_image.url }}" alt="{{ orderproduct.product.product_name }}">
+        {% else %}
+        <div class="text-muted">ไม่มีรูปภาพ</div>
+        {% endif %}
+        <h2>{{ orderproduct.product.product_name }}</h2>
+        <p>฿{{ orderproduct.product.price }}</p>
+      </div>
+      {% endfor %}
+
+      {% if order.status_order.status_name == 'เตรียมของ' %}
+        <form method="post" action="{% url 'tracking:cancel_order' order.order_id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">ยกเลิก order</button>
+        </form>
+      {% endif %}
+   
+      {% if order.status_order.status_name == 'ยกเลิกคำสั่งซื้อ' %}
+        <a href="{% url 'tracking:refund_info' order.order_id %}" class="btn btn-success">กรอกข้อมูลการคืนเงิน</a>
+      {% endif %}
+
+      {% if order.status_order.status_name == 'กำลังจัดส่ง' %}
+      
+      <form method="post" action="{% url 'tracking:submit_order' order.order_id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">ยืนยันรับสินค้า</button>
+      </form>
+
+      {% endif %}
+
+      {% if order.status_order.status_name == 'จัดส่งสำเร็จ' or order.status_order.status_name == 'เคลม' %}
+        {% with existing_claim=order.claim_set.first %}
+            <div class="btn-group">
+                {% if existing_claim %}
+                    {% if existing_claim.claim_status == 'ยกเลิกคำขอ' %}
+                        <button class="btn btn-secondary" disabled>ไม่สามารถเคลมได้ เคลมถูกยกเลิก</button>
+                    {% else %}
+                        <a href="{% url 'claim:claim_status' claim.claim_id %}" class="btn btn-danger">คืนเงิน/คืนสินค้า</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'claim:claim_request' order.order_id %}" class="btn btn-danger">คืนเงิน/คืนสินค้า</a>
+                {% endif %}
+                <a href="{% url 'review:review_page' %}" class="btn btn-primary">ให้คะแนนสินค้า</a>
+            </div>
+        {% endwith %}
+      {% endif %}
+
+    </div>
+  </section>
+
+  <div class="container order-summary">
+    <h2 class="text-left text-pink">สรุปคำสั่งซื้อ</h2>
+    <table class="table table-bordered">
+      <tr>
+        <td>หมายเลขคำสั่งซื้อ</td>
+        <td>{{ order.order_id }}</td>
+      </tr>
+      <tr>
+        <td>ลูกค้า</td>
+        <td>{{ order.user.user_name }}</td>
+      </tr>
+      <tr>
+        <td>ราคา</td>
+        <td>฿{{ order.total_price }}</td>
+      </tr>
+      <tr>
+        <td>วันที่สั่งซื้อ</td>
+        <td>{{ order.order_date|date:"d-m-Y H:i" }}</td>
+      </tr>
+      <tr>
+        <td>สถานะ</td>
+        <td>{{ order.status_order.status_name }}</td>
+      </tr>
+
+      {% if order.status_order.status_name == "จัดส่งสำเร็จ" or order.status_order.status_name == "กำลังจัดส่ง" %}
+      <tr>
+        <td>เลขติดตามพัสดุ</td>
+        <td>{{ order.tracking_num }}</td>
+      </tr>
+      <tr>
+        <td>บริษัทขนส่ง</td>
+        <td>{{ order.shipper.shipper_name }}</td>
+      </tr>
+      {% endif %}
+
+    </table>
+  </div>
+
+
+
+  <!-- รายละเอียดคำสั่งซื้อ -->
+  {% if order.status_order.status_name != 'ยกเลิกคำสั่งซื้อ' and order.status_order.status_name != 'ดำเนินการคืนเงิน' and order.status_order.status_name != 'คืนเงินสำเร็จแล้ว' %}
+  <div class="container order-details">
+    <h2>รายละเอียดคำสั่งซื้อ</h2>
+    <table class="table table-bordered">
+      <tr>
+        <td>หมายเลขคำสั่งซื้อ</td>
+        <td>{{ order.order_id }}</td>
+      </tr>
+      <tr>
+        <td>วันที่สั่งซื้อ</td>
+        <td>{{ order.order_date|date:"d-m-Y H:i" }}</td>
+      </tr>
+
+      {% if order.status_order.status_name == "เตรียมจัดส่ง" or order.status_order.status_name == "จัดส่งสำเร็จ" or order.status_order.status_name == "เตรียมของ" %}
+      <tr>
+        <td>เวลาที่ชำระเงิน</td>
+        <td>{{ payment.payment_date|date:"d-m-Y H:i" }}</td>
+      </tr>
+      {% endif %}
+
+      {% if order.status_order.status_name == "กำลังจัดส่ง" or order.status_order.status_name == "จัดส่งสำเร็จ" %}
+      <tr>
+        <td>เวลาที่จัดส่งสินค้า</td>
+        <td>{{ order.shipper_date|date:"d-m-Y H:i" }}</td>
+      </tr>
+      {% endif %}
+
+      {% if order.status_order.status_name == "จัดส่งสำเร็จ" %}
+      <tr>
+        <td>วันที่ได้รับสินค้า</td>
+        <td>{{ order.delivery_date|date:"d-m-Y H:i" }}</td>
+      </tr>
+      {% endif %}
+
+    </table>
+  </div>
+  {% endif %}
+
+  <h3 class="text-left text-pink">สินค้าอื่นๆ</h3>
+  <div class="product-list">
+    {% for product in all_products %}
+    <div class="product-card">
+      <img src="{{ product.product_image.url}}" alt="{{ product.name }}" class="product-img">
+      <div class="product-info">
+        <h4 class="product-name">{{ product.name }}</h4>
+        <p class="product-price">฿{{ product.price }}</p>
+        <button class="btn-cart">🛒 เพิ่มลงตะกร้า</button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  </main>
+</div>
+{% endblock %}

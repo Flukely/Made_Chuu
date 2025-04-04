@@ -1,0 +1,263 @@
+{% extends 'main/base.html' %}
+
+{% block title %}ยืนยันการสั่งซื้อ{% endblock %}
+
+{% block styleCustom %}
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #ffe6f2;
+        }
+        
+        .container {
+            max-width: 1000px;
+        }
+        
+        /* การ์ดสินค้า */
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ff99cc;
+            transition: transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        
+        .card:hover {
+            transform: scale(1.02);
+            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header {
+            background-color: #ffccff;
+            font-weight: bold;
+            border-bottom: 2px solid #ff66b2;
+            padding: 12px;
+        }
+        
+        /* รูปภาพสินค้า */
+        .card img {
+            border-radius: 8px;
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border: 2px solid #ff99cc;
+            transition: transform 0.3s ease;
+        }
+        
+        .card img:hover {
+            transform: scale(1.1);
+        }
+        
+        /* ข้อความภายในการ์ด */
+        .card-text {
+            margin: 50px;
+        }
+        
+        .text-pink {
+            color: #ff66b2;
+            font-weight: bold;
+        }
+        
+        /* ราคาสินค้า */
+        .total-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #d1005c;
+        }
+        
+        /* ปุ่มต่าง ๆ */
+        .btn-danger,
+        .btn-checkout {
+            border-radius: 25px;
+            background-color: #ff66b2;
+            border-color: #ff66b2;
+            transition: background-color 0.3s ease-in-out;
+        }
+        
+        .btn-danger:hover,
+        .btn-checkout:hover {
+            background-color: #e0559e;
+            border-color: #e0559e;
+        }
+        
+        .btn-checkout {
+            width: 150px;
+        }
+        
+        /* ปุ่มย้อนกลับ */
+        .btn-back {
+            background-color: #ff99cc;
+            border-color: #ff99cc;
+            color: white;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            transition: background-color 0.3s ease-in-out;
+        }
+        
+        .btn-back:hover {
+            background-color: #ff66b2;
+            border-color: #ff66b2;
+        }
+        
+        /* หัวข้อ */
+        .top {
+            margin-top: -25px;
+        }
+        
+        .header-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            border: 3px solid rgb(31, 7, 19);
+        }
+        
+        /* แถบด้านล่าง */
+        .fixed-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #ffffff;
+            padding: 10px 20px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        .fancy-title {
+            font-size: 1.8rem;
+         
+            text-shadow: 2px 2px 5px rgba(64, 60, 62, 0.5);
+            font-weight: bold;
+            letter-spacing: 1px;
+            position: relative;
+        }    
+    </style>
+{% endblock %}
+
+{% block scriptCustom %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let cartItemsContainer = document.getElementById("cart-items");
+            let totalPriceElement = document.getElementById("total-price");
+            let orderBtn = document.getElementById("order-btn");
+
+            let selectedItems = JSON.parse(localStorage.getItem("selectedCartItems"));  // ข้อมูลที่ถูกเก็บทั้งหมดอยู่นี้
+            let totalPrice = 0;
+
+            if (selectedItems && selectedItems.length > 0) {
+                cartItemsContainer.innerHTML = ""; 
+                selectedItems.forEach(item => {
+                    let itemTotalPrice = parseFloat(item.price) * parseInt(item.quantity);
+                    let itemHTML = `
+                        <div class="card p-3 mb-4" >
+                            <div class="d-flex align-items-center">
+                                <img src="${item.image}" class="rounded" alt="product" width="200px">
+                                <div class="ms-3">
+                                    <h5>${item.name}</h5>
+                                    <p class="text-muted">จำนวน: ${item.quantity}</p>
+                                    <p class="text-danger fw-bold mb-0">฿${itemTotalPrice.toFixed(2)}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                    `;
+                    cartItemsContainer.insertAdjacentHTML("beforeend", itemHTML);
+                    totalPrice += itemTotalPrice;
+                });
+
+                totalPriceElement.innerText = "฿" + totalPrice.toFixed(2);
+                orderBtn.classList.remove("disabled"); // เปิดปุ่ม "สั่งสินค้า"
+            } else {
+                cartItemsContainer.innerHTML = "<p class='text-center'>ไม่มีสินค้าที่เลือก</p>";
+                orderBtn.classList.add("disabled"); // ปิดปุ่ม "สั่งสินค้า"
+            }
+
+            // เมื่อกดปุ่ม "สั่งสินค้า"
+            orderBtn.addEventListener("click", function () {
+                let orderData = {
+                    items: selectedItems.map(item => ({
+                        product_id: item.id,  // ตรวจสอบให้แน่ใจว่ามีคีย์ product_id
+                        quantity: item.quantity
+                    })),
+                    total_price: totalPrice
+                };
+
+                // เพิ่มการตั้งค่า CSRF token
+                let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                // สร้างฟอร์มเพื่อส่งข้อมูลไปยังเซิร์ฟเวอร์
+                let form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{% url "Cart:place_order" %}';
+                form.style.display = 'none';
+
+                // เพิ่ม CSRF token ลงในฟอร์ม
+                let csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = csrfToken;
+                form.appendChild(csrfInput);
+
+                // เพิ่มข้อมูล orderData ลงในฟอร์ม
+                let orderDataInput = document.createElement('input');
+                orderDataInput.type = 'hidden';
+                orderDataInput.name = 'order_data';
+                orderDataInput.value = JSON.stringify(orderData);
+                form.appendChild(orderDataInput);
+
+                document.body.appendChild(form);
+                form.submit();
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="header-container">
+            <div class="d-flex justify-content-center align-items-center mb-3">
+                <a href="javascript:history.back()" class="btn btn-back rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                    <i class="bi bi-arrow-left-circle"></i> 
+                </a>
+                <h3 class="fw-bold m-0 mx-auto fancy-title">✅ ยืนยันการสั่งซื้อ</h3>
+            </div>
+        </div>
+
+        <div class="card p-3 mb-4" style="width: 100%; background-color: white; margin-top: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <div class="card-body">
+                <h5 class="mb-3" style="font-weight: bold; color:rgb(243, 170, 34);">ที่อยู่จัดส่ง</h5>
+                <div style="border: 2px solid #ff99cc; border-radius: 10px; padding: 15px;">
+                    {% if detail_user %}
+                        {% with user=detail_user.0 %}
+                            <p class="card-text" style="margin: 5px 0; color: #333;">ชื่อ: <span style="font-weight: bold;">{{ user.user_name }}</span></p>
+                            <p class="card-text" style="margin: 5px 0; color: #333;">ที่อยู่: <span style="font-weight: bold;">{{ user.address }}</span></p>
+                            <p class="card-text" style="margin: 5px 0; color: #333;">เบอร์โทร: <span style="font-weight: bold;">{{ user.phone_num }}</span></p>
+                        {% endwith %}
+                    {% else %}
+                        <p class="card-text" style="margin: 5px 0; color: #333;">ไม่มีข้อมูลผู้ใช้</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="container mt-4" id="cart-items" style="min-height: 100px;">
+            <!-- สินค้าที่เลือกจะแสดงที่นี่ -->
+        </div>
+    </div>
+
+    <!-- รวมและปุ่มสั่งสินค้า -->
+    <div class="fixed-footer d-flex justify-content-between align-items-center">
+        <div class="ms-auto">
+            <span class="fw-bold me-2">รวม: <span id="total-price" class="total-price" name = "total-price">฿0.00</span></span>
+            <button id="order-btn" class="btn btn-danger disabled order-btn" >สั่งสินค้า</button>
+        </div>
+    </div>
+
+    <!-- เพิ่ม CSRF token -->
+    <form method="post" style="display: none;">
+        {% csrf_token %}
+    </form>
+{% endblock %}

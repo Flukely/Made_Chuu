@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %} Order Detail {% endblock %}
+
+{% block content %}
+  <div class="container-xxl mb-5">
+    <div class="container-fluid">
+        <h1 class="display-6 mb-3">Order Detail</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">ดูรายละเอียด</button>
+        </form>
+        {% if order %}
+        <h2 class="mt-5">Order ID: {{ order.order_id }}</h2>
+        <p>Username: {{ order.user.user_name }}</p>
+        <p>ยอดชำระ: {{ order.total_price }}</p>
+        <p>สถานที่ส่ง: {{ order.place_delivery }}</p>
+        <p>วันที่สั่ง: {{ order.order_date }}</p>
+        <p>สถานะ: {{ order.status_order }}</p>
+        <h3 class="mt-4">Products</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order_product in order_products %}
+                <tr>
+                    <td>{{ order_product.product.product_name }}</td>
+                    <td>{{ order_product.quantity }}</td>
+                    <td>{{ order_product.product.price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+  </div>
+{% endblock %}

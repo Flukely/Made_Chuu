@@ -1,0 +1,260 @@
+{% extends 'admin_function/base.html' %}
+{% load static %}
+{% block title %} Dashboard {% endblock %}
+{% block content %}
+<div class="container mt-5">
+  <h1 class="text-center text-primary">Dashboard</h1>
+  <p class="text-center text-muted">กราฟ และข้อมูลการสั่งซื้อของลูกค้า</p>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="card p-3" >
+        <div class="overview__inner">
+            <div class="overview-box clearfix d-flex justify-content-center mx-3 mt-3">
+                <div class="text">
+                    <h2><i class="fa-solid fa-box"></i>
+                      {{orders_all}}
+                    </h2>
+                    <span>Orders </span>
+                </div>
+                {% if orders_today == 0 %} 
+                <div>
+                  <p class = "text-muted mx-3"><i class = "fas fa-caret-up"></i>
+                    {{orders_today}}
+                  </p>
+                </div>
+                {% else %}
+                <div>
+                  <p class = "text-success"><i class = "fas fa-caret-up"></i>
+                    {{orders_today}}
+                  </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card p-3" >
+        <div class="overview__inner">
+            <div class="overview-box clearfix d-flex justify-content-center mx-3 mt-3">
+                <div class="text">
+                    <h2><i class="fa-solid fa-user"></i>
+                      {{users_all}}
+                    </h2>
+                    <span>members </span>
+                </div>
+                {% if users_today == 0 %} 
+                <div>
+                  <p class = "text-muted mx-3"><i class = "fas fa-caret-up"></i>
+                    {{users_today}}
+                  </p>
+                </div>
+                {% else %}
+                <div>
+                  <p class = "text-success"><i class = "fas fa-caret-up"></i>
+                    {{users_today}}
+                  </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+      </div>
+  </div>
+</div>
+
+<!-- Bottom Row: 2 Large Cards -->
+<div class="row g-3 mt-3">
+    <div class="col-md-8">
+        <p class="text-center text-primary"> จำนวน Products แต่ละ Categories</p>
+        <canvas id="myChart1" class = "card"></canvas>
+    <script>
+      window.addEventListener('DOMContentLoaded', function() {
+        var ctx = document.getElementById('myChart1').getContext('2d');
+        var myChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: [{% for category in categories %} '{{ category.category_name }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Categories',
+                data: [{% for category in category_counts %} {{ category.total }} {% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(255, 159, 64, 0.6)',
+                    'rgba(255, 205, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(201, 203, 207, 0.6)'
+                ],
+                borderWidth: 1
+            }]
+        }
+        ,
+        options: {
+          plugins: {
+            customCanvasBackgroundColor: {
+              color: 'lightGreen'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+        
+        });
+      });
+    </script>
+    </div>
+    <div class="col-md-4">
+      <p class="text-center text-primary"> จำนวน ชาย : หญิง : อื่นๆ</p>
+      <canvas id="GenderChart-customer" class = "card"></canvas>
+      <script>
+       window.addEventListener('DOMContentLoaded', function() {
+      var ctx = document.getElementById('GenderChart-customer').getContext('2d');
+      var myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Male' , 'Female' , 'Others'],
+          datasets: [{
+              label: 'Gender',
+              data: [{{ gender_data.male }}, {{ gender_data.female }}, {{ gender_data.other }}],
+              backgroundColor: [
+                  'rgba(0, 60, 255, 0.6)',
+                  'rgba(254 , 0 , 174 , 0.6)',
+                  'rgba(147, 112, 219, 0.6)'
+              ],
+              borderWidth: 1
+          }]
+      }
+      ,
+      options: {
+        responsive: true,
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(tooltipItem) {
+                // Calculate the percentage
+                var total = tooltipItem.dataset.data.reduce((a, b) => a + b, 0);  // Sum of all data points
+                var percentage = ((tooltipItem.raw / total) * 100).toFixed(2);  // Calculate percentage
+                return tooltipItem.label + ': ' + percentage + '%';  // Return percentage in tooltip
+              }
+            }
+          }
+        }
+      }
+    });
+  });
+</script>
+    </div>
+</div>
+<!-- แสดงยอดขาย-->
+<div class="row g-3 mt-3">
+  <div class="col-md-10">
+    <p class="text-center text-primary">ยอดขายโดยรวม</p>
+    <canvas id="orderChart" class="card"></canvas>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          var ctx = document.getElementById('orderChart').getContext('2d');
+
+          var labels = {{ labels|safe }};  // ใช้ safe เพื่อให้ Django สร้าง JSON ที่ถูกต้อง
+          var orderData = {{ order_data|default:"[]"|safe }};  // ป้องกัน None และรูปแบบผิดพลาด
+
+          var orderChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                  labels: labels,
+                  datasets: [{
+                      label: 'ยอดคำสั่งซื้อ (บาท)',
+                      data: orderData,
+                      borderColor: 'rgba(54, 162, 235, 1)',
+                      backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                      borderWidth: 2,
+                      fill: true,
+                      tension: 0.3
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  scales: {
+                      y: {
+                          beginAtZero: true
+                      }
+                  }
+              }
+          });
+      });
+    </script>
+  </div>
+
+
+  <div class="col-md-2">
+    <form method="get" action="{% url 'Dashboard' %}">
+      <label for="filter" class="form-label">เลือกช่วงเวลา</label>
+      <select name="filter" id="filter" class="form-select">
+        <option value="5days" {% if filter_type == '5days' %}selected{% endif %}>5 วันล่าสุด</option>
+        <option value="1month" {% if filter_type == '1month' %}selected{% endif %}>1 เดือนล่าสุด</option>
+        <option value="3months" {% if filter_type == '3months' %}selected{% endif %}>3 เดือนล่าสุด</option>
+        <option value="6months" {% if filter_type == '6months' %}selected{% endif %}>6 เดือนล่าสุด</option>
+      </select>
+      <button type="submit" class="btn btn-primary mt-3">แสดงข้อมูล</button>
+    </form>
+  </div>
+</div>
+<!-- แสดงยอดขายแบบสินค้ารายตัว  -->
+<div class="row g-3 mt-3">
+  <p class="text-center text-primary"> ยอดขายสินค้าแต่ละชนิด</p>
+  <div class="col-md-3 d-flex flex-column">
+      <div class="card mb-2 flex-grow-1">Box 1</div>
+      <div class="card mb-2 flex-grow-1">Box 2</div>
+      <div class="card mb-2 flex-grow-1">Box 3</div>
+  </div>
+  <div class="col-md-9">
+    <canvas id="Product-Chart" class = 'card'></canvas>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          var ctx = document.getElementById('Product-Chart').getContext('2d');
+          var labels = {{ labels|safe }};
+          var productData = {{ product_data|safe }};
+  
+          var datasets = [];
+          var colors = ['red', 'blue', 'green', 'purple', 'orange'];  // กำหนดสีให้แต่ละสินค้า
+  
+          Object.keys(productData).forEach(function(product, index) {
+              datasets.push({
+                  type: 'line',
+                  label: product,
+                  data: productData[product],
+                  borderColor: colors[index % colors.length],
+                  fill: false
+              });
+          });
+  
+          var productChart = new Chart(ctx, {
+              type: 'line',
+              data: { labels: labels, datasets: datasets },
+              options: {
+                  responsive: true,
+                  tension: 0.5,
+                  plugins: {
+                      legend: { position: 'top' }
+                  },
+                  scales: {
+                      x: { title: { display: true, text: 'วัน' } },
+                      y: { title: { display: true, text: 'ราคาสินค้าที่ขายได้' } }
+                  }
+              }
+          });
+      });
+  </script>
+  </div>
+</div>
+
+
+
+</div>
+  
+
+
+{% endblock%}

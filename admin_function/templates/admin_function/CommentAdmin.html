@@ -1,0 +1,72 @@
+{% extends 'admin_function/base.html' %}
+{% load static %}
+{% block title %} Comments {% endblock %}
+{% block content %}
+<div class="container mt-5">
+  <h1 class="text-center text-primary">Comments</h1>
+  <p class="text-center text-muted">ลูกค้าคิดยังไงบ้าง</p>
+
+  <!-- Filters -->
+  <div class="row mb-4">
+      <div class="col-md-6">
+          <select class="form-select" id="filter-comments">
+              <option value="all" selected>-- ระดับความพึงพอใจ --</option>
+              {% for rating in "12345" %}
+              <option value="{{ rating }}">{{ rating }}</option>
+              {% endfor %}
+          </select>
+      </div>
+      <div class="col-md-6">
+          <select class="form-select" id="filter-products">
+              <option value="all" selected>-- คัดกรองสินค้า --</option>
+              {% for product in products %}
+              <option value="{{ product.product_name }}">{{ product.product_name }}</option>
+              {% endfor %}
+          </select>
+      </div>
+  </div>
+
+  <div class="comments">
+      {% for review in reviews %}
+          <div class="card mb-3 shadow-sm comment-card" data-comment-id="{{ review.review_id }}" data-comment-type="{{ review.rating }}" data-product-name="{{ review.product.product_name }}">
+              <div class="card-body">
+                  <div class="d-flex align-items-center">
+                      <img src="{{ review.product.product_image.url }}" class="rounded mx-3" width="100" height="100" alt="User">
+                      <div>
+                          <h6 class="mb-0">{{ review.order.user.user_name }}</h6>
+                          <small class="text-muted">{{ review.review_date|date:"d F Y" }}</small>
+                      </div>
+                  </div>
+                  <p class="mt-2"><strong>Customer Name:</strong> {{ review.order.user.user_name }}</p>
+                  <p class="mt-2"><strong>Review:</strong> {{ review.review_text }}</p>
+                  <p class="mt-2"><strong>Rating:</strong> {{ review.rating }}</p>
+                  <p class="mt-2"><strong>Product:</strong> {{ review.product.product_name }}</p>
+                  {% if not review.review_text_admin %}
+                  <form method="post" action="{% url 'add_reply' %}" class="reply-form" id="reply-form-{{ review.review_id }}">
+                      {% csrf_token %}
+                      <div class="input-group">
+                          <input type="hidden" name="review_id" value="{{ review.review_id }}">
+                          <input type="text" class="form-control reply-input" name="reply_text" placeholder="ตอบกลับ...">
+                          <button type="submit" class="btn btn-primary">ตอบกลับ</button>
+                      </div>
+                  </form>
+                  {% else %}
+                  <p class="mt-2" id="reply-text-{{ review.review_id }}"><strong>Admin Reply:</strong> {{ review.review_text_admin }}</p>
+                  <form method="post" action="{% url 'add_reply' %}" class="reply-form" id="reply-form-{{ review.review_id }}" style="display: none;">
+                      {% csrf_token %}
+                      <div class="input-group">
+                          <input type="hidden" name="review_id" value="{{ review.review_id }}">
+                          <input type="text" class="form-control reply-input" name="reply_text" placeholder="แก้ไขการตอบกลับ...">
+                          <button type="submit" class="btn btn-primary">บันทึก</button>
+                      </div>
+                  </form>
+                  {% endif %}
+              </div>
+          </div>
+      {% endfor %}
+  </div>
+</div>
+
+<script src="{% static 'js/filter_admin_comment_review.js' %}"></script>
+<script src="{% static 'js/reply_comment.js' %}"></script>
+{% endblock%}
