@@ -1,7 +1,11 @@
 from django.urls import path, include
 from main import views
+
+app_name = 'main'
+
 urlpatterns = [
     path('',views.index, name='index'),
-    path('product/',include('product.urls')),
-    path('tracking/',include('tracking.urls')),
+    path('login/', views.login_view, name='login'),
+    
 ]
+

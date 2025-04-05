@@ -1,86 +1,467 @@
-{% extends 'accounts/base.html' %}
-
 {% load form_tags %}
 
-{% block title %}Register{% endblock %}
+{% block extra_css %}
+<style>
+    :root {
+        --madechuu-pink: #FF9BB3;
+        --madechuu-darkpink: #D85A7F;
+        --madechuu-lightpink: #FFD1DC;
+        --madechuu-whitepink: #FFF0F5;
+    }
+    
+    body {
+        font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+        background-color: var(--madechuu-whitepink);
+        background-image: url('https://madechuu.com/images/bg-pattern.png');
+        background-size: 400px;
+        background-blend-mode: overlay;
+    }
+    
+    .register-container {
+        display: flex;
+        min-height: 100vh;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    
+    .register-wrapper {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .register-card {
+        border-radius: 24px;
+        border: none;
+        box-shadow: 0 15px 40px rgba(216, 90, 127, 0.25);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+    
+    .register-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .register-header {
+        background: linear-gradient(135deg, var(--madechuu-pink), var(--madechuu-darkpink));
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .register-header::before {
+        content: "";
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 150px;
+        height: 150px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+    
+    .register-header::after {
+        content: "";
+        position: absolute;
+        bottom: -30px;
+        left: -30px;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+    
+    .register-logo {
+        font-size: 60px;
+        margin-bottom: 15px;
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    .register-title {
+        font-weight: 800;
+        font-size: 28px;
+        margin-bottom: 8px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .register-subtitle {
+        font-weight: 400;
+        opacity: 0.9;
+        font-size: 16px;
+        position: relative;
+        z-index: 1;
+        margin-bottom: 0;
+    }
+    
+    .register-body {
+        padding: 40px;
+        background-color: white;
+    }
+    
+    .section-title {
+        color: var(--madechuu-darkpink);
+        font-weight: 700;
+        font-size: 18px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--madechuu-lightpink);
+        display: flex;
+        align-items: center;
+    }
+    
+    .section-title i {
+        margin-right: 10px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-control {
+        border-radius: 14px;
+        padding: 16px 20px;
+        border: 2px solid var(--madechuu-lightpink);
+        font-size: 15px;
+        transition: all 0.3s;
+        width: 100%;
+    }
+    
+    .form-control:focus {
+        border-color: var(--madechuu-pink);
+        box-shadow: 0 0 0 4px rgba(255, 155, 179, 0.2);
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .btn-madechuu {
+        background: linear-gradient(135deg, var(--madechuu-pink), var(--madechuu-darkpink));
+        border: none;
+        border-radius: 14px;
+        padding: 16px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        font-size: 15px;
+        box-shadow: 0 4px 15px rgba(216, 90, 127, 0.3);
+        transition: all 0.3s;
+        width: 100%;
+        display: block;
+        color: white;
+    }
+    
+    .btn-madechuu:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(216, 90, 127, 0.4);
+        color: white;
+    }
+    
+    .btn-madechuu:active {
+        transform: translateY(0);
+    }
+    
+    .terms-check {
+        display: flex;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+    
+    .form-check-input {
+        margin-right: 10px;
+        border: 2px solid var(--madechuu-lightpink);
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--madechuu-darkpink);
+        border-color: var(--madechuu-darkpink);
+    }
+    
+    .form-check-input:focus {
+        box-shadow: 0 0 0 0.25rem rgba(216, 90, 127, 0.25);
+    }
+    
+    .terms-label {
+        color: #666;
+    }
+    
+    .terms-link {
+        color: var(--madechuu-darkpink);
+        font-weight: 600;
+        text-decoration: none;
+    }
+    
+    .terms-link:hover {
+        color: var(--madechuu-pink);
+        text-decoration: underline;
+    }
+    
+    .login-link-section {
+        text-align: center;
+        margin-top: 30px;
+    }
+    
+    .login-text {
+        color: #666;
+        margin-bottom: 0;
+    }
+    
+    .login-link {
+        color: var(--madechuu-darkpink);
+        font-weight: 700;
+        text-decoration: none;
+        margin-left: 4px;
+    }
+    
+    .login-link:hover {
+        color: var(--madechuu-pink);
+        text-decoration: underline;
+    }
+    
+    .alert-error {
+        background-color: #FFEBEE;
+        color: #D32F2F;
+        padding: 12px 16px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .alert-error i {
+        margin-right: 8px;
+    }
+    
+    .field-error {
+        color: #D32F2F;
+        font-size: 14px;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .field-error i {
+        margin-right: 5px;
+    }
+    
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<section class="vh-100 gradient-custom">
-    <div class="container py-5 h-100">
-      <div class="row d-flex justify-content-center align-items-center h-100">
-        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-          <div class="card bg-dark text-white" style="border-radius: 1rem;">
-            <div class="card-body p-5">
-  
-              <div class="mb-md-5 mt-md-4 pb-5">
-  
-                <h2 class="fw-bold mb-2 text-uppercase text-center">Register</h2>
-                <p class="text-white-50 mb-5 text-center">Please fill in the form to create an account!</p>
-  
-                <form method="post">
-                  {% csrf_token %}
-                  
-                  <h5 class="text-uppercase text-white-50 mb-3">Login Information</h5>
-                  <div class="form-outline form-white mb-4">
-                    {{ form.email.label_tag }}
-                    {{ form.email|add_class:"form-control form-control-lg text-dark bg-light" }}
-                  </div>
-                  <div class="form-outline form-white mb-4">
-                    {{ form.user_name.label_tag }}
-                    {{ form.user_name|add_class:"form-control form-control-lg text-dark bg-light" }}
-                  </div>
-                  <div class="form-outline form-white mb-4">
-                    {{ form.password1.label_tag }}
-                    {{ form.password1|add_class:"form-control form-control-lg text-dark bg-light" }}
-                  </div>
-                  <div class="form-outline form-white mb-4">
-                    {{ form.password2.label_tag }}
-                    {{ form.password2|add_class:"form-control form-control-lg text-dark bg-light" }}
-                  </div>
-
-                  <h5 class="text-uppercase text-white-50 mb-3">Personal Information</h5>
-                  <div class="form-outline form-white mb-4">
-                    {{ form.address.label_tag }}
-                    {{ form.address|add_class:"form-control form-control-lg text-dark bg-light" }}
-                  </div>
-                  <div class="form-outline form-white mb-4">
-                    {{ form.district.label_tag }}
-                    {{ form.district|add_class:"form-control form-control-lg text-dark bg-light" }}
-                  </div>
-                  <div class="form-outline form-white mb-4">
-                    {{ form.province.label_tag }}
-                    {{ form.province|add_class:"form-control form-control-lg text-dark bg-light" }}
-                  </div>
-                  <div class="form-outline form-white mb-4">
-                    {{ form.postal_code.label_tag }}
-                    {{ form.postal_code|add_class:"form-control form-control-lg text-dark bg-light" }}
-                  </div>
-                  <div class="form-outline form-white mb-4">
-                    {{ form.gender.label_tag }}
-                    {{ form.gender|add_class:"form-control form-control-lg text-dark bg-light" }}
-                  </div>
-                  <div class="form-outline form-white mb-4">
-                    {{ form.birth_date.label_tag }}
-                    {{ form.birth_date|add_class:"form-control form-control-lg text-dark bg-light" }}
+<div class="register-container">
+    <div class="register-wrapper">
+        <div class="register-card">
+            <div class="register-header">
+                <div class="register-logo">
+                    <i class="fas fa-heart"></i>
                 </div>
-                  <div class="form-outline form-white mb-4">
-                    {{ form.phone_num.label_tag }}
-                    {{ form.phone_num|add_class:"form-control form-control-lg text-dark bg-light" }}
-                  </div>
-                  
-                  <button class="btn btn-outline-light btn-lg px-5" type="submit">Register</button>
-                </form>
-  
-              </div>
-  
-              <div class="text-center">
-                <p class="mb-0">Already have an account? <a href="{% url 'login' %}" class="text-white-50 fw-bold">Login</a></p>
-              </div>
-  
+                <h1 class="register-title">Join Made Chuu</h1>
+                <p class="register-subtitle">Create your account to get started</p>
             </div>
-          </div>
+            
+            <div class="register-body">
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="alert-error">
+                        <i class="fas fa-exclamation-circle"></i> Please correct the errors below
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Login Information Section -->
+                    <h5 class="section-title">
+                        <i class="fas fa-key"></i> Login Information
+                    </h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                {{ form.email|add_class:"form-control" }}
+                                {% if form.email.errors %}
+                                <div class="field-error">
+                                    <i class="fas fa-exclamation-circle"></i> {{ form.email.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Username</label>
+                                {{ form.user_name|add_class:"form-control" }}
+                                {% if form.user_name.errors %}
+                                <div class="field-error">
+                                    <i class="fas fa-exclamation-circle"></i> {{ form.user_name.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Password</label>
+                                {{ form.password1|add_class:"form-control" }}
+                                {% if form.password1.errors %}
+                                <div class="field-error">
+                                    <i class="fas fa-exclamation-circle"></i> {{ form.password1.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Confirm Password</label>
+                                {{ form.password2|add_class:"form-control" }}
+                                {% if form.password2.errors %}
+                                <div class="field-error">
+                                    <i class="fas fa-exclamation-circle"></i> {{ form.password2.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Personal Information Section -->
+                    <h5 class="section-title">
+                        <i class="fas fa-user"></i> Personal Information
+                    </h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Phone Number</label>
+                                {{ form.phone_num|add_class:"form-control" }}
+                                {% if form.phone_num.errors %}
+                                <div class="field-error">
+                                    <i class="fas fa-exclamation-circle"></i> {{ form.phone_num.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Birth Date</label>
+                                {{ form.birth_date|add_class:"form-control" }}
+                                {% if form.birth_date.errors %}
+                                <div class="field-error">
+                                    <i class="fas fa-exclamation-circle"></i> {{ form.birth_date.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="form-label">Address</label>
+                                {{ form.address|add_class:"form-control" }}
+                                {% if form.address.errors %}
+                                <div class="field-error">
+                                    <i class="fas fa-exclamation-circle"></i> {{ form.address.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">District</label>
+                                {{ form.district|add_class:"form-control" }}
+                                {% if form.district.errors %}
+                                <div class="field-error">
+                                    <i class="fas fa-exclamation-circle"></i> {{ form.district.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">Province</label>
+                                {{ form.province|add_class:"form-control" }}
+                                {% if form.province.errors %}
+                                <div class="field-error">
+                                    <i class="fas fa-exclamation-circle"></i> {{ form.province.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">Postal Code</label>
+                                {{ form.postal_code|add_class:"form-control" }}
+                                {% if form.postal_code.errors %}
+                                <div class="field-error">
+                                    <i class="fas fa-exclamation-circle"></i> {{ form.postal_code.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="form-label">Gender</label>
+                                {{ form.gender|add_class:"form-control" }}
+                                {% if form.gender.errors %}
+                                <div class="field-error">
+                                    <i class="fas fa-exclamation-circle"></i> {{ form.gender.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Terms and Submit -->
+                    <div class="terms-check">
+                        <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                        <label class="terms-label" for="termsCheck">
+                            I agree to the <a href="#" class="terms-link">Terms and Conditions</a>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn-madechuu">
+                        <i class="fas fa-user-plus me-2"></i> Register Now
+                    </button>
+                </form>
+                
+                <div class="login-link-section">
+                    <p class="login-text">Already have an account? 
+                        <a href="{% url 'accounts:login' %}" class="login-link">Login here</a>
+                    </p>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </section>
+</div>
+
+<script>
+// Form validation
+(function () {
+  'use strict'
+
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  var forms = document.querySelectorAll('.needs-validation')
+
+  // Loop over them and prevent submission
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()
+</script>
 {% endblock %}

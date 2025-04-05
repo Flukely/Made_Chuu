@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from main.models import Receipt, OrderProduct, Order, Payment, Product, Shop, User
 
-@login_required
+@login_required(login_url='/login/')
 def check_receipt(request):
     """ หน้าตรวจสอบใบเสร็จ แสดงการชำระเงินของผู้ใช้ที่ล็อกอิน """
     user_payments = Payment.objects.filter(order__user=request.user).order_by('-payment_date')
@@ -25,7 +25,7 @@ def check_receipt(request):
 
     return render(request, 'check_receipt.html', {'payments_with_items': payments_with_items})
 
-@login_required
+@login_required(login_url='/login/')
 def receipt(request, order_id):
     """ แสดงรายละเอียดใบเสร็จ หรือแจ้งเตือนหากยังไม่มีใบเสร็จ """
     order = get_object_or_404(Order, pk=order_id, user=request.user)

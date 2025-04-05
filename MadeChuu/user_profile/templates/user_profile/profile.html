@@ -1,0 +1,35 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<div class="profile-container" style="max-width: 800px; margin: 2rem auto; padding: 2rem; background-color: #fff8f8; border-radius: 20px; box-shadow: 0 4px 15px rgba(255, 182, 193, 0.3);">
+    <h1 style="color: #ff85a2; text-align: center; margin-bottom: 2rem; font-weight: bold;">โปรไฟล์ผู้ใช้</h1>
+    
+    <div class="profile-section" style="background-color: white; padding: 2rem; border-radius: 15px; margin-bottom: 2rem; box-shadow: 0 2px 10px rgba(255, 182, 193, 0.2);">
+        <div class="profile-info">
+            <div style="display: flex; justify-content: center; margin-bottom: 1.5rem;">
+                <div style="width: 120px; height: 120px; background-color: #ffd6e0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #ff85a2;">
+                    {{ user.user_name|first|upper }}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <p style="color: #888; margin-bottom: 0.5rem;"><strong style="color: #ff85a2;">ชื่อ:</strong> {{ user.user_name }}</p>
+                    <p style="color: #888; margin-bottom: 0.5rem;"><strong style="color: #ff85a2;">อีเมล:</strong> {{ user.email }}</p>
+                    <p style="color: #888; margin-bottom: 0.5rem;"><strong style="color: #ff85a2;">เบอร์โทรศัพท์:</strong> {{ user.phone_num }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p style="color: #888; margin-bottom: 0.5rem;"><strong style="color: #ff85a2;">วันเกิด:</strong> {{ user.birth_date|date:"d/m/Y" }}</p>
+                    <p style="color: #888; margin-bottom: 0.5rem;"><strong style="color: #ff85a2;">เพศ:</strong> {{ user.gender }}</p>
+                </div>
+            </div>
+            <p style="color: #888; margin-top: 1rem;"><strong style="color: #ff85a2;">ที่อยู่:</strong> {{ user.address }}, {{ user.district }}, {{ user.province }} {{ user.postal_code }}</p>
+        </div>
+    </div>
+    
+    <div class="profile-actions" style="display: flex; justify-content: center; gap: 1rem;">
+        <a href="{% url 'user_profile:edit_profile' %}" class="btn" style="background-color: #ff85a2; color: white; border: none; border-radius: 50px; padding: 0.5rem 1.5rem; font-weight: 500; box-shadow: 0 2px 5px rgba(255, 133, 162, 0.3);">แก้ไขโปรไฟล์</a>
+        <a href="{% url 'user_profile:change_password' %}" class="btn" style="background-color: #a2d6f9; color: white; border: none; border-radius: 50px; padding: 0.5rem 1.5rem; font-weight: 500; box-shadow: 0 2px 5px rgba(162, 214, 249, 0.3);">เปลี่ยนรหัสผ่าน</a>
+    </div>
+</div>
+{% endblock %}

@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'ProductDetail',
     'allauth.account',
     'django_htmx',
+    'user_profile',
 ]
 
 JAZZMIN_SETTINGS = {
@@ -201,8 +202,7 @@ ROOT_URLCONF = 'MadeChuu.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'accounts', 'templates'),  # ไดเรกทอรีเทมเพลตของแอป accounts
-        ],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -257,7 +257,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Bangkok'
 
 USE_I18N = True
 
@@ -269,8 +269,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
-    BASE_DIR / "product" / "static",
+    os.path.join(BASE_DIR, 'static')  # เพิ่มเส้นทางไปยังโฟลเดอร์ static ของโปรเจค
 ]
 
 # Default primary key field type

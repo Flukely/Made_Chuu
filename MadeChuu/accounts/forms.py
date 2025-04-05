@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserChangeForm
+from main.models import User
 
 User = get_user_model()
 
@@ -113,3 +115,28 @@ class UserRegisterForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+    
+class UserProfileForm(UserChangeForm):
+    password = None  # เอา field password ออกเพราะจะจัดการแยกต่างหาก
+    
+    class Meta:
+        model = User
+        fields = [
+            'user_name', 
+            'email', 
+            'phone_num', 
+            'birth_date',
+            'gender',
+            'address',
+            'district',
+            'province',
+            'postal_code'
+        ]
+        widgets = {
+            'birth_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+class PasswordChangeForm(forms.Form):
+    old_password = forms.CharField(widget=forms.PasswordInput)
+    new_password1 = forms.CharField(widget=forms.PasswordInput)
+    new_password2 = forms.CharField(widget=forms.PasswordInput)

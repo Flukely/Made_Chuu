@@ -1,141 +1,434 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>MadeChuu</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="" name="keywords">
-    <meta content="" name="description">
-    <title>Product Detail</title>
-    {% load static %}
-    <!-- CSS only -->
-    <link rel="stylesheet" href="{% static '../static/css/productdetail_style.css' %}" defer>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- JavaScript Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static '../static/js/scripts.js' %}" defer></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const countElement = document.getElementById("count");
-            const btnIncrease = document.getElementById("increase");
-            const btnDecrease = document.getElementById("decrease");
-            const formQuantity = document.getElementById("form-quantity");
+{% extends 'main/base.html' %}
+{% load static %}
 
-            let count = parseInt(countElement.value);
-            const maxLimit = parseInt(countElement.getAttribute("data-max")); // ดึงค่า limit
+{% block title %}{{ product.product_name }} | Made Chuu{% endblock %}
 
-            btnIncrease.addEventListener("click", function () {
-                if (count < maxLimit) {
-                    count++;
-                    countElement.value = count;
-                    formQuantity.value = count;
-                }
-            });
+{% block styleCustom %}
+<style>
+    :root {
+        --primary-color: #FF85A2; /* Made Chuu pink */
+        --secondary-color: #FFD6E0; /* Light pink */
+        --accent-color: #A2F5E8; /* Mint green */
+        --dark-color: #333333;
+        --light-color: #FFF9FB;
+    }
+    
+    body {
+        background-color: var(--light-color);
+        font-family: 'Nunito', sans-serif;
+    }
+    
+    .body {
+        padding: 40px 0;
+    }
+    
+    .product-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        padding: 30px 0;
+        margin-bottom: 40px;
+        color: white;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .product-image-container {
+        background: white;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .product-image {
+        width: 100%;
+        border-radius: 15px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .product-image:hover {
+        transform: scale(1.02);
+    }
+    
+    .product-info {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    #product-name {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--dark-color);
+        margin-bottom: 10px;
+    }
+    
+    #shop-made {
+        font-size: 1.2rem;
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+    
+    #product-price {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+    }
+    
+    .promotion-badge {
+        background-color: var(--accent-color);
+        color: var(--dark-color);
+        font-weight: 600;
+        padding: 8px 15px;
+        border-radius: 50px;
+        display: inline-block;
+        margin-bottom: 15px;
+    }
+    
+    #category {
+        color: #777;
+        font-size: 1rem;
+        margin-bottom: 20px;
+    }
+    
+    #product-description {
+        color: var(--dark-color);
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+    
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+    
+    .quantity-label {
+        margin-right: 15px;
+        font-weight: 600;
+        color: var(--dark-color);
+    }
+    
+    .input-group {
+        width: 150px;
+    }
+    
+    .btn-quantity {
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+        border: none;
+        font-weight: bold;
+        width: 40px;
+    }
+    
+    .btn-quantity:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .quantity-input {
+        text-align: center;
+        border-color: var(--secondary-color);
+        font-weight: 600;
+    }
+    
+    .btn-add-to-cart {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-add-to-cart:hover {
+        background-color: #ff6b8b;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 133, 162, 0.4);
+    }
+    
+    .review-section {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        margin-top: 40px;
+    }
+    
+    #product-rating {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--dark-color);
+        margin-bottom: 10px;
+    }
+    
+    .star-rating {
+        color: #FFD700;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+    }
+    
+    .filter-button {
+        border-radius: 50px;
+        padding: 5px 15px;
+    }
+    
+    .show-all-button {
+        border-radius: 50px;
+        padding: 5px 15px;
+    }
+    
+    .review {
+        padding: 20px 0;
+    }
+    
+    #user {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+    
+    #admin {
+        font-weight: 600;
+        color: var(--accent-color);
+        margin-top: 10px;
+    }
+    
+    .review_image {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 10px;
+        margin: 10px 0;
+    }
+    
+    hr {
+        border-top: 1px solid var(--secondary-color);
+        margin: 20px 0;
+    }
+    
+    .original-price {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 1.2rem;
+        margin-left: 10px;
+    }
+    
+    .discounted-price {
+        color: var(--primary-color);
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+    
+    @media (max-width: 768px) {
+        #product-name {
+            font-size: 1.5rem;
+        }
+        
+        .product-header {
+            padding: 20px 0;
+        }
+        
+        .product-info {
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}
 
-            btnDecrease.addEventListener("click", function () {
-                if (count > 0) {
-                    count--;
-                    countElement.value = count;
-                    formQuantity.value = count;
-                }
-            });
+{% block scriptCustom %}
+<script src="{% static '../static/js/productdetail_script.js' %}" defer></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const countElement = document.getElementById("count");
+        const btnIncrease = document.getElementById("increase");
+        const btnDecrease = document.getElementById("decrease");
+        const formQuantity = document.getElementById("form-quantity");
+
+        let count = parseInt(countElement.value);
+        const maxLimit = parseInt(countElement.getAttribute("data-max"));
+
+        btnIncrease.addEventListener("click", function () {
+            if (count < maxLimit) {
+                count++;
+                countElement.value = count;
+                formQuantity.value = count;
+            }
         });
-    </script>
-</head>
-<body class ="body">
-    <nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top p-0">
-        <button class="btn sidebar_icon" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button">
-            <i class="bi bi-list fs-3 sidebar_icon" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
-        </button>
-        <a href="#" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
-            <h5 class = 'logo_test'>Made Chuu</h5>
-        </a>
-        <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
-            <div class="navbar-nav ms-auto p-4 p-lg-0">
-                <a href="" class="nav-item nav-link"><i class="bi bi-person-check-fill"></i> Username </a>
-                <a href="index.html" class="nav-item nav-link"><i class="bi bi-box-arrow-right"></i> Logout</a>
-    </nav>
-    <div class="container mt-5">
+
+        btnDecrease.addEventListener("click", function () {
+            if (count > 0) {
+                count--;
+                countElement.value = count;
+                formQuantity.value = count;
+            }
+        });
+        
+        // Initialize star ratings
+        document.querySelectorAll('.star-rating').forEach(ratingElement => {
+            const rating = parseFloat(ratingElement.getAttribute('data-rating'));
+            let stars = '';
+            
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '★';
+                } else if (i - 0.5 <= rating) {
+                    stars += '½';
+                } else {
+                    stars += '☆';
+                }
+            }
+            
+            if (!ratingElement.innerHTML.trim()) {
+                ratingElement.innerHTML = stars;
+            } else {
+                ratingElement.innerHTML = stars + ' ' + ratingElement.innerHTML;
+            }
+        });
+    });
+    
+    function add_Cart(productId) {
+        Toastify({
+            text: `Added to cart! 💖`,
+            duration: 3000,
+            close: true,
+            gravity: "bottom",
+            position: "right",
+            backgroundColor: "#FF85A2",
+            stopOnFocus: true,
+        }).showToast();
+    }
+    
+    function buyNow(productId) {
+        Toastify({
+            text: `Purchase successful! 🎀`,
+            duration: 3000,
+            close: true,
+            gravity: "bottom",
+            position: "right",
+            backgroundColor: "#A2F5E8",
+            stopOnFocus: true,
+        }).showToast();
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="product-header">
+    <div class="container text-center">
+        <h1>{{ product.product_name }}</h1>
+        <p class="lead">✨ Kawaii product details ✨</p>
+    </div>
+</div>
+
+<div class="body">
+    <div class="container">
         <div class="row row1">
-            <div class="col-md-6 text-center" id = "product-image">
-                <img src="{{product.product_image.url}}" alt="Product Image" class="img-fluid rounded">
+            <div class="col-md-6">
+                <div class="product-image-container text-center">
+                    <img src="{{product.product_image.url}}" alt="Product Image" class="product-image">
+                </div>
             </div>
             <div class="col-md-6">
-                <div id="product-name">{{product.product_name}}</div>
-                <div id="shop-made">Made by {{product.shop.shop_name}}</div>
-                <br>
-                <div class="fs-4 fw-bold text-danger">฿ {{product.price}}</div>
-                <br>
-                <p id="category">Category: {{product.category.category_name}}</p>
-                <p id="product-description">{{product.description}}</p>
-                <div class="mt-3">
-                    <label id="quantity" class="form-label">Quantity: {{product.quantity}}</label>
-                    <div class="input-group w-50">
-                        <button id="decrease" class="btn btn-primary" type="button">-</button>
-                        <input id="count" data-max="{{ product.quantity }}" type="number" class="form-control text-center" value="0" min="0" max="{{ product.quantity }}">
-                        <button id="increase" class="btn btn-primary" type="button">+</button>
+                <div class="product-info">
+                    <div id="product-name">{{ product.product_name }}</div>
+                    <div id="shop-made">✨ Made by {{ product.shop.shop_name }} ✨</div>
+                    
+                    <!-- Price with promotion if available -->
+                    {% with product.promotionproduct_set.all|first as promotion_product %}
+{% if promotion_product %}
+    <div class="promotion-badge">
+        🎀 {{ promotion_product.promotion_id.promotion_name }} 🎀
+        <br><small>{{ promotion_product.promotion_id.discount }}% OFF</small>
+    </div>
+    <div>
+        <span class="discounted-price">฿{{ product.get_discounted_price|floatformat:2 }}</span>
+        <span class="original-price">฿{{ product.price }}</span>
+    </div>
+{% else %}
+    <div id="product-price">฿{{ product.price }}</div>
+{% endif %}
+{% endwith %}
+                    
+                    <p id="category">📦 Category: {{ product.category.category_name }}</p>
+                    <p id="product-description">{{ product.description }}</p>
+                    
+                    <div class="mt-3">
+                        <div class="quantity-control">
+                            <span class="quantity-label">Quantity:</span>
+                            <div class="input-group">
+                                <button id="decrease" class="btn btn-quantity" type="button">-</button>
+                                <input id="count" data-max="{{ product.quantity }}" type="number" class="form-control text-center quantity-input" value="1" min="1" max="{{ product.quantity }}">
+                                <button id="increase" class="btn btn-quantity" type="button">+</button>
+                            </div>
+                            <small class="ms-3 text-muted">{{ product.quantity }} available</small>
+                        </div>
                     </div>
-                </div>
-                <div class="mt-4 d-flex gap-2">
-                    <button id ="buy"class="btn btn-primary btn-lg" onclick ="buyNow({{product.product_id}})">Buy</button>
-                    <form method="POST" action="{% url 'add_cart' product.product_id %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="product_id" value="{{ product.product_id }}">
-                        <input type="hidden" name="quantity" id = "form-quantity" value="1">
-                        <button type="submit" class="btn btn-outline-secondary btn-lg" onclick ="addToCart({{product.product_id}})">Add to Cart</button>
-                    </form>
+                    
+                    <div class="mt-4 d-flex gap-2">
+                        <form method="POST" action="{% url 'ProductDetail:add_cart' product.product_id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                            <input type="hidden" name="quantity" id="form-quantity" value="1">
+                            <button type="submit" class="btn btn-add-to-cart" onclick="add_Cart({{ product.product_id }})">
+                                <i class="fas fa-cart-plus me-2"></i> Add to Cart
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
+        
         <div class="row mt-5">
             <div class="col-12">
-                <div class="border p-4 rounded review-section">
-                    <div id="product-rating">Product Ratings</div>
+                <div class="review-section">
+                    <div id="product-rating">⭐ Product Ratings ⭐</div>
                     <div id="average-rating" class="star-rating" data-rating="{{ average_rating }}">
-                        {{ average_rating }} / 5
+                        {{ average_rating }} out of 5
                     </div>
+                    
                     <p>Filter by rating:</p>
-                    <div class="d-flex gap-2 mb-3">
-                        <button class="btn btn-outline-warning show-all-button">Show All</button>
+                    <div class="d-flex gap-2 mb-3 flex-wrap">
+                        <button class="btn btn-outline-primary show-all-button">Show All</button>
                         <button class="btn btn-outline-warning filter-button" data-rating="5">5 ★</button>
                         <button class="btn btn-outline-warning filter-button" data-rating="4">4 ★</button>
                         <button class="btn btn-outline-warning filter-button" data-rating="3">3 ★</button>
                         <button class="btn btn-outline-warning filter-button" data-rating="2">2 ★</button>
                         <button class="btn btn-outline-warning filter-button" data-rating="1">1 ★</button>
                     </div>
-                    <h4>Reviews</h4>
+                    
+                    <h4>💌 Customer Reviews</h4>
                     <br>
+                    
                     {% for review in reviews %}
                         <div class="review">
-                            <div id="user">{{review.order.user.user_name}} </div>
+                            <div id="user">{{review.order.user.user_name}}</div>
                             <div class="star-rating" data-rating="{{ review.rating }}"></div>
-                            <div class="col-md-6 text-center" id = "review_image">
-                                <img src ="{{review.review_image.url}}" alt="User Image" class="img-fluid rounded review_image">
+                            {% if review.review_image %}
+                            <div class="text-center">
+                                <img src="{{review.review_image.url}}" alt="Review Image" class="review_image">
                             </div>
-                            <div>{{ review.review_date }}</div>
-                            <div>{{ review.review_text }}</div>
-                            <br>
-                            <div id="admin">Admin </div>
-                            <div>{{ review.review_text_admin }}</div>
-                            <!--<div> {{review.review_text_admin}}-->
+                            {% endif %}
+                            <div class="text-muted small">{{ review.review_date }}</div>
+                            <div class="mt-2">{{ review.review_text }}</div>
+                            
+                            {% if review.review_text_admin %}
+                            <div id="admin">💝 Shop Response</div>
+                            <div class="mt-2">{{ review.review_text_admin }}</div>
+                            {% endif %}
                             <hr>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-comment-slash fa-3x mb-3" style="color: var(--secondary-color);"></i>
+                            <p>No reviews yet. Be the first to review this product!</p>
                         </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
     </div>
-</body>
-<script>
-    function addToCart(productId) {
-        alert("✅ Product " + productId + " added to cart!");
-    }
-
-    function buyNow(productId) {
-        alert("🚀 Purchased product " + productId + " successfully!");
-    }
-</script>
-</html>
+</div>
+{% endblock %}

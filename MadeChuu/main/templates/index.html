@@ -1,43 +1,172 @@
-<!-- templates/index.html -->
+{% extends 'main/base.html' %}
+
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Made Chuu</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <script src="{% static 'js/script.js' %}" defer></script>
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-</head>
+{% block title %}Made Chuu - หน้าแรก{% endblock %}
 
-<body>
+{% block styleCustom %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, rgba(255,138,167,0.1) 0%, rgba(255,255,255,1) 100%);
+        border-radius: 20px;
+        padding: 3rem;
+        margin-bottom: 3rem;
+    }
+    
+    .product-img {
+        transition: all 0.3s ease-in-out;
+        border-radius: 15px;
+        height: 200px;
+        object-fit: cover;
+    }
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top p-3 shadow-sm">
-    <h1 class="text-pink">Made Chuu</h1>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link active" href="#">หน้าแรก</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">รายการสินค้า</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">ตระกร้า</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">คำสั่งซื้อ</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">ชำระเงิน</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">ดูใบเสร็จ</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">รีวิวสินค้า</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">เคลมสินค้า</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">ติดต่อผู้ขาย</a></li>
-        </ul>
+    .product-img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 20px rgba(255, 138, 167, 0.2);
+    }
+    
+    .card {
+        transition: all 0.3s ease;
+        border: none;
+        overflow: hidden;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(255, 138, 167, 0.15);
+    }
+    
+    .creator-img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border: 3px solid #ff8aa7;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .welcome-text {
+        font-family: 'Pacifico', cursive;
+        color: #ff8aa7;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .section-title {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 2rem;
+    }
+    
+    .section-title:after {
+        content: '';
+        position: absolute;
+        width: 50%;
+        height: 3px;
+        background: #ff8aa7;
+        bottom: -10px;
+        left: 25%;
+        border-radius: 3px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section my-4">
+    <div class="container text-center">
+        <h1 class="welcome-text display-4 mb-4">✨ ยินดีต้อนรับสู่ Made Chuu ✨</h1>
+        <p class="lead text-muted mb-5">พบกับสินค้าน่ารักๆ ที่คัดสรรมาเพื่อคุณ</p>
+        
+        <div class="row justify-content-center align-items-center g-4">
+            <div class="col-md-5">
+                <div class="d-flex align-items-center justify-content-center justify-content-md-end">
+                    <img src="{% static 'images/logo1.jpg' %}" alt="MomMam" class="creator-img me-3">
+                    <h2 class="fw-bold" style="color: #ff8aa7;">MomMam</h2>
+                </div>
+            </div>
+            <div class="col-md-2 text-center">
+                <span class="badge bg-pink rounded-pill px-3 py-2">&</span>
+            </div>
+            <div class="col-md-5">
+                <div class="d-flex align-items-center justify-content-center justify-content-md-start">
+                    <img src="{% static 'images/logo-2.png' %}" alt="KaJang" class="creator-img me-3">
+                    <h2 class="fw-bold" style="color: #ff8aa7;">KaJang</h2>
+                </div>
+            </div>
+        </div>
     </div>
-</nav>
+</section>
 
-<div class="banner">
-    <h2 class="text-center text-pink mb-4">✨ ยินดีต้อนรับสู่เว็บไซต์ของเรา ✨</h2>
-</div>
+<!-- Featured Products -->
+<section class="container py-5">
+    <h2 class="text-center section-title">สินค้ายอดนิยม</h2>
+    
+    <div class="row g-4">
+        {% for product in product|slice:":4" %}
+        <div class="col-lg-3 col-md-6">
+            <div class="card h-100 border-0 rounded-4 overflow-hidden p-3">
+                <div class="overflow-hidden rounded-4">
+                    {% if product.product_image %}
+                    <img class="img-fluid w-100 product-img" src="{{ product.product_image.url }}" alt="{{ product.product_name }}">
+                    {% else %}
+                    <img class="img-fluid w-100 product-img" src="{% static 'MadeChuu/images/default.png' %}" alt="Default product image">
+                    {% endif %}
+                </div>
+                <div class="card-body text-center px-0 pb-0 pt-3">
+                    <h5 class="fw-bold mb-2">{{ product.product_name }}</h5>
+                    <p class="text-muted small mb-2">{{ product.category.category_name }}</p>
+                    <h6 class="fw-bold text-pink mb-3">{{ product.price }} บาท</h6>
+                    {% comment %} <a href="#" class="btn btn-sm btn-outline-pink w-100">เพิ่มในตระกร้า</a> {% endcomment %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <img src="{% static 'images/empty.svg' %}" alt="No products" class="img-fluid mb-4" style="max-height: 200px;">
+            <h5 class="text-muted">ยังไม่มีสินค้าในขณะนี้</h5>
+            <a href="{% url 'product:product' %}" class="btn btn-pink mt-3">ดูสินค้าทั้งหมด</a>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="text-center mt-5">
+        <a href="{% url 'product:product' %}" class="btn btn-pink px-4 py-2">
+            ดูสินค้าทั้งหมด <i class="fas fa-arrow-right ms-2"></i>
+        </a>
+    </div>
+</section>
 
-</body>
-</html>
+<!-- Features Section -->
+<section class="bg-light py-5 my-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="p-4 rounded-3 h-100" style="background-color: rgba(255, 138, 167, 0.05);">
+                    <div class="icon-box bg-pink text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="fas fa-truck fa-lg"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">จัดส่งรวดเร็ว</h5>
+                    <p class="text-muted mb-0">เราจัดส่งสินค้าภายใน 1-3 วันทำการ</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="p-4 rounded-3 h-100" style="background-color: rgba(255, 138, 167, 0.05);">
+                    <div class="icon-box bg-pink text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="fas fa-undo fa-lg"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">คืนสินค้าง่าย</h5>
+                    <p class="text-muted mb-0">สามารถคืนสินค้าได้ภายใน 7 วัน</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="p-4 rounded-3 h-100" style="background-color: rgba(255, 138, 167, 0.05);">
+                    <div class="icon-box bg-pink text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="fas fa-headset fa-lg"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">บริการลูกค้า</h5>
+                    <p class="text-muted mb-0">ทีมงานพร้อมช่วยเหลือตลอด 24 ชม.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

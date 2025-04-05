@@ -7,7 +7,7 @@ urlpatterns = [
     path('admin_function/', include('admin_function.urls')),  # URL สำหรับ admin_function
     path('', include('main.urls')),  # URL สำหรับแอปหลัก 
     path('review/', include('review.urls')), # URL สำหรับ review
-    path('payment/', include('payment.urls')), # URL สำหรับ payment
+    path('payment/', include('payment.urls',namespace='payment')), # URL สำหรับ payment
     path('receipt/', include('receipt.urls')), # URL สำหรับ receipt
     path('tracking/', include('tracking.urls')), # URL สำหรับ tracking
     path('product/', include('product.urls')), # URL สำหรับ product
@@ -16,5 +16,6 @@ urlpatterns = [
     path('ProductDetail/', include('ProductDetail.urls')), # URL สำหรับ ProductDetail
     path('Cart/', include('Cart.urls')), # URL สำหรับ cart
     path('accounts/', include('accounts.urls')), # URL สำหรับ accounts
+    path('user_profile/', include('user_profile.urls')), # URL สำหรับ user_profile
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

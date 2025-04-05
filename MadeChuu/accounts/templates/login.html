@@ -1,45 +1,289 @@
-{% extends 'accounts/base.html' %}
-
-{% block title %}Login{% endblock %}
+<!-- login.html -->
+{% block extra_css %}
+<style>
+    :root {
+        --madechuu-pink: #FF9BB3;
+        --madechuu-darkpink: #D85A7F;
+        --madechuu-lightpink: #FFD1DC;
+        --madechuu-whitepink: #FFF0F5;
+    }
+    
+    body {
+        font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+        background-color: var(--madechuu-whitepink);
+    }
+    
+    .login-container {
+        display: flex;
+        min-height: 100vh;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background-image: url('https://madechuu.com/images/bg-pattern.png');
+        background-size: 400px;
+        background-blend-mode: overlay;
+    }
+    
+    .login-wrapper {
+        width: 100%;
+        max-width: 480px;
+        margin: 0 auto;
+    }
+    
+    .login-card {
+        border-radius: 24px;
+        border: none;
+        box-shadow: 0 15px 40px rgba(216, 90, 127, 0.25);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+    
+    .login-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .login-header {
+        background: linear-gradient(135deg, var(--madechuu-pink), var(--madechuu-darkpink));
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .login-header::before {
+        content: "";
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 150px;
+        height: 150px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+    
+    .login-header::after {
+        content: "";
+        position: absolute;
+        bottom: -30px;
+        left: -30px;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+    
+    .login-logo {
+        font-size: 60px;
+        margin-bottom: 15px;
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    .login-title {
+        font-weight: 800;
+        font-size: 28px;
+        margin-bottom: 8px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .login-subtitle {
+        font-weight: 400;
+        opacity: 0.9;
+        font-size: 16px;
+        position: relative;
+        z-index: 1;
+        margin-bottom: 0;
+    }
+    
+    .login-body {
+        padding: 40px;
+    }
+    
+    .form-group {
+        margin-bottom: 24px;
+    }
+    
+    .form-control {
+        border-radius: 14px;
+        padding: 16px 20px;
+        border: 2px solid var(--madechuu-lightpink);
+        font-size: 15px;
+        transition: all 0.3s;
+        width: 100%;
+    }
+    
+    .form-control:focus {
+        border-color: var(--madechuu-pink);
+        box-shadow: 0 0 0 4px rgba(255, 155, 179, 0.2);
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .btn-madechuu {
+        background: linear-gradient(135deg, var(--madechuu-pink), var(--madechuu-darkpink));
+        border: none;
+        border-radius: 14px;
+        padding: 16px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        font-size: 15px;
+        box-shadow: 0 4px 15px rgba(216, 90, 127, 0.3);
+        transition: all 0.3s;
+        width: 100%;
+        display: block;
+    }
+    
+    .btn-madechuu:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(216, 90, 127, 0.4);
+    }
+    
+    .btn-madechuu:active {
+        transform: translateY(0);
+    }
+    
+    .login-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 24px;
+        margin-bottom: 32px;
+    }
+    
+    .remember-me {
+        display: flex;
+        align-items: center;
+    }
+    
+    .form-check-input {
+        margin-right: 8px;
+    }
+    
+    .forgot-link {
+        color: var(--madechuu-darkpink);
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    
+    .forgot-link:hover {
+        color: var(--madechuu-pink);
+        text-decoration: underline;
+    }
+    
+    .signup-section {
+        text-align: center;
+        margin-top: 32px;
+    }
+    
+    .signup-text {
+        color: #666;
+        margin-bottom: 0;
+    }
+    
+    .signup-link {
+        color: var(--madechuu-darkpink);
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.2s;
+        margin-left: 4px;
+    }
+    
+    .signup-link:hover {
+        color: var(--madechuu-pink);
+        text-decoration: underline;
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--madechuu-darkpink);
+        border-color: var(--madechuu-darkpink);
+    }
+    
+    .form-check-input:focus {
+        box-shadow: 0 0 0 0.25rem rgba(216, 90, 127, 0.25);
+    }
+    
+    .alert-error {
+        background-color: #FFEBEE;
+        color: #D32F2F;
+        padding: 12px 16px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .alert-error i {
+        margin-right: 8px;
+    }
+    
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<section class="vh-100 gradient-custom">
-    <div class="container py-5 h-100">
-      <div class="row d-flex justify-content-center align-items-center h-100">
-        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-          <div class="card bg-dark text-white" style="border-radius: 1rem;">
-            <div class="card-body p-5 text-center">
-  
-              <div class="mb-md-5 mt-md-4 pb-5">
-  
-                <h2 class="fw-bold mb-2 text-uppercase">Login</h2>
-                <p class="text-white-50 mb-5">Please enter your login and password!</p>
-  
-                <form method="post">
-                  {% csrf_token %}
-                  <div data-mdb-input-init class="form-outline form-white mb-4">
-                    <input type="email" id="typeEmailX" class="form-control form-control-lg" name="email" required />
-                    <label class="form-label" for="typeEmailX">Email</label>
-                  </div>
-    
-                  <div data-mdb-input-init class="form-outline form-white mb-4">
-                    <input type="password" id="typePasswordX" class="form-control form-control-lg" name="password" required />
-                    <label class="form-label" for="typePasswordX">Password</label>
-                  </div>
-       
-                  <button data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-light btn-lg px-5" type="submit">Login</button>
-                </form>
-  
-              </div>
-  
-              <div>
-                <p class="mb-0">Don't have an account? <a href="{% url 'register' %}" class="text-white-50 fw-bold">Sign Up</a></p>
-              </div>
-  
+<div class="login-container">
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h1 class="login-title">Welcome</h1>
+                <p class="login-subtitle">Sign in to continue to Made Chuu</p>
             </div>
-          </div>
+            
+            <div class="login-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="alert-error">
+                        <i class="fas fa-exclamation-circle"></i> Invalid email or password
+                    </div>
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-control" name="email" placeholder="your@email.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" placeholder="••••••••" required>
+                    </div>
+                    
+                    <div class="login-footer">
+                        <div class="remember-me">
+                            <input class="form-check-input" type="checkbox" id="remember">
+                            <label class="form-check-label" for="remember">Remember me</label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-madechuu">
+                        Sign In <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </form>
+                
+                <div class="signup-section">
+                    <p class="signup-text">Don't have an account? 
+                        <a href="{% url 'accounts:register' %}" class="signup-link">Create one now</a>
+                    </p>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </section>
+</div>
 {% endblock %}

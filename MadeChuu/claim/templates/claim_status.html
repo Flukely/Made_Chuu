@@ -1,32 +1,42 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สถานะการพิจารณาการคืนเงิน</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% extends 'main/base.html' %}
+
+{% block title %}สถานะการพิจารณาการคืนเงิน{% endblock %}
+
+{% block styleCustom %}
     <style>
         body {
-            background-color: #ffffff;
+            background-color: #fff9fb;
             font-family: 'Prompt', sans-serif;
         }
-        .container {
-            max-width: 600px;
-            background: white;
+        .container-box {
+            max-width: 800px;
+            margin: 0 auto;
             padding: 20px;
+            background-color: #fff;
             border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 50px;
+            box-shadow: 0 4px 15px rgba(255, 138, 167, 0.2);
         }
         .btn-pastel {
             background-color: #ff90bc;
             border: none;
             color: white;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(255, 144, 188, 0.3);
         }
         .btn-pastel:hover {
             background-color: #ff73a5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 144, 188, 0.3);
+            color: white;
+        }
+        .btn-outline-danger {
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s;
         }
         .text-pink {
             color: #ff90bc;
@@ -34,47 +44,96 @@
         .img-fluid {
             max-height: 200px;
             object-fit: cover;
+            border-radius: 15px;
+            border: 1px solid #ffe6ee;
         }
         .info-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            padding: 10px 15px;
+            background-color: #fff9fb;
+            border-radius: 10px;
         }
         .info-row strong {
             flex: 1;
             text-align: left;
+            color: #ff90bc;
         }
         .info-row span {
             flex: 2;
             text-align: right;
+            color: #888;
         }
         .status-icon {
-            font-size: 50px;
+            font-size: 70px;
             margin-bottom: 20px;
+            margin-top: 10px;
         }
         .status-icon.processing {
             color: #ff90bc;
+            animation: pulse 2s infinite;
         }
         .status-icon.approved {
-            color: #28a745;
+            color: #a8e6cf;
         }
         .status-icon.rejected {
-            color: #dc3545;
+            color: #ffaaa5;
+        }
+        .product-list {
+            background-color: #fff9fb;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .product-list strong {
+            color: #ff90bc;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .product-item {
+            padding: 5px 0;
+            color: #888;
+        }
+        h1 {
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .w-45 {
+            width: 48%;
         }
     </style>
-</head>
-<body>
-    <div class="container mt-5 text-center">
+{% endblock %}
+
+{% block content %}
+    <div class="container-box mt-5 text-center">
         {% if status == "กำลังดำเนินการ" %}
             <i class="fas fa-spinner fa-spin status-icon processing"></i>
             <h1 class="text-pink">กำลังพิจารณาคำขอ</h1>
-            <img src="{{ orderproduct.product.product_image.url }}" alt="ภาพสินค้า" class="img-fluid rounded mb-3">
-            <div class="info-row">
-                <strong>ชื่อสินค้า:</strong>
-                <span>{{ product_name }}</span>
+            <div class="mb-4" style="color: #888;">เรากำลังตรวจสอบคำขอของคุณ กรุณารอสักครู่...</div>
+           
+            <div class="product-list">
+                <strong>รายการสินค้า:</strong>
+                {% for product in orderproduct %}
+                    <div class="product-item">
+                        - {{ product.product.product_name }}
+                    </div>
+                    {% empty %}
+                    <div class="product-item">
+                        - ไม่มีสินค้า
+                    </div>
+                {% endfor %}
             </div>
             <div class="info-row">
-                <strong>ราคาสินค้า:</strong>
+                <strong>ราคารวมทั้งหมด:</strong>
                 <span>{{ product_price }} บาท</span>
             </div>
             <div class="info-row">
@@ -83,7 +142,7 @@
             </div>
             <div class="info-row">
                 <strong>คืนเงินไปยังพร้อมเพย์:</strong>
-                <span>{{ promptpay }}</span>
+                <span>{{promtpay_number}}</span>
             </div>
             <div class="info-row">
                 <strong>วันเวลาที่ส่งคำขอ:</strong>
@@ -98,16 +157,25 @@
                 <span>{{ reason }}</span>
             </div>
             <div class="d-flex justify-content-between mt-4">
-                <a href="{% url 'track' order_id=1 %}" class="btn btn-pastel w-45">กลับ</a>
-                <a href="{% url 'track' order_id=1 %}" class="btn btn-outline-danger w-45">ยกเลิกคำขอ</a>
+                <a href="{% url 'tracking:tracking' order_id %}" class="btn btn-pastel w-45">กลับ</a>
+                <a href="{% url 'claim:cancel_claim' claim_id=request_id %}" class="btn btn-outline-danger w-45">ยกเลิกคำขอ</a>
             </div>
         {% elif status == "ผ่าน" %}
             <i class="fas fa-check-circle status-icon approved"></i>
-            <h1 class="text-success">คำขอคืนเงินได้รับการอนุมัติแล้ว</h1>
-            <img src="{{ product_image_url }}" alt="ภาพสินค้า" class="img-fluid rounded mb-3">
-            <div class="info-row">
-                <strong>ชื่อสินค้า:</strong>
-                <span>{{ product_name }}</span>
+            <h1 style="color: #a8e6cf;">คำขอคืนเงินได้รับการอนุมัติแล้ว</h1>
+            <div class="mb-4" style="color: #888;">เงินจะถูกโอนเข้าบัญชีของคุณภายใน 3-5 วันทำการ</div>
+            
+            <div class="product-list">
+                <strong>รายการสินค้า:</strong>
+                {% for product in orderproduct %}
+                    <div class="product-item">
+                        - {{ product.product.product_name }}
+                    </div>
+                    {% empty %}
+                    <div class="product-item">
+                        - ไม่มีสินค้า
+                    </div>
+                {% endfor %}
             </div>
             <div class="info-row">
                 <strong>ราคาสินค้า:</strong>
@@ -119,7 +187,7 @@
             </div>
             <div class="info-row">
                 <strong>คืนเงินไปยังพร้อมเพย์:</strong>
-                <span>{{ promptpay }}</span>
+                <span>{{ promtpay_number}}</span>
             </div>
             <div class="info-row">
                 <strong>วันเวลาที่ส่งคำขอ:</strong>
@@ -133,17 +201,25 @@
                 <strong>เหตุผล:</strong>
                 <span>{{ reason }}</span>
             </div>
-            <div class="d-flex justify-content-between mt-4">
-                <a href="{% url 'track' order_id=1 %}" class="btn btn-pastel w-45">กลับ</a>
-                <a href="#" class="btn btn-outline-danger w-45">ติดต่อผู้ขาย</a>
+            <div class="d-flex justify-content-center mt-4">
+                <a href="{% url 'tracking:tracking' order_id %}" class="btn btn-pastel" style="width: 200px;">กลับ</a>
             </div>
         {% elif status == "ไม่ผ่าน" %}
             <i class="fas fa-times-circle status-icon rejected"></i>
-            <h1 class="text-danger">คำขอของคุณไม่ผ่านเงื่อนไข</h1>
-            <img src="{{ product_image_url }}" alt="ภาพสินค้า" class="img-fluid rounded mb-3">
-            <div class="info-row">
-                <strong>ชื่อสินค้า:</strong>
-                <span>{{ product_name }}</span>
+            <h1 style="color: #ffaaa5;">คำขอของคุณไม่ผ่านเงื่อนไข</h1>
+            <div class="mb-4" style="color: #888;">ขออภัยในความไม่สะดวก กรุณาตรวจสอบเงื่อนไขการคืนเงิน</div>
+            
+            <div class="product-list">
+                <strong>รายการสินค้า:</strong>
+                {% for product in orderproduct %}
+                    <div class="product-item">
+                        - {{ product.product.product_name }}
+                    </div>
+                    {% empty %}
+                    <div class="product-item">
+                        - ไม่มีสินค้า
+                    </div>
+                {% endfor %}
             </div>
             <div class="info-row">
                 <strong>ราคาสินค้า:</strong>
@@ -155,7 +231,7 @@
             </div>
             <div class="info-row">
                 <strong>คืนเงินไปยังพร้อมเพย์:</strong>
-                <span>{{ promptpay }}</span>
+                <span>{{ promtpay_number }}</span>
             </div>
             <div class="info-row">
                 <strong>วันเวลาที่ส่งคำขอ:</strong>
@@ -169,13 +245,9 @@
                 <strong>เหตุผล:</strong>
                 <span>{{ reason }}</span>
             </div>
-            <div class="d-flex justify-content-between mt-4">
-                <a href="{% url 'track' order_id=1 %}" class="btn btn-pastel w-45">กลับ</a>
-                <a href="#" class="btn btn-outline-danger w-45">ติดต่อผู้ขาย</a>
+            <div class="d-flex justify-content-center mt-4">
+                <a href="{% url 'tracking:tracking' order_id %}" class="btn btn-pastel" style="width: 200px;">กลับ</a>
             </div>
         {% endif %}
-       
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}

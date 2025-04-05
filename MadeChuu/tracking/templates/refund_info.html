@@ -1,0 +1,190 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block title %}Refund Information - Made Chuu{% endblock %}
+
+{% block styleCustom %}
+<style>
+    body {
+        background-color: #fff9fb;
+        font-family: 'Prompt', sans-serif;
+    }
+    
+    .container_refund {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(255, 92, 141, 0.1);
+    }
+    
+    h1 {
+        color: #ff5c8d;
+        text-align: center;
+        margin-bottom: 25px;
+        font-weight: 700;
+        text-shadow: 2px 2px 4px rgba(255, 92, 141, 0.1);
+    }
+    
+    .form-label {
+        color: #ff5c8d;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #ffd6e7;
+        border-radius: 12px;
+        padding: 12px 15px;
+        transition: all 0.3s;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #ff5c8d;
+        box-shadow: 0 0 0 0.25rem rgba(255, 92, 141, 0.2);
+    }
+    
+    .btn-primary {
+        background-color: #ff5c8d;
+        border: none;
+        border-radius: 50px;
+        padding: 12px 25px;
+        font-weight: 500;
+        width: 100%;
+        margin-top: 15px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(255, 92, 141, 0.3);
+    }
+    
+    .btn-primary:hover {
+        background-color: #ff3d7a;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(255, 92, 141, 0.4);
+    }
+    
+    .text-danger {
+        color: #ff5c8d !important;
+        margin-top: 5px;
+        font-size: 0.9rem;
+    }
+    
+    .hidden {
+        display: none;
+    }
+    
+    /* เอฟเฟกต์พิเศษ */
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-3px); }
+    }
+    
+    .container {
+        animation: float 4s ease-in-out infinite;
+    }
+    
+    /* ไอคอนน่ารัก */
+    .fa-credit-card, .fa-money-bill-wave, .fa-exchange-alt {
+        color: #ff5c8d;
+        margin-right: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block scriptCustom %}
+<script src="{% static 'js/script.js' %}" defer></script>
+<script src="{% static 'js/order_status.js' %}" defer></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const refundTypeSelect = document.getElementById('refund_type');
+        const bankNameInput = document.getElementById('bank_name');
+        const refundNumberInput = document.getElementById('refund_number');
+        const accountNameInput = document.getElementById('account_name');
+
+        function toggleFields() {
+            const selectedType = refundTypeSelect.value;
+
+            bankNameInput.parentElement.classList.add('hidden');
+            refundNumberInput.parentElement.classList.add('hidden');
+            accountNameInput.parentElement.classList.add('hidden');
+            
+            if (selectedType === 'bank') {
+                bankNameInput.parentElement.classList.remove('hidden');
+                refundNumberInput.parentElement.classList.remove('hidden');
+                accountNameInput.parentElement.classList.remove('hidden');
+            } else if (selectedType === 'promptpay') {
+                refundNumberInput.parentElement.classList.remove('hidden');
+                accountNameInput.parentElement.classList.remove('hidden');
+            }
+        }
+
+        toggleFields();
+        refundTypeSelect.addEventListener('change', toggleFields);
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container_refund">
+    <h1 class="mb-4">
+        <i class="fas fa-exchange-alt"></i> ข้อมูลการคืนเงินสำหรับออร์เดอร์ #{{ order.order_id }}
+    </h1>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="mb-4">
+            <label for="refund_type" class="form-label">
+                <i class="fas fa-credit-card"></i> วิธีการรับเงินคืน
+            </label>
+            {{ form.refund_type }}
+            {% if form.refund_type.errors %}
+            <div class="text-danger">
+                {{ form.refund_type.errors|striptags }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="mb-4 hidden">
+            <label for="bank_name" class="form-label">
+                <i class="fas fa-university"></i> ชื่อธนาคาร
+            </label>
+            {{ form.bank_name }}
+            {% if form.bank_name.errors %}
+            <div class="text-danger">
+                {{ form.bank_name.errors|striptags }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="mb-4 hidden">
+            <label for="refund_number" class="form-label">
+                <i class="fas fa-money-bill-wave"></i> หมายเลขบัญชี/พร้อมเพย์
+            </label>
+            {{ form.refund_number }}
+            {% if form.refund_number.errors %}
+            <div class="text-danger">
+                {{ form.refund_number.errors|striptags }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="mb-4 hidden">
+            <label for="account_name" class="form-label">
+                <i class="fas fa-user-circle"></i> ชื่อเจ้าของบัญชี
+            </label>
+            {{ form.account_name }}
+            {% if form.account_name.errors %}
+            <div class="text-danger">
+                {{ form.account_name.errors|striptags }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-paper-plane"></i> ส่งข้อมูลการคืนเงิน
+        </button>
+    </form>
+</div>
+{% endblock %}

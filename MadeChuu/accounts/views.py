@@ -11,20 +11,20 @@ class LoginForm(forms.Form):
 
 def register(request):
     if request.user.is_authenticated:
-        return redirect("index")
+        return redirect("main:index")
     
     if request.method == "POST":
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
+            #login(request, user)
             
             # เพิ่มบทบาทให้กับผู้ใช้
             default_role = UserRole.objects.get(user_role_name='Customer')  # ดึงบทบาทที่มีอยู่แล้ว
             user.user_role = default_role  # ใช้ user ซึ่งเป็นอินสแตนซ์ของโมเดล User
             user.save()  # บันทึกข้อมูลลงฐานข้อมูล
             
-            return redirect("index")
+            return redirect("accounts:login")
     else:
         form = UserRegisterForm()
     return render(request, "register.html", {"form": form})
@@ -33,7 +33,7 @@ def register(request):
 # เข้าสู่ระบบ
 def user_login(request):
     if request.user.is_authenticated:
-        return redirect("index")  # ถ้าผู้ใช้ล็อกอินอยู่แล้ว ให้เปลี่ยนเส้นทางไปยังหน้าแดชบอร์ด
+        return redirect("main:index")  # ถ้าผู้ใช้ล็อกอินอยู่แล้ว ให้เปลี่ยนเส้นทางไปยังหน้าแดชบอร์ด
     
     if request.method == "POST":
         form = LoginForm(request.POST)
@@ -52,7 +52,7 @@ def user_login(request):
                 roles = AdminRole.objects.filter(admin__user=user).values_list('admin_role_name', flat=True)
                 request.session['user_roles'] = list(roles)
                 
-                return redirect("index")
+                return redirect("main:index")
             else:
                 form.add_error(None, "Invalid email or password")
     else:
@@ -61,4 +61,4 @@ def user_login(request):
 
 def logout_view(request):
     logout(request)
-    return redirect("login")
+    return redirect("accounts:login")

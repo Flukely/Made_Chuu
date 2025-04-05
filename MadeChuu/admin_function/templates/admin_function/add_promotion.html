@@ -1,0 +1,331 @@
+{% extends 'admin_function/base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0" style="color: #ff6b6b; font-weight: 700;">
+            <i class="fas fa-tag me-2"></i>เพิ่มโปรโมชันใหม่
+        </h2>
+        <a href="{% url 'promotion_list' %}" class="btn btn-chuu-outline">
+            <i class="fas fa-arrow-left me-2"></i>กลับไปหน้ารายการ
+        </a>
+    </div>
+    
+    <!-- ฟอร์มกรองสินค้า -->
+    <div class="card shadow-sm mb-4" style="border: none; border-radius: 12px;">
+        <div class="card-body p-4" style="background-color: #fff9fb;">
+            <form method="get" class="row g-3">
+                <div class="col-md-5">
+                    <label for="shop_id" class="form-label" style="color: #e5989b; font-weight: 600;">
+                        <i class="fas fa-store me-1"></i>เลือกร้านค้า:
+                    </label>
+                    <select name="shop_id" id="shop_id" class="form-select chuu-select" onchange="this.form.submit()">
+                        <option value="">-- ทุกร้านค้า --</option>
+                        {% for shop in shops %}
+                        <option value="{{ shop.shop_id }}" {% if selected_shop == shop.shop_id %}selected{% endif %}>
+                            {{ shop.shop_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label for="category_id" class="form-label" style="color: #e5989b; font-weight: 600;">
+                        <i class="fas fa-tags me-1"></i>เลือกหมวดหมู่:
+                    </label>
+                    <select name="category_id" id="category_id" class="form-select chuu-select" onchange="this.form.submit()">
+                        <option value="">-- ทุกหมวดหมู่ --</option>
+                        {% for category in categories %}
+                        <option value="{{ category.category_id }}" {% if selected_category == category.category_id %}selected{% endif %}>
+                            {{ category.category_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <a href="{% url 'add_promotion' %}" class="btn btn-chuu-outline w-100">
+                        <i class="fas fa-undo me-1"></i>ล้าง
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ฟอร์มหลักสำหรับสร้างโปรโมชัน -->
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- ส่วนรายละเอียดโปรโมชัน -->
+        <div class="card shadow-sm mb-4" style="border: none; border-radius: 12px;">
+            <div class="card-header" style="background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); color: white; border-radius: 12px 12px 0 0 !important;">
+                <i class="fas fa-info-circle me-2"></i>รายละเอียดโปรโมชัน
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" style="color: #e5989b; font-weight: 600;">ชื่อโปรโมชัน</label>
+                        {{ promotion_form.promotion_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" style="color: #e5989b; font-weight: 600;">ประเภทโปรโมชัน</label>
+                        {{ promotion_form.promotion_type }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" style="color: #e5989b; font-weight: 600;">ส่วนลด (%)</label>
+                        <div class="input-group">
+                            {{ promotion_form.discount }}
+                            <span class="input-group-text" style="background-color: #ffdfd3; color: #e5989b;">%</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" style="color: #e5989b; font-weight: 600;">วันที่เริ่ม</label>
+                        {{ promotion_form.start_date }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" style="color: #e5989b; font-weight: 600;">วันที่สิ้นสุด</label>
+                        {{ promotion_form.end_date }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" style="color: #e5989b; font-weight: 600;">คำอธิบาย</label>
+                        {{ promotion_form.description }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" style="color: #e5989b; font-weight: 600;">รูปภาพโปรโมชัน</label>
+                        <div class="file-upload-wrapper">
+                            {{ promotion_form.promotion_image }}
+                            <div class="file-upload-preview mt-2">
+                                <div id="imagePreview" class="rounded" style="width: 150px; height: 150px; background-color: #f8edeb; display: flex; align-items: center; justify-content: center; color: #e5989b;">
+                                    <i class="fas fa-image fa-3x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ส่วนเลือกสินค้า -->
+        <div class="card shadow-sm mb-4" style="border: none; border-radius: 12px;">
+            <div class="card-header" style="background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); color: white; border-radius: 12px 12px 0 0 !important;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-box-open me-2"></i>เลือกสินค้าในโปรโมชัน
+                    </div>
+                    <span class="badge rounded-pill" style="background-color: white; color: #ff6b6b; font-weight: 600;">
+                        {{ product_form.products.field.queryset.count }} สินค้า
+                    </span>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                {% if product_form.products.field.queryset.exists %}
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    {% for product in product_form.products.field.queryset %}
+                    <div class="col">
+                        <div class="product-card h-100 position-relative" style="border-radius: 12px; overflow: hidden; border: 2px solid transparent; transition: all 0.3s;">
+                            <input type="checkbox" name="products" value="{{ product.product_id }}" id="product{{ product.product_id }}" class="d-none">
+                            <label for="product{{ product.product_id }}" class="stretched-link"></label>
+                            
+                            <!-- รูปภาพสินค้า -->
+                            <div class="text-center p-3" style="height: 180px; background-color: #fff9fb;">
+                                {% if product.product_image %}
+                                <img src="{{ product.product_image.url }}" 
+                                    alt="{{ product.product_name }}"
+                                    style="max-height: 100%; max-width: 100%; object-fit: contain; border-radius: 8px;">
+                                {% else %}
+                                <div class="h-100 d-flex align-items-center justify-content-center" style="color: #f8edeb;">
+                                    <i class="fas fa-image fa-3x"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- ชื่อและรายละเอียดสินค้า -->
+                            <div class="card-body" style="background-color: white;">
+                                <h5 class="card-title" style="color: #5a5a5a; font-weight: 600;">{{ product.product_name }}</h5>
+                                <p class="text-success fw-bold">{{ product.price }} บาท</p>
+                                <p class="small" style="color: #a5a5a5;">
+                                    <i class="fas fa-store" style="color: #e5989b;"></i> {{ product.shop.shop_name }}<br>
+                                    <i class="fas fa-tag" style="color: #e5989b;"></i> {{ product.category.category_name }}
+                                </p>
+                            </div>
+                            
+                            <!-- เอฟเฟกต์เมื่อเลือก -->
+                            <div class="selection-overlay" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 182, 193, 0.2); pointer-events: none;">
+                                <div class="position-absolute top-0 end-0 m-2" style="width: 28px; height: 28px; background-color: #ff6b6b; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-check text-white" style="font-size: 12px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-chuu" style="background-color: #fff5f5; border-left: 4px solid #ffb3ba; color: #e5989b;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>ไม่พบสินค้าตามเงื่อนไขที่กรอง
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ปุ่มดำเนินการ -->
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-chuu btn-lg me-3 px-5 py-2">
+                <i class="fas fa-save me-2"></i>บันทึกโปรโมชัน
+            </button>
+            <a href="{% url 'promotion_list' %}" class="btn btn-chuu-outline btn-lg px-5 py-2">
+                <i class="fas fa-times me-2"></i>ยกเลิก
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* สไตล์แบบ Made Chuu */
+    :root {
+        --chuu-pink: #ffb3ba;
+        --chuu-light-pink: #ffdfd3;
+        --chuu-dark-pink: #ff6b6b;
+        --chuu-text: #5a5a5a;
+        --chuu-light-bg: #fff9fb;
+    }
+    
+    .btn-chuu {
+        background-color: var(--chuu-dark-pink);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-weight: 600;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    }
+    
+    .btn-chuu:hover {
+        background-color: #ff5252;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+        color: white;
+    }
+    
+    .btn-chuu-outline {
+        background-color: white;
+        color: var(--chuu-dark-pink);
+        border: 2px solid var(--chuu-dark-pink);
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .btn-chuu-outline:hover {
+        background-color: var(--chuu-light-bg);
+        color: var(--chuu-dark-pink);
+        transform: translateY(-2px);
+    }
+    
+    .chuu-select {
+        border-radius: 10px;
+        border: 1px solid #ffdfd3;
+        padding: 10px 15px;
+    }
+    
+    .chuu-select:focus {
+        border-color: var(--chuu-pink);
+        box-shadow: 0 0 0 0.25rem rgba(255, 182, 193, 0.25);
+    }
+    
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 10px 15px;
+        border: 1px solid #ffdfd3;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--chuu-pink);
+        box-shadow: 0 0 0 0.25rem rgba(255, 182, 193, 0.25);
+    }
+    
+    /* สไตล์การ์ดสินค้า */
+    .product-card {
+        transition: all 0.3s;
+        cursor: pointer;
+        overflow: hidden;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(255, 182, 193, 0.3);
+    }
+    
+    /* สไตล์เมื่อเลือกสินค้า */
+    input[type="checkbox"]:checked + label + .selection-overlay {
+        display: block !important;
+    }
+    
+    input[type="checkbox"]:checked ~ .card-body {
+        background-color: #fff5f5 !important;
+    }
+    
+    /* สไตล์สำหรับอัพโหลดรูปภาพ */
+    .file-upload-wrapper {
+        position: relative;
+    }
+    
+    .custom-file-upload {
+        display: inline-block;
+        padding: 10px 15px;
+        cursor: pointer;
+        background-color: #ffdfd3;
+        color: #e5989b;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .custom-file-upload:hover {
+        background-color: #ffb3ba;
+        color: white;
+    }
+    
+    /* ปรับแต่ง textarea */
+    textarea.form-control {
+        min-height: 100px;
+    }
+    
+    /* ปรับแต่ง alert */
+    .alert-chuu {
+        border-radius: 10px;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ตรวจสอบการเลือกสินค้า
+    document.querySelectorAll('input[type="checkbox"][name="products"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const productCard = this.closest('.product-card');
+            if (this.checked) {
+                productCard.style.borderColor = '#ff6b6b';
+            } else {
+                productCard.style.borderColor = 'transparent';
+            }
+        });
+    });
+    
+    // แสดงตัวอย่างรูปภาพเมื่อเลือก
+    const imageInput = document.querySelector('input[type="file"][name="promotion_image"]');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    if (imageInput && imagePreview) {
+        imageInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,315 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block title %}คำสั่งซื้อของฉัน | Made Chuu{% endblock %}
+
+{% block styleCustom %}
+<style>
+    :root {
+        --madechuu-pink: #FF9BB3;
+        --madechuu-darkpink: #D85A7F;
+        --madechuu-lightpink: #FFD1DC;
+        --madechuu-whitepink: #FFF0F5;
+    }
+
+    .order-list-container {
+        background-color: var(--madechuu-whitepink);
+        min-height: 100vh;
+        padding: 30px 0;
+    }
+
+    .order-header {
+        text-align: center;
+        padding: 25px 0;
+        background: linear-gradient(135deg, var(--madechuu-pink), var(--madechuu-darkpink));
+        color: white;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 20px rgba(216, 90, 127, 0.2);
+        border-radius: 0 0 20px 20px;
+    }
+
+    .order-header h1 {
+        font-weight: 800;
+        font-size: 32px;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .order-card {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        margin: 0 auto 25px;
+        box-shadow: 0 8px 25px rgba(216, 90, 127, 0.1);
+        max-width: 900px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid var(--madechuu-lightpink);
+    }
+
+    .order-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(216, 90, 127, 0.15);
+    }
+
+    .shop-name {
+        color: var(--madechuu-darkpink);
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+    }
+
+    .shop-name i {
+        margin-right: 10px;
+        font-size: 24px;
+    }
+
+    .product-image {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 15px;
+        margin-right: 25px;
+        border: 2px solid var(--madechuu-lightpink);
+        box-shadow: 0 4px 10px rgba(216, 90, 127, 0.1);
+        float: left;
+    }
+
+    .order-info {
+        margin-left: 125px;
+    }
+
+    .order-id {
+        color: #5A5A5A;
+        font-size: 15px;
+        margin-bottom: 10px;
+        line-height: 1.6;
+    }
+
+    .order-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .meta-item {
+        background: var(--madechuu-whitepink);
+        padding: 8px 15px;
+        border-radius: 50px;
+        font-size: 14px;
+        color: var(--madechuu-darkpink);
+        font-weight: 600;
+    }
+
+    .btn-view-details {
+        background: linear-gradient(135deg, var(--madechuu-pink), var(--madechuu-darkpink));
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 12px 30px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(216, 90, 127, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 14px;
+        margin-top: 15px;
+        float: right;
+        clear: both;
+    }
+
+    .btn-view-details:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(216, 90, 127, 0.4);
+    }
+
+    .btn-view-details i {
+        margin-right: 8px;
+        font-size: 16px;
+    }
+
+    .no-orders {
+        text-align: center;
+        padding: 50px 20px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 8px 25px rgba(216, 90, 127, 0.1);
+        max-width: 800px;
+        margin: 0 auto;
+        border: 1px dashed var(--madechuu-lightpink);
+    }
+
+    .no-orders img {
+        width: 180px;
+        margin-bottom: 25px;
+        opacity: 0.8;
+    }
+
+    .no-orders p {
+        color: #5A5A5A;
+        font-size: 16px;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+
+    .btn-shop-now {
+        background: linear-gradient(135deg, var(--madechuu-pink), var(--madechuu-darkpink));
+        color: white;
+        border-radius: 50px;
+        padding: 14px 35px;
+        text-decoration: none;
+        display: inline-block;
+        font-weight: 600;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(216, 90, 127, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-shop-now:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(216, 90, 127, 0.4);
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .order-header h1 {
+            font-size: 26px;
+        }
+        
+        .order-card {
+            padding: 20px;
+        }
+        
+        .product-image {
+            width: 80px;
+            height: 80px;
+            margin-right: 15px;
+        }
+        
+        .order-info {
+            margin-left: 95px;
+        }
+        
+        .btn-view-details {
+            width: 100%;
+            float: none;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .order-header h1 {
+            font-size: 22px;
+        }
+        
+        .product-image {
+            float: none;
+            margin-right: 0;
+            margin-bottom: 15px;
+            width: 100%;
+            height: auto;
+            max-height: 200px;
+        }
+        
+        .order-info {
+            margin-left: 0;
+        }
+        
+        .order-meta {
+            flex-direction: column;
+            gap: 8px;
+        }
+    }
+    .order-status {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    
+    .order-status.เตรียมของ {
+        background-color: #FFD700;
+        color: #000;
+    }
+    
+    .order-status.จัดส่งสำเร็จ {
+        background-color: #32CD32;
+        color: #fff;
+    }
+    
+    .order-status.ยกเลิกคำสั่งซื้อ {
+        background-color: #FF6347;
+        color: #fff;
+    }
+    
+    .order-status.เตรียมจัดส่ง {
+        background-color: #1E90FF;
+        color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="order-list-container">
+    <header class="order-header">
+        <h1>คำสั่งซื้อของฉัน</h1>
+    </header>
+    
+    {% if orders %}
+    {% for order in orders %}
+    <div class="order-card">
+        <h2 class="shop-name">
+            <i class="fas fa-store"></i>{{ order.shop.shop_name }}
+        </h2>
+        
+        {% for order_product in order.orderproduct_set.all %}
+        <img src="{{ order_product.product.product_image.url }}" alt="{{ order_product.product.product_name }}" class="product-image">
+        <div class="order-info">
+            <p class="order-id">
+                <strong>เลขที่คำสั่งซื้อ:</strong> {{ order.order_id }}<br>
+                <strong>สินค้า:</strong> {{ order_product.product.product_name }}<br>
+                <strong>จำนวน:</strong> {{ order_product.quantity }} ชิ้น<br>
+                <strong>ราคาต่อชิ้น:</strong> {{ order_product.product.price }} บาท<br>
+            </p>
+            <div class="order-meta">
+                <span class="meta-item">
+                    <i class="fas fa-calendar-day"></i> {{ order.order_date|date:"d/m/Y" }}
+                </span>
+                <span class="meta-item">
+                    <i class="fas fa-tag"></i> <span class="order-status {{ order.status_order.status_name|slugify }}">
+                        {{ order.status_order.status_name }}
+                    </span>
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <form method="POST" action="{% url 'tracking:tracking' order.order_id %}">
+            {% csrf_token %}
+            <input type="hidden" name="order_id" value="{{ order.order_id }}">
+            <button class="btn-view-details" type="submit">
+                <i class="fas fa-search"></i> ดูรายละเอียด
+            </button>
+        </form>
+    </div>
+    {% endfor %}
+    {% else %}
+        <div class="no-orders">
+            <img src="{% static 'images/no-orders.png' %}" alt="No orders">
+            <p>คุณยังไม่มีคำสั่งซื้อ</p>
+            <a href="{% url 'shop:all_products' %}" class="btn-shop-now">
+                <i class="fas fa-shopping-bag"></i> ช็อปสินค้าตอนนี้
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

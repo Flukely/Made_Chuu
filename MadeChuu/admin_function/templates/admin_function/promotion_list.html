@@ -1,0 +1,213 @@
+<!-- templates/admin_function/promotion_list.html -->
+{% extends 'admin_function/base.html' %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0" style="color: #ff6b6b; font-weight: 700;">
+            <i class="fas fa-tags me-2"></i>รายการโปรโมชัน
+        </h2>
+        <a href="{% url 'add_promotion' %}" class="btn btn-chuu">
+            <i class="fas fa-plus me-2"></i>เพิ่มโปรโมชันใหม่
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead style="background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); color: white;">
+                        <tr>
+                            <th class="ps-4">ชื่อโปรโมชัน</th>
+                            <th>ประเภท</th>
+                            <th>ส่วนลด</th>
+                            <th>วันที่เริ่ม</th>
+                            <th>วันที่สิ้นสุด</th>
+                            <th>สินค้าในโปรโมชัน</th>
+                            <th>รูปภาพ</th>
+                            <th class="text-end pe-4">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for promotion in promotions %}
+                        <tr class="align-middle">
+                            <td class="ps-4 fw-bold" style="color: #495057;">{{ promotion.promotion_name }}</td>
+                            <td>
+                                <span class="badge rounded-pill py-2 px-3" 
+                                      style="background-color: #f8edeb; color: #e5989b;">
+                                    {{ promotion.promotion_type }}
+                                </span>
+                            </td>
+                            <td style="color: #e63946; font-weight: 600;">{{ promotion.discount }}%</td>
+                            <td>{{ promotion.start_date|date:"d/m/Y" }}</td>
+                            <td>{{ promotion.end_date|date:"d/m/Y" }}</td>
+                            <td style="max-width: 250px;">
+                                <div class="product-list-container">
+                                    {% for pp in promotion.promotionproduct_set.all %}
+                                    <div class="product-item mb-2 p-2 rounded" 
+                                         style="background-color: #fff5f5; border-left: 3px solid #ffb3ba;">
+                                        <div class="d-flex justify-content-between">
+                                            <span>{{ pp.product_id.product_name }}</span>
+                                            <span class="text-muted">{{ pp.product_id.price }} บาท</span>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <span class="text-muted fst-italic">ไม่มีสินค้าในโปรโมชันนี้</span>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td>
+                                {% if promotion.promotion_image %}
+                                <div class="promotion-image-container">
+                                    <img src="{{ promotion.promotion_image.url }}" 
+                                         alt="{{ promotion.promotion_name }}" 
+                                         class="img-thumbnail rounded" 
+                                         style="width: 80px; height: 80px; object-fit: cover;">
+                                </div>
+                                {% else %}
+                                <div class="no-image-placeholder rounded d-flex align-items-center justify-content-center" 
+                                     style="width: 80px; height: 80px; background-color: #f8edeb; color: #e5989b;">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="d-flex justify-content-end">
+                                    <a href="{% url 'edit_promotion' promotion.promotion_id %}" 
+                                       class="btn btn-sm btn-edit me-2">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                    <a href="{% url 'delete_promotion' promotion.promotion_id %}" 
+                                       class="btn btn-sm btn-delete"
+                                       onclick="return confirm('คุณแน่ใจหรือไม่ที่จะลบโปรโมชันนี้?');">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4" style="color: #6c757d;">
+                                <i class="fas fa-exclamation-circle me-2"></i>ไม่มีโปรโมชัน
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* สไตล์แบบ Made Chuu */
+    :root {
+        --chuu-pink: #ffb3ba;
+        --chuu-light-pink: #ffdfd3;
+        --chuu-purple: #d8b5ff;
+        --chuu-blue: #95e8d7;
+        --chuu-text: #5a5a5a;
+    }
+    
+    .btn-chuu {
+        background-color: #ff6b6b;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 600;
+        transition: all 0.3s;
+        box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);
+    }
+    
+    .btn-chuu:hover {
+        background-color: #ff5252;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        color: white;
+    }
+    
+    .btn-edit {
+        background-color: #95e8d7;
+        color: white;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .btn-delete {
+        background-color: #ff9a9e;
+        color: white;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .btn-edit:hover, .btn-delete:hover {
+        transform: scale(1.1);
+    }
+    
+    .table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .table thead th {
+        border: none;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    
+    .table tbody tr {
+        transition: all 0.2s;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #fff5f5;
+        transform: translateX(4px);
+    }
+    
+    .product-list-container {
+        max-height: 200px;
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+    
+    .product-list-container::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .product-list-container::-webkit-scrollbar-thumb {
+        background-color: #ffb3ba;
+        border-radius: 4px;
+    }
+    
+    .promotion-image-container {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .no-image-placeholder {
+        font-size: 24px;
+    }
+    
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+        border: none;
+    }
+    
+    .badge {
+        font-weight: 500;
+    }
+</style>
+{% endblock %}

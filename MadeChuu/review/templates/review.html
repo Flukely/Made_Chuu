@@ -1,0 +1,367 @@
+{% extends 'main/base.html' %}
+
+{% block title %}รีวิวสินค้า - Made Chuu{% endblock %}
+
+{% block styleCustom %}
+    <style>
+        /* สไตล์ Made Chuu */
+        body {
+            background-color: #fff9fb;
+            font-family: 'Prompt', sans-serif;
+        }
+        
+        header {
+            background-color: #ffebf1;
+            color: #ff5c8d;
+            padding: 15px;
+            text-align: center;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 4px 12px rgba(255, 92, 141, 0.1);
+        }
+        
+        .navbar {
+            background-color: #ffd6e7;
+            color: #ff5c8d;
+            box-shadow: 0 2px 8px rgba(255, 92, 141, 0.1);
+        }
+        
+        .banner {
+            background: linear-gradient(135deg, #ffebf1, #ffd6e7);
+            height: 180px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .banner::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23ff5c8d" opacity="0.05"><circle cx="25" cy="25" r="5"/><circle cx="75" cy="25" r="5"/><circle cx="50" cy="50" r="5"/><circle cx="25" cy="75" r="5"/><circle cx="75" cy="75" r="5"/></svg>');
+            background-size: 60px 60px;
+        }
+        
+        .review-card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(255, 92, 141, 0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #ffe5ee;
+        }
+        
+        .review-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 92, 141, 0.15);
+        }
+        
+        .review-card img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 3px solid white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: #ff5c8d;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(255, 92, 141, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background-color: #ff3d7a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 92, 141, 0.4);
+        }
+        
+        .btn-primary:active {
+            background-color: #ff1f67;
+            transform: translateY(0);
+        }
+        
+        .star-rating {
+            display: flex;
+            gap: 5px;
+            cursor: pointer;
+            margin: 15px 0;
+        }
+        
+        .star-rating span {
+            font-size: 1.8rem;
+            color: #ffd1dc;
+            transition: all 0.3s;
+        }
+        
+        .star-rating span.active, 
+        .star-rating span:hover, 
+        .star-rating span:hover~span {
+            color: #ff5c8d;
+            text-shadow: 0 0 8px rgba(255, 92, 141, 0.3);
+        }
+        
+        .preview-img {
+            max-width: 150px;
+            display: none;
+            margin-top: 10px;
+            border-radius: 8px;
+            transition: opacity 0.3s;
+            border: 2px solid #ffd6e7;
+        }
+        
+        .form-control, .form-select {
+            border: 1px solid #ffd6e7;
+            border-radius: 10px;
+            padding: 10px 15px;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #ff5c8d;
+            box-shadow: 0 0 0 0.25rem rgba(255, 92, 141, 0.25);
+        }
+        
+        .alert-info {
+            background-color: #ffebf1;
+            border-color: #ffd6e7;
+            color: #ff5c8d;
+            border-radius: 10px;
+        }
+        
+        /* ไอคอน Made Chuu Style */
+        .fa-tag, .fa-coins, .fa-cubes, .fa-clock, .fa-star-half-alt, 
+        .fa-star, .fa-comment-dots, .fa-exclamation-circle, 
+        .fa-camera, .fa-comment, .fa-paper-plane, .fa-list-alt,
+        .fa-heart, .fa-shopping-bag {
+            color: #ff5c8d;
+            margin-right: 5px;
+        }
+        
+        /* เอฟเฟกต์พิเศษ */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .submit-review {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .submit-review:hover {
+            animation: none;
+        }
+        
+        /* Badge สไตล์ Made Chuu */
+        .badge {
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <header>
+        <h1 style="font-weight: 700; text-shadow: 2px 2px 4px rgba(255, 92, 141, 0.2);">
+            <i class="fas fa-heart"></i> รีวิวสินค้า <i class="fas fa-heart"></i>
+        </h1>
+        <p class="mt-2" style="color: #ff7da5;">แบ่งปันประสบการณ์การใช้งานสินค้าให้เพื่อนๆ ชาว Made Chuu รู้กันค่ะ</p>
+    </header>
+
+    <div class="container mt-4">
+        <h2 class="mb-4"><i class="fas fa-list-alt"></i> รายการสินค้าและรีวิว</h2>
+
+        {% if product_orders %}
+            {% for order_product in product_orders %}
+            <div class="review-card position-relative"
+                id="review-card-{{ order_product.product.product_id }}-{{ order_product.order.order_id }}">
+                <div class="position-absolute top-0 end-0 m-3">
+                    <span class="badge rounded-pill" style="background-color: #ffd6e7; color: #ff5c8d;">
+                        <i class="fas fa-shopping-bag"></i> ออร์เดอร์ #{{ order_product.order.order_id }}
+                    </span>
+                </div>
+                
+                <div class="d-flex align-items-center mb-3">
+                    {% if order_product.product.product_image %}
+                    <img src="{{ order_product.product.product_image.url }}" alt="{{ order_product.product.product_name }}"
+                        class="me-3">
+                    {% else %}
+                    <div class="me-3 text-muted"><i class="fas fa-image"></i> ไม่มีรูปภาพ</div>
+                    {% endif %}
+                    <div>
+                        <h5><i class="fas fa-tag"></i> {{ order_product.product.product_name }}</h5>
+                        <p class="text-muted"><i class="fas fa-coins"></i> ราคา: {{ order_product.product.price }} บาท</p>
+                        <p class="text-muted"><i class="fas fa-cubes"></i> จำนวน: {{ order_product.quantity }} ชิ้น</p>
+                        <p class="text-muted"><i class="fas fa-clock"></i> รีวิวภายใน 7 วัน</p>
+                    </div>
+                </div>
+
+                <!-- รีวิว -->
+                <h6><i class="fas fa-star-half-alt"></i> รีวิวสินค้า:</h6>
+                <ul class="list-unstyled">
+                    {% for review in order_product.order.reviews.all %}
+                    <li class="border-bottom pb-2 mb-2">
+                        <strong><i class="fas fa-star"></i> คะแนน: {{ review.rating }} ดาว</strong>
+                        <p><i class="fas fa-comment-dots"></i> {{ review.review_text }}</p>
+                        {% if review.review_image %}
+                        <img src="{{ review.review_image.url }}" alt="รูปรีวิว" class="img-thumbnail"
+                            style="max-width: 150px;">
+                        {% endif %}
+                    </li>
+                    {% empty %}
+                    <li class="text-muted"><i class="fas fa-exclamation-circle"></i> ยังไม่มีรีวิวสำหรับสินค้านี้</li>
+                    {% endfor %}
+                </ul>
+
+                <!-- Form สำหรับรีวิว -->
+                <form method="post" enctype="multipart/form-data"
+                    action="{% url 'review:submit_review' order_product.product.product_id order_product.order.order_id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-star"></i> ให้คะแนนสินค้า</label>
+                        <div class="star-rating">
+                            <span data-value="1">★</span>
+                            <span data-value="2">★</span>
+                            <span data-value="3">★</span>
+                            <span data-value="4">★</span>
+                            <span data-value="5">★</span>
+                        </div>
+                        <input type="hidden" name="rating" value="0" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-camera"></i> เพิ่มรูปภาพ</label>
+                        <input type="file" name="review_image" class="form-control image-input" accept="image/*">
+                        <img class="preview-img">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-comment"></i> ความคิดเห็น</label>
+                        <select class="review-select form-control">
+                            <option value="" selected disabled>กรุณาเลือกความคิดเห็น</option>
+                            <option value="สินค้าดีมาก!">สินค้าดีมาก!</option>
+                            <option value="คุ้มค่ากับราคา">คุ้มค่ากับราคา</option>
+                            <option value="คุณภาพพอใช้ได้">คุณภาพพอใช้ได้</option>
+                            <option value="ไม่พอใจ">ไม่พอใจ</option>
+                            <option value="other">อื่นๆ</option>
+                        </select>
+                        <textarea class="review-text form-control mt-2" rows="3" style="display: none;"
+                            placeholder="กรุณากรอกความคิดเห็น"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 submit-review py-3"
+                        data-product-id="{{ order_product.product.product_id }}"
+                        data-order-id="{{ order_product.order.order_id }}"
+                        style="font-size: 1.1rem; letter-spacing: 1px;">
+                        <i class="fas fa-paper-plane"></i> ส่งรีวิวความน่ารัก
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info text-center py-3">
+                {% if selected_order_id %}
+                    <i class="fas fa-info-circle"></i> ไม่พบสินค้าที่สามารถรีวิวได้ในออร์เดอร์นี้
+                {% else %}
+                    <i class="fas fa-info-circle"></i> ไม่พบสินค้าที่สามารถรีวิวได้
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // แสดงดาวที่ถูกเลือก
+        document.querySelectorAll('.star-rating span').forEach(star => {
+            star.addEventListener('click', function () {
+                let value = this.getAttribute('data-value');
+                let parent = this.parentNode;
+                parent.querySelectorAll('span').forEach(s => s.classList.remove('active'));
+                this.classList.add('active');
+                for (let i = 0; i < value; i++) {
+                    parent.children[i].classList.add('active');
+                }
+                parent.nextElementSibling.value = value;
+            });
+        });
+
+        // แสดงตัวอย่างรูปภาพที่อัปโหลด
+        document.querySelectorAll('.image-input').forEach(input => {
+            input.addEventListener('change', function (event) {
+                let reader = new FileReader();
+                let preview = this.nextElementSibling;
+                reader.onload = function () {
+                    preview.src = reader.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(event.target.files[0]);
+            });
+        });
+
+        // ซ่อนการ์ดรีวิวเมื่อกดยืนยัน
+        document.querySelectorAll('.submit-review').forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                let productId = this.getAttribute('data-product-id');
+                let orderId = this.getAttribute('data-order-id');
+                let form = this.closest('form');
+                let formData = new FormData(form);
+
+                let reviewSelect = form.querySelector(".review-select");
+                let reviewText = form.querySelector(".review-text");
+
+                if (reviewSelect.value === "other") {
+                    formData.set("review_text", reviewText.value);
+                } else {
+                    formData.set("review_text", reviewSelect.value);
+                }
+
+                fetch(`/review/submit_review/${productId}/${orderId}/`, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            let reviewCard = document.getElementById(`review-card-${data.product_id}-${data.order_id}`);
+                            if (reviewCard) {
+                                reviewCard.style.display = 'none';
+                            }
+                        } else {
+                            alert("เกิดข้อผิดพลาด: " + JSON.stringify(data.errors));
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+            });
+        });
+
+        // ตรวจสอบการเลือก "อื่นๆ" แล้วเปิดช่องให้พิมพ์
+        document.querySelectorAll(".review-select").forEach((reviewSelect, index) => {
+            let reviewText = document.querySelectorAll(".review-text")[index];
+
+            reviewSelect.addEventListener("change", function () {
+                if (this.value === "other") {
+                    reviewText.style.display = "block";
+                    reviewText.required = true;
+                    reviewText.value = "";
+                } else {
+                    reviewText.style.display = "none";
+                    reviewText.required = false;
+                    reviewText.value = this.value;
+                }
+            });
+        });
+    </script>
+{% endblock %}
