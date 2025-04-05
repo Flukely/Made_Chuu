@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_plotly_dash.apps.DjangoPlotlyDashConfig',
     'main',
     'review',
     'payment',
@@ -287,3 +288,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'main.User'  # ใช้โมเดลที่เราจะสร้างแทน Django User
 LOGIN_URL = 'login'
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'

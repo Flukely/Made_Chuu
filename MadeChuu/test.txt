@@ -92,7 +92,7 @@ from datetime import timedelta
 from django.db.models import Sum
 
 @staff_member_required
-def dashboard_admin2(request):
+def dashboard_admin(request):
     today = timezone.localtime(timezone.now()).date()
     shop_id = request.session['shop_id'] = 1
     product_of_shop_all = Product.objects.filter(shop_id=shop_id).count()
@@ -270,8 +270,8 @@ def status_claim(request, order_id):
     return render(request, 'orders/status_claim.html', {'order': order})
 
 ## test
-@staff_member_required
-def dashboard_admin(request):
+
+def bar_plot1(request):
     today = timezone.localtime(timezone.now()).date()
     shop_id = request.session.get('shop_id', 1)
     products = Product.objects.filter(shop_id=shop_id)
@@ -313,6 +313,27 @@ def dashboard_admin(request):
 
     # สร้าง labels ตามช่วงวันที่ที่เลือก
     labels = [(start_date_filter + timedelta(days=i)).strftime('%Y-%m-%d') for i in range((end_date_filter - start_date_filter).days + 1)]
+
+    # กรองข้อมูล Order ตามช่วงเวลาที่เลือก
+    orders_filter = Order.objects.filter(
+        order_date__date__gte=start_date_filter,
+        order_date__date__lte=end_date_filter,
+        shop_id=shop_id
+    ).exclude(
+        status_order__status_order_id__in=[1, 2]
+    )
+
+    order_data = []
+    for label in labels:
+        # Convert label string to datetime, then make it timezone-aware
+        label_date = timezone.make_aware(datetime.strptime(label, '%Y-%m-%d'))
+        # ใช้ label_date.date() เพื่อให้ตรงกับ order_date__date
+        filtered_orders = orders_filter.filter(order_date__date=label_date.date())
+        
+        # คำนวณยอดรวมจาก quantity ของ OrderProduct
+        total_quantity = filtered_orders.aggregate(Sum('orderproduct__quantity'))['orderproduct__quantity__sum'] or 0
+        order_data.append(total_quantity)
+
 
     selected_products = [
         selected_product_graph1_id,
@@ -371,6 +392,57 @@ def dashboard_admin(request):
                 product_data[product_name][index] += total_quantity
 
 
+    # กราฟรายได้ Overall --------------------------------------------------
+
+    revenue_overall_fig = go.Figure(
+        go.Scatter(
+            x=labels,
+            y=order_data,
+            mode='lines+markers',
+            line=dict(color='#4e79a7', width=3),
+            marker=dict(size=8, color='#4e79a7'),
+            name='รายได้รวม',
+            hovertemplate='<b>วันที่ %{x}</b><br>รายได้: <b>%{y:,.0f} บาท</b><extra></extra>',
+            fill='tozeroy',
+            fillcolor='rgba(78, 121, 167, 0.1)'
+        )
+    )
+
+    revenue_overall_fig.update_layout(
+        title=dict(
+            text='<b>ภาพรวมรายได้</b>',
+            font=dict(size=24, family='Prompt', color='#2a3f5f'),
+            x=0.5,
+            y=0.95
+        ),
+        xaxis=dict(
+            title=dict(text='<b>วันที่</b>', font=dict(size=14)),
+            tickangle=45,
+            gridcolor='rgba(0,0,0,0.1)',
+            showline=True,
+            linecolor='rgba(0,0,0,0.1)'
+        ),
+        yaxis=dict(
+            title=dict(text='<b>รายได้ (บาท)</b>', font=dict(size=14)),
+            tickformat=',.0f',
+            gridcolor='rgba(0,0,0,0.1)',
+            zerolinecolor='rgba(0,0,0,0.1)'
+        ),
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        height=500,
+        margin=dict(t=100, b=100, l=80, r=50),
+        hovermode='x unified',
+        hoverlabel=dict(
+            bgcolor='white',
+            font_size=14,
+            bordercolor='rgba(0,0,0,0.5)'
+        )
+    )
+    revenue_overall_fig = plot(revenue_overall_fig, output_type='div', include_plotlyjs=True)
+    
+    
+    # END กราฟรายได้ Overall -----------------------------------------------
 
     colors = px.colors.qualitative.Vivid
     dash_styles = ['solid', 'dash', 'dot', 'dashdot']
@@ -950,10 +1022,11 @@ def dashboard_admin(request):
         'choropleth_plot': choropleth_plot,
         'bubble_plot': bubble_plot,
         'revenue_plot': revenue_plot,
+        'revenue_overall_fig':revenue_overall_fig,
         'top_seller_chart':top_seller_chart,
         'top_start_date':top_start_date,
         'top_end_date':top_end_date,
         'top_category':top_category,
     }
     
-    return render(request, 'admin_function/Dashboard.html', context)
+    return render(request, 'admin_function/Dashboardtest.html', context)

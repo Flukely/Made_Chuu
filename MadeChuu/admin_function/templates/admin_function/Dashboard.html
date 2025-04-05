@@ -1,260 +1,697 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load plotly_dash %}
 {% block title %} Dashboard {% endblock %}
 {% block content %}
-<div class="container mt-5">
-  <h1 class="text-center text-primary">Dashboard</h1>
-  <p class="text-center text-muted">กราฟ และข้อมูลการสั่งซื้อของลูกค้า</p>
-  <div class="row g-3">
-    <div class="col-md-6">
-      <div class="card p-3" >
-        <div class="overview__inner">
-            <div class="overview-box clearfix d-flex justify-content-center mx-3 mt-3">
-                <div class="text">
-                    <h2><i class="fa-solid fa-box"></i>
-                      {{orders_all}}
-                    </h2>
-                    <span>Orders </span>
-                </div>
-                {% if orders_today == 0 %} 
-                <div>
-                  <p class = "text-muted mx-3"><i class = "fas fa-caret-up"></i>
-                    {{orders_today}}
-                  </p>
-                </div>
-                {% else %}
-                <div>
-                  <p class = "text-success"><i class = "fas fa-caret-up"></i>
-                    {{orders_today}}
-                  </p>
-                </div>
-                {% endif %}
+
+<style>
+  :root {
+    --primary-color: #4e73df;
+    --secondary-color: #1cc88a;
+    --accent-color: #36b9cc;
+    --dark-color: #5a5c69;
+    --light-color: #f8f9fc;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+  
+  body {
+    background-color: #f5f7fb;
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  
+  .dashboard-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #224abe 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+  }
+  
+  .stat-card {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    border: none;
+    box-shadow: var(--shadow);
+    border-left: 5px solid;
+    overflow: hidden;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  .stat-card.primary {
+    border-left-color: var(--primary-color);
+  }
+  
+  .stat-card.success {
+    border-left-color: var(--secondary-color);
+  }
+  
+  .stat-card.info {
+    border-left-color: var(--accent-color);
+  }
+  
+  .stat-card.warning {
+    border-left-color: #f6c23e;
+  }
+  
+  .stat-icon {
+    font-size: 2rem;
+    opacity: 0.7;
+  }
+  
+  .card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+  
+  .card-header {
+    background-color: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.25rem 1.5rem;
+    font-weight: 600;
+    color: var(--dark-color);
+  }
+  
+  .filter-card {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+  }
+  
+  .filter-header {
+    background-color: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 15px 15px 0 0 !important;
+  }
+  
+  .chart-container {
+    width:auto;
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    height: 100%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    position:relative;
+  }
+  
+  .gender-chart-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .gender-chart-col {
+    flex: 1;
+    min-width: 300px;
+  }
+  
+  .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+  }
+  
+  .btn-primary:hover {
+    background-color: #2e59d9;
+    border-color: #2653d4;
+  }
+  
+  .form-control {
+    border-radius: 8px;
+    padding: 10px 15px;
+    border: 1px solid #d1d3e2;
+  }
+  
+  .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+  }
+  
+  .table {
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .table th {
+    background-color: var(--light-color);
+    font-weight: 600;
+  }
+  
+  .text-primary {
+    color: var(--primary-color) !important;
+  }
+  
+  .text-success {
+    color: var(--secondary-color) !important;
+  }
+  
+  .text-info {
+    color: var(--accent-color) !important;
+  }
+  
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #224abe 100%);
+  }
+  
+  .no-data-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    color: #6c757d;
+  }
+  
+  .no-data-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+  
+  @media (max-width: 768px) {
+    .dashboard-header {
+      padding: 1.5rem;
+    }
+    
+    .gender-chart-col {
+      min-width: 100%;
+    }
+  }
+</style>
+
+<div class="container-fluid py-4">
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <h1 class="text-white mb-2">Dashboard Analytics</h1>
+    <p class="text-white-50">ข้อมูลและสถิติการขายสินค้าทั้งหมด</p>
+    <div class="d-flex align-items-center mt-3">
+      <i class="fas fa-calendar-alt me-2"></i>
+      <span>{{ today|date:"d F Y" }}</span>
+    </div>
+  </div>
+
+  <!-- Stats Cards Row -->
+  <div class="row mb-4">
+    <!-- Orders Card -->
+    <div class="col-xl-4 col-md-6 mb-4">
+      <div class="card stat-card h-100 py-2 primary">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                คำสั่งซื้อทั้งหมด</div>
+              <div class="h3 mb-0 font-weight-bold text-gray-800">{{ orders_all }}</div>
             </div>
+            <div class="col-auto">
+              <i class="fas fa-shopping-cart stat-icon text-primary"></i>
+            </div>
+          </div>
+          <div class="mt-3">
+            <span class="badge bg-primary bg-opacity-10 text-primary p-2">
+              <i class="fas fa-caret-up me-1"></i>
+              {{ orders_today }} คำสั่งซื้อวันนี้
+            </span>
+          </div>
         </div>
       </div>
     </div>
-    <div class="col-md-6">
-      <div class="card p-3" >
-        <div class="overview__inner">
-            <div class="overview-box clearfix d-flex justify-content-center mx-3 mt-3">
-                <div class="text">
-                    <h2><i class="fa-solid fa-user"></i>
-                      {{users_all}}
-                    </h2>
-                    <span>members </span>
-                </div>
-                {% if users_today == 0 %} 
-                <div>
-                  <p class = "text-muted mx-3"><i class = "fas fa-caret-up"></i>
-                    {{users_today}}
-                  </p>
-                </div>
-                {% else %}
-                <div>
-                  <p class = "text-success"><i class = "fas fa-caret-up"></i>
-                    {{users_today}}
-                  </p>
-                </div>
-                {% endif %}
+
+    <!-- Users Card -->
+    <div class="col-xl-4 col-md-6 mb-4">
+      <div class="card stat-card h-100 py-2 success">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                สมาชิกทั้งหมด</div>
+              <div class="h3 mb-0 font-weight-bold text-gray-800">{{ users_all }}</div>
             </div>
+            <div class="col-auto">
+              <i class="fas fa-users stat-icon text-success"></i>
+            </div>
+          </div>
+          <div class="mt-3">
+            <span class="badge bg-success bg-opacity-10 text-success p-2">
+              <i class="fas fa-caret-up me-1"></i>
+              {{ users_today }} สมาชิกใหม่วันนี้
+            </span>
+          </div>
         </div>
       </div>
+    </div>
+
+    <!-- Revenue Card -->
+    <div class="col-xl-4 col-md-12 mb-4">
+      <div class="card stat-card h-100 py-2 info">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                รายได้ทั้งหมด</div>
+              <div class="h3 mb-0 font-weight-bold text-gray-800">{{ revenue_all|floatformat:2 }} ฿</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-dollar-sign stat-icon text-info"></i>
+            </div>
+          </div>
+          <div class="mt-3">
+            <span class="badge bg-info bg-opacity-10 text-info p-2">
+              <i class="fas fa-caret-up me-1"></i>
+              {{ revenue_today|floatformat:2 }} ฿ วันนี้
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products Card -->
+
+  <!-- Top Row - Revenue Charts -->
+  <div class="row">
+    <!-- Revenue Chart -->
+    <div class="col-lg-12 mb-4">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="m-0 font-weight-bold text-primary">กราฟยอดขายและรายได้</h6>
+          <button id="filterButton" class="btn btn-sm btn-primary">
+            <i class="fas fa-filter me-2"></i>กรองข้อมูล
+          </button>
+        </div>
+        <div class="card-body">
+          <!-- Filter Options -->
+          <div id="filterOptions" class="mb-4 p-4 bg-light rounded" style="display: none;">
+            <h6 class="font-weight-bold mb-3"><i class="fas fa-sliders-h me-2"></i>ตัวเลือกการกรอง</h6>
+            <form method="get" action="{% url 'Dashboard' %}">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label for="start_date" class="form-label">วันที่เริ่มต้น</label>
+                  <input type="date" id="start_date" name="start_date" class="form-control" 
+                         max="{{ yesterday|date:'Y-m-d'}}" value="{{ start_date_filter|date:'Y-m-d'|default:'' }}">
+                </div>
+                
+                <div class="col-md-3">
+                  <label for="end_date" class="form-label">วันที่สิ้นสุด</label>
+                  <input type="date" id="end_date" name="end_date" class="form-control" 
+                         max="{{ today|date:'Y-m-d' }}" value="{{ end_date_filter|date:'Y-m-d'|default:'' }}">
+                </div>
+                
+                <div class="col-md-3 d-flex align-items-end">
+                  <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-check me-1"></i>นำไปใช้
+                  </button>
+                </div>
+              </div>
+              
+              <div class="row mt-3 g-3">
+                <div class="col-md-3">
+                  <label for="product_graph1" class="form-label">สินค้า 1</label>
+                  <select id="product_graph1" name="product_graph1" class="form-control">
+                    <option value="">-- เลือกสินค้า --</option>
+                    {% for product in products %}
+                    <option value="{{ product.product_id }}" {% if product.product_id == selected_product_graph1_id %}selected{% endif %}>
+                      {{ product.product_name }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="col-md-3">
+                  <label for="product_graph2" class="form-label">สินค้า 2</label>
+                  <select id="product_graph2" name="product_graph2" class="form-control">
+                    <option value="">-- เลือกสินค้า --</option>
+                    {% for product in products %}
+                    <option value="{{ product.product_id }}" {% if product.product_id == selected_product_graph2_id %}selected{% endif %}>
+                      {{ product.product_name }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="col-md-3">
+                  <label for="product_graph3" class="form-label">สินค้า 3</label>
+                  <select id="product_graph3" name="product_graph3" class="form-control">
+                    <option value="">-- เลือกสินค้า --</option>
+                    {% for product in products %}
+                    <option value="{{ product.product_id }}" {% if product.product_id == selected_product_graph3_id %}selected{% endif %}>
+                      {{ product.product_name }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="col-md-3">
+                  <label for="product_graph4" class="form-label">สินค้า 4</label>
+                  <select id="product_graph4" name="product_graph4" class="form-control">
+                    <option value="">-- เลือกสินค้า --</option>
+                    {% for product in products %}
+                    <option value="{{ product.product_id }}" {% if product.product_id == selected_product_graph4_id %}selected{% endif %}>
+                      {{ product.product_name }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+          
+          <!-- Charts -->
+          <div class="row">
+
+            <div class="col-md-12 mb-4">
+              <div class="chart-container">
+                {{ revenue_plot|safe }}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Middle Row - Top Products and Map -->
+  <div class="row">
+    <!-- Top Products -->
+<div class="col-lg-7 mb-4">
+  <div class="card h-100">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h6 class="m-0 font-weight-bold text-primary">สินค้าขายดี</h6>
+      <button id="filterTopProducts" class="btn btn-sm btn-primary">
+        <i class="fas fa-filter me-2"></i>กรองข้อมูล
+      </button>
+    </div>
+    <div class="card-body">
+      <!-- Filter Options -->
+      <div id="topProductsFilter" class="mb-4 p-4 bg-light rounded" style="display: none;">
+        <h6 class="font-weight-bold mb-3"><i class="fas fa-sliders-h me-2"></i>ตัวเลือกการกรอง</h6>
+        <form method="get" action="{% url 'Dashboard' %}">
+          
+          <div class="row g-3">
+            <!-- Date Range -->
+            <div class="col-md-6">
+              <label for="top_start_date" class="form-label">วันที่เริ่มต้น</label>
+              <input type="date" id="top_start_date" name="top_start_date" class="form-control" 
+                     max="{{ yesterday|date:'Y-m-d'}}" value="{{ top_start_date|date:'Y-m-d'|default:'' }}">
+            </div>
+            
+            <div class="col-md-6">
+              <label for="top_end_date" class="form-label">วันที่สิ้นสุด</label>
+              <input type="date" id="top_end_date" name="top_end_date" class="form-control" 
+                     max="{{ today|date:'Y-m-d' }}" value="{{ top_end_date|date:'Y-m-d'|default:'' }}">
+            </div>
+            
+            <!-- Category Filter -->
+            <div class="col-md-12">
+              <label for="top_category" class="form-label">ประเภทสินค้า</label>
+              <select id="top_category" name="top_category" class="form-control">
+                <option value="top_category_all">-- ทั้งหมด --</option>
+                {% for category in categorys %}
+                <option value="{{ category.category_name }}" {% if category.category_name == selected_top_category %}selected{% endif %}>
+                  {{ category.category_name }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            
+            <div class="col-md-12">
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-check me-1"></i>นำไปใช้
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Chart Container -->
+      <div class="chart-container">
+        {{ top_seller_chart|safe }}
+      </div>
+    </div>
+  </div>
+</div>
+    
+    <!-- Map Visualization -->
+    <div class="col-lg-5 mb-4">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="m-0 font-weight-bold text-primary">การกระจายตัวของลูกค้า</h6>
+          <button id="filterButton2" class="btn btn-sm btn-primary">
+            <i class="fas fa-filter me-2"></i>กรองข้อมูล
+          </button>
+        </div>
+        <div class="card-body">
+          <!-- Filter Options -->
+          <div id="filterOptions2" class="mb-4 p-4 bg-light rounded" style="display: none;">
+            <h6 class="font-weight-bold mb-3"><i class="fas fa-sliders-h me-2"></i>ตัวเลือกการกรอง</h6>
+            <form method="get" action="{% url 'Dashboard' %}">
+              <div class="row g-3">
+                <div class="col-md-8">
+                  <label for="category_map" class="form-label">ประเภทสินค้า</label>
+                  <select id="category_map" name="category_map" class="form-control">
+                    <option value="all_category_map">-- ทั้งหมด --</option>
+                    {% for category in categorys %}
+                    <option value="{{ category.category_name }}" {% if category.category_name == selected_category %}selected{% endif %}>
+                      {{ category.category_name}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                  <button class="btn btn-primary w-100" type="submit">
+                    <i class="fas fa-check me-1"></i>นำไปใช้
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+          
+          <div class="chart-container">
+            {{ bubble_plot|safe }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Row - Gender Analysis -->
+  <div class="row">
+    <div class="col-lg-12 mb-4">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="m-0 font-weight-bold text-primary">การวิเคราะห์เพศของผู้ซื้อ</h6>
+          <button id="filterButton3" class="btn btn-sm btn-primary">
+            <i class="fas fa-filter me-2"></i>กรองข้อมูล
+          </button>
+        </div>
+        <div class="card-body">
+          <!-- Filter Options -->
+          <div id="filterOptions3" class="mb-4 p-4 bg-light rounded" style="display: none;">
+            <h6 class="font-weight-bold mb-3"><i class="fas fa-sliders-h me-2"></i>ตัวเลือกการกรอง</h6>
+            <form method="get" action="{% url 'Dashboard' %}">
+              <div class="row g-3">
+                <div class="col-md-5">
+                  <label for="product1" class="form-label">สินค้า 1</label>
+                  <select id="product1" name="product1" class="form-control">
+                    <option value="">-- เลือกสินค้า --</option>
+                    {% for product in products %}
+                    <option value="{{ product.product_id }}" {% if product.product_id == selected_product1_id %}selected{% endif %}>
+                      {{ product.product_name }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-5">
+                  <label for="product2" class="form-label">สินค้า 2</label>
+                  <select id="product2" name="product2" class="form-control">
+                    <option value="">-- เลือกสินค้า --</option>
+                    {% for product in products %}
+                    <option value="{{ product.product_id }}" {% if product.product_id == selected_product2_id %}selected{% endif %}>
+                      {{ product.product_name }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                  <button class="btn btn-primary w-100" type="submit">
+                    <i class="fas fa-check me-1"></i>นำไปใช้
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+          
+          <!-- Gender Charts -->
+          <div class="row">
+            <div class="col-md-4 mb-4">
+              <div class="chart-container h-100">
+                {{ shop_pie_chart|safe }}
+                {% if shop_gender_data %}
+                <div class="table-responsive mt-3">
+                  <table class="table table-sm">
+                    <thead class="bg-light">
+                      <tr>
+                        <th>เพศ</th>
+                        <th>จำนวน</th>
+                        <th>ร้อยละ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for item in shop_gender_data %}
+                      <tr>
+                        <td>{{ item.gender }}</td>
+                        <td>{{ item.count }}</td>
+                        <td>{{ item.percentage }}%</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+              <div class="chart-container h-100">
+                {% if product1 %}
+                  {{ product1_pie_chart|safe }}
+                  {% if product1_gender_data %}
+                  <div class="table-responsive mt-3">
+                    <table class="table table-sm">
+                      <thead class="bg-light">
+                        <tr>
+                          <th>เพศ</th>
+                          <th>จำนวน</th>
+                          <th>ร้อยละ</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for item in product1_gender_data %}
+                        <tr>
+                          <td>{{ item.gender }}</td>
+                          <td>{{ item.count }}</td>
+                          <td>{{ item.percentage }}%</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                  {% endif %}
+                {% else %}
+                  <div class="no-data-placeholder">
+                    <i class="fas fa-box-open"></i>
+                    <p>กรุณาเลือกสินค้าที่ 1</p>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+              <div class="chart-container h-100">
+                {% if product2 %}
+                  {{ product2_pie_chart|safe }}
+                  {% if product2_gender_data %}
+                  <div class="table-responsive mt-3">
+                    <table class="table table-sm">
+                      <thead class="bg-light">
+                        <tr>
+                          <th>เพศ</th>
+                          <th>จำนวน</th>
+                          <th>ร้อยละ</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for item in product2_gender_data %}
+                        <tr>
+                          <td>{{ item.gender }}</td>
+                          <td>{{ item.count }}</td>
+                          <td>{{ item.percentage }}%</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                  {% endif %}
+                {% else %}
+                  <div class="no-data-placeholder">
+                    <i class="fas fa-box-open"></i>
+                    <p>กรุณาเลือกสินค้าที่ 2</p>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- Bottom Row: 2 Large Cards -->
-<div class="row g-3 mt-3">
-    <div class="col-md-8">
-        <p class="text-center text-primary"> จำนวน Products แต่ละ Categories</p>
-        <canvas id="myChart1" class = "card"></canvas>
-    <script>
-      window.addEventListener('DOMContentLoaded', function() {
-        var ctx = document.getElementById('myChart1').getContext('2d');
-        var myChart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: [{% for category in categories %} '{{ category.category_name }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
-            datasets: [{
-                label: 'Categories',
-                data: [{% for category in category_counts %} {{ category.total }} {% if not forloop.last %}, {% endif %}{% endfor %}],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.6)',
-                    'rgba(255, 159, 64, 0.6)',
-                    'rgba(255, 205, 86, 0.6)',
-                    'rgba(75, 192, 192, 0.6)',
-                    'rgba(54, 162, 235, 0.6)',
-                    'rgba(153, 102, 255, 0.6)',
-                    'rgba(201, 203, 207, 0.6)'
-                ],
-                borderWidth: 1
-            }]
-        }
-        ,
-        options: {
-          plugins: {
-            customCanvasBackgroundColor: {
-              color: 'lightGreen'
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-        
-        });
-      });
-    </script>
-    </div>
-    <div class="col-md-4">
-      <p class="text-center text-primary"> จำนวน ชาย : หญิง : อื่นๆ</p>
-      <canvas id="GenderChart-customer" class = "card"></canvas>
-      <script>
-       window.addEventListener('DOMContentLoaded', function() {
-      var ctx = document.getElementById('GenderChart-customer').getContext('2d');
-      var myChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Male' , 'Female' , 'Others'],
-          datasets: [{
-              label: 'Gender',
-              data: [{{ gender_data.male }}, {{ gender_data.female }}, {{ gender_data.other }}],
-              backgroundColor: [
-                  'rgba(0, 60, 255, 0.6)',
-                  'rgba(254 , 0 , 174 , 0.6)',
-                  'rgba(147, 112, 219, 0.6)'
-              ],
-              borderWidth: 1
-          }]
-      }
-      ,
-      options: {
-        responsive: true,
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: function(tooltipItem) {
-                // Calculate the percentage
-                var total = tooltipItem.dataset.data.reduce((a, b) => a + b, 0);  // Sum of all data points
-                var percentage = ((tooltipItem.raw / total) * 100).toFixed(2);  // Calculate percentage
-                return tooltipItem.label + ': ' + percentage + '%';  // Return percentage in tooltip
-              }
-            }
-          }
-        }
-      }
+<script>
+  // Toggle filter sections
+  document.getElementById("filterButton").addEventListener("click", function() {
+    document.getElementById("filterOptions").style.display = 
+      document.getElementById("filterOptions").style.display === "none" ? "block" : "none";
+  });
+
+  document.getElementById("filterButton2").addEventListener("click", function() {
+    document.getElementById("filterOptions2").style.display = 
+      document.getElementById("filterOptions2").style.display === "none" ? "block" : "none";
+  });
+
+  document.getElementById("filterButton3").addEventListener("click", function() {
+    document.getElementById("filterOptions3").style.display = 
+      document.getElementById("filterOptions3").style.display === "none" ? "block" : "none";
+  });
+
+  // Set max date for date inputs
+  document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('end_date').max = today;
+    
+    const startDate = document.getElementById('start_date');
+    const endDate = document.getElementById('end_date');
+    
+    startDate.addEventListener('change', function() {
+      endDate.min = this.value;
+    });
+    
+    endDate.addEventListener('change', function() {
+      startDate.max = this.value;
     });
   });
+
+    // Toggle top products filter
+    document.getElementById("filterTopProducts").addEventListener("click", function() {
+      const filter = document.getElementById("topProductsFilter");
+      filter.style.display = filter.style.display === "none" ? "block" : "none";
+    });
+  
+    // Set date limits
+    document.addEventListener('DOMContentLoaded', function() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('top_end_date').max = today;
+      
+      const topStartDate = document.getElementById('top_start_date');
+      const topEndDate = document.getElementById('top_end_date');
+      
+      topStartDate.addEventListener('change', function() {
+        topEndDate.min = this.value;
+      });
+      
+      topEndDate.addEventListener('change', function() {
+        topStartDate.max = this.value;
+      });
+    });
+
 </script>
-    </div>
-</div>
-<!-- แสดงยอดขาย-->
-<div class="row g-3 mt-3">
-  <div class="col-md-10">
-    <p class="text-center text-primary">ยอดขายโดยรวม</p>
-    <canvas id="orderChart" class="card"></canvas>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-          var ctx = document.getElementById('orderChart').getContext('2d');
 
-          var labels = {{ labels|safe }};  // ใช้ safe เพื่อให้ Django สร้าง JSON ที่ถูกต้อง
-          var orderData = {{ order_data|default:"[]"|safe }};  // ป้องกัน None และรูปแบบผิดพลาด
-
-          var orderChart = new Chart(ctx, {
-              type: 'line',
-              data: {
-                  labels: labels,
-                  datasets: [{
-                      label: 'ยอดคำสั่งซื้อ (บาท)',
-                      data: orderData,
-                      borderColor: 'rgba(54, 162, 235, 1)',
-                      backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                      borderWidth: 2,
-                      fill: true,
-                      tension: 0.3
-                  }]
-              },
-              options: {
-                  responsive: true,
-                  scales: {
-                      y: {
-                          beginAtZero: true
-                      }
-                  }
-              }
-          });
-      });
-    </script>
-  </div>
-
-
-  <div class="col-md-2">
-    <form method="get" action="{% url 'Dashboard' %}">
-      <label for="filter" class="form-label">เลือกช่วงเวลา</label>
-      <select name="filter" id="filter" class="form-select">
-        <option value="5days" {% if filter_type == '5days' %}selected{% endif %}>5 วันล่าสุด</option>
-        <option value="1month" {% if filter_type == '1month' %}selected{% endif %}>1 เดือนล่าสุด</option>
-        <option value="3months" {% if filter_type == '3months' %}selected{% endif %}>3 เดือนล่าสุด</option>
-        <option value="6months" {% if filter_type == '6months' %}selected{% endif %}>6 เดือนล่าสุด</option>
-      </select>
-      <button type="submit" class="btn btn-primary mt-3">แสดงข้อมูล</button>
-    </form>
-  </div>
-</div>
-<!-- แสดงยอดขายแบบสินค้ารายตัว  -->
-<div class="row g-3 mt-3">
-  <p class="text-center text-primary"> ยอดขายสินค้าแต่ละชนิด</p>
-  <div class="col-md-3 d-flex flex-column">
-      <div class="card mb-2 flex-grow-1">Box 1</div>
-      <div class="card mb-2 flex-grow-1">Box 2</div>
-      <div class="card mb-2 flex-grow-1">Box 3</div>
-  </div>
-  <div class="col-md-9">
-    <canvas id="Product-Chart" class = 'card'></canvas>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-          var ctx = document.getElementById('Product-Chart').getContext('2d');
-          var labels = {{ labels|safe }};
-          var productData = {{ product_data|safe }};
-  
-          var datasets = [];
-          var colors = ['red', 'blue', 'green', 'purple', 'orange'];  // กำหนดสีให้แต่ละสินค้า
-  
-          Object.keys(productData).forEach(function(product, index) {
-              datasets.push({
-                  type: 'line',
-                  label: product,
-                  data: productData[product],
-                  borderColor: colors[index % colors.length],
-                  fill: false
-              });
-          });
-  
-          var productChart = new Chart(ctx, {
-              type: 'line',
-              data: { labels: labels, datasets: datasets },
-              options: {
-                  responsive: true,
-                  tension: 0.5,
-                  plugins: {
-                      legend: { position: 'top' }
-                  },
-                  scales: {
-                      x: { title: { display: true, text: 'วัน' } },
-                      y: { title: { display: true, text: 'ราคาสินค้าที่ขายได้' } }
-                  }
-              }
-          });
-      });
-  </script>
-  </div>
-</div>
-
-
-
-</div>
-  
-
-
-{% endblock%}
+{% endblock %}

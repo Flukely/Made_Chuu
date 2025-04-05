@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path , include
 from . import views
 from django.conf import settings
 from  django.conf.urls.static import static
@@ -32,5 +32,6 @@ urlpatterns = [
     path('status/delivery/<int:order_id>/', views.status_delivery, name='status_delivery'),
     path('status/ordersuccess/<int:order_id>/', views.status_ordersuccess, name='status_ordersuccess'),
     path('status/claim/<int:order_id>/', views.status_claim, name='status_claim'),
+    path('django_plotly_dash/', include('django_plotly_dash.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
