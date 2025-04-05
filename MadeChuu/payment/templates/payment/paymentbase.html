@@ -7,7 +7,6 @@
     <meta name="description" content="Made Chuu - ร้านค้าออนไลน์สำหรับสินค้าน่ารัก">
 
     <title>{% block title %}Made Chuu{% endblock %}</title>
-
     <!-- Favicon -->
     <link rel="icon" href="{% static 'images/favicon.ico' %}">
 
@@ -130,5 +129,18 @@
     
     <!-- Custom JS -->
     <script src="{% static 'js/script.js' %}"></script>
+    {% comment %} <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if(!sessionStorage.getItem('autoRefreshed')) {
+                sessionStorage.setItem('autoRefreshed', '1');
+                setTimeout(function() {
+                    window.location.reload();
+                }, 5000);
+            } else {
+                sessionStorage.removeItem('autoRefreshed');
+            }
+        });
+    </script> {% endcomment %}
+    
 </body>
 </html>

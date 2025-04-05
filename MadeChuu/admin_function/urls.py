@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from django.conf import settings
 from  django.conf.urls.static import static
@@ -18,18 +18,14 @@ urlpatterns = [
     path('CommentAdmin/', staff_member_required(views.comment_admin), name='CommentAdmin'),
 
 
-
     path('add_promotion/', views.add_promotion, name='add_promotion'),
     path('promotion_list/', views.promotion_list, name='promotion_list'),
     path('delete_promotion/<int:promotion_id>/', views.delete_promotion, name='delete_promotion'),
     path('promotions/edit/<int:promotion_id>/', views.edit_promotion, name='edit_promotion'),
 
 
-
     path('ProductsAdmin/',views.product_list, name = 'ProductsAdmin'),
 
-    path('PromotionsAdmin/',views.PromotionsAdmin, name = 'PromotionsAdmin'),
-    
     path('add_product/',views.product_list, name = 'add_product'),
 
     path('edit_product/<int:product_id>/', views.edit_product, name='edit_product'),
@@ -43,5 +39,7 @@ urlpatterns = [
     path('status/delivery/<int:order_id>/', views.status_delivery, name='status_delivery'),
     path('status/ordersuccess/<int:order_id>/', views.status_ordersuccess, name='status_ordersuccess'),
     path('status/claim/<int:order_id>/', views.status_claim, name='status_claim'),
+
+    path('django_plotly_dash/', include('django_plotly_dash.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

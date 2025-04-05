@@ -4,14 +4,26 @@ from django.contrib import messages
 from django.utils.timezone import now
 from .form import PaymentForm
 from main.models import Order, PaymentStatus, StatusOrder
+from django.views.decorators.cache import never_cache
 
+@never_cache
 @login_required
 def payment(request, order_id):
     order = get_object_or_404(Order, order_id=order_id)
     
+    # ตรวจสอบว่ามีการชำระเงินสำหรับคำสั่งซื้อนี้แล้วหรือไม่
+    if hasattr(order, 'payment') and order.payment:
+        messages.info(request, "คำสั่งซื้อนี้ได้รับการชำระเงินแล้ว")
+        return redirect('receipt:check_receipt')
+    
     if request.method == "POST":
         form = PaymentForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
+            # ตรวจสอบอีกครั้งเพื่อป้องกันการส่งซ้ำ
+            if hasattr(order, 'payment') and order.payment:
+                messages.info(request, "คำสั่งซื้อนี้ได้รับการชำระเงินแล้ว")
+                return redirect('receipt:check_receipt')
+                
             payment = form.save(commit=False)
             payment.payment_date = now()
             payment_status, created = PaymentStatus.objects.get_or_create(
@@ -19,10 +31,9 @@ def payment(request, order_id):
                 defaults={'payment_status_name': "รอการตรวจสอบ"}
             )
             payment.payment_status = payment_status
-            payment.order = order  # กำหนด order ให้กับ payment
+            payment.order = order
             payment.save()
 
-            # ตรวจสอบและสร้างสถานะคำสั่งซื้อหากไม่มี
             status_order, created = StatusOrder.objects.get_or_create(
                 status_name="ตรวจสอบจ่ายเงิน",
                 defaults={'status_name': "ตรวจสอบจ่ายเงิน"}

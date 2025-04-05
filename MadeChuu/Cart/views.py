@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.urls import reverse
 from django.db import transaction
 
-@login_required
+@login_required(login_url='/login/')
 def AddCart(request):
     user_id = request.session.get('user_id')
     request.session['user_id'] = user_id
@@ -38,7 +38,7 @@ def AddCart(request):
         "detail_cartitem": detail_cartitem,
     })
 
-@login_required
+@login_required(login_url='/login/')
 def Confirm_Cart(request):
     user_id = request.session.get('user_id')
     
@@ -97,7 +97,7 @@ def Confirm_Cart(request):
         "selected_items_json": json.dumps([item.id for item in detail_cartitem]),
     })
 
-@login_required
+@login_required(login_url='/login/')
 def delete(request, id):
     try:
         cart_item = CartItem.objects.get(id=id, cart__user_id=request.session.get('user_id'))
@@ -108,7 +108,7 @@ def delete(request, id):
     return redirect('Cart:AddCart')
 
 @csrf_exempt
-@login_required
+@login_required(login_url='/login/')
 def place_order(request):
     if request.method != 'POST':
         return JsonResponse({'success': False, 'message': 'Method not allowed'}, status=405)
