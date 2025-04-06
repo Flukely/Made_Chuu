@@ -281,7 +281,7 @@
     <div class="col-lg-12 mb-4">
       <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <h6 class="m-0 font-weight-bold text-primary">กราฟยอดขายและรายได้</h6>
+          <h6 class="m-0 font-weight-bold text-primary">กราฟยอดขาย</h6>
           <button id="filterButton" class="btn btn-sm btn-primary">
             <i class="fas fa-filter me-2"></i>กรองข้อมูล
           </button>
@@ -633,6 +633,57 @@
       </div>
     </div>
   </div>
+
+
+  <div class="row">
+  <div class="col-lg-12 mb-4">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">กราฟจำนวนการขอเคลม ยกเลิก และจัดส่งสำเร็จ</h6>
+        <button id="filterButton4" class="btn btn-sm btn-primary">
+          <i class="fas fa-filter me-2"></i>กรองข้อมูล
+        </button>
+      </div>
+      <div class="card-body">
+        <!-- Filter Options -->
+        <div id="filterOptions4" class="mb-4 p-4 bg-light rounded" style="display: none;">
+          <h6 class="font-weight-bold mb-3"><i class="fas fa-sliders-h me-2"></i>ตัวเลือกการกรอง</h6>
+          <form method="get" action="{% url 'Dashboard' %}">
+            
+            <div class="row g-3">
+              <!-- Date Range -->
+              
+              <!-- Products Filter -->
+              <div class="col-md-12">
+                <label for="detailOrder_product" class="form-label">สินค้า</label>
+                <select id="detailOrder_product" name="detailOrder_product" class="form-control">
+                  <option value="">-- สินค้าทั้งหมด --</option>
+                  {% for product in products %}
+                  <option value="{{ product.product_id }}" {% if product.product_id == selected_detailOrder_product_id %}selected{% endif %}>
+                    {{ product.product_name }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+              
+              <div class="col-md-12">
+                <button type="submit" class="btn btn-primary w-100">
+                  <i class="fas fa-check me-1"></i>นำไปใช้
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Chart Container -->
+        <div class="chart-container">
+          {{ status_chart|safe }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 </div>
 
 <script>
@@ -650,6 +701,11 @@
   document.getElementById("filterButton3").addEventListener("click", function() {
     document.getElementById("filterOptions3").style.display = 
       document.getElementById("filterOptions3").style.display === "none" ? "block" : "none";
+  });
+
+  document.getElementById("filterButton4").addEventListener("click", function() {
+    document.getElementById("filterOptions4").style.display = 
+      document.getElementById("filterOptions4").style.display === "none" ? "block" : "none";
   });
 
   // Set max date for date inputs

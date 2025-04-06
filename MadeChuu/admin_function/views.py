@@ -30,6 +30,11 @@ def ChatAdmin(request):
 
 def OrderAdmin(request):
     #Query from model Order
+    today = timezone.localtime(timezone.now()).date()
+    shop_id = request.session['shop_id'] = 1
+    order = Order.objects.filter(shop_id = shop_id)
+    ### ถ้า  status_order__status_order__name = 
+
     order_filter = OrderFilter(request.GET, queryset=Order.objects.all())
     paginator = Paginator(order_filter.qs, 5)
 
@@ -282,8 +287,12 @@ def dashboard_admin(request):
     orders_today = Order.objects.filter(order_date__date=today, shop_id=shop_id).count()
     users_all = User.objects.all().count()
     users_today = User.objects.filter(join_date=today).count()
-    revenue_all = Order.objects.filter(shop_id=shop_id).aggregate(total_revenue=Sum('total_price'))['total_revenue'] or 0
-    revenue_today = Order.objects.filter(order_date__date=today, shop_id=shop_id).aggregate(total_revenue=Sum('total_price'))['total_revenue'] or 0
+    revenue_all = Order.objects.filter(shop_id=shop_id).exclude(
+        status_order__status_name__in=['รอตรวจสอบ', 'รอตรวจสอบจ่ายเงิน']
+    ).aggregate(total_revenue=Sum('total_price'))['total_revenue'] or 0
+    revenue_today = Order.objects.filter(order_date__date=today, shop_id=shop_id).exclude(
+        status_order__status_name__in=['รอตรวจสอบ', 'รอตรวจสอบจ่ายเงิน']
+    ).aggregate(total_revenue=Sum('total_price'))['total_revenue'] or 0
 
     # รับค่าจากฟอร์ม
     selected_product_graph1_id = request.GET.get('product_graph1')
@@ -916,8 +925,119 @@ def dashboard_admin(request):
     top_seller_chart = plot(top_seller_fig, output_type='div', include_plotlyjs=False)
     #### --------------------END สินค้าขายดี 10 อันดับ -----------------------------------------------------------
 
-    
-    
+
+    #### --------------------จำนวนสินค้าที่ถูกเคลม/ยกเลิก/จัดส่งสำเร็จ -----------------------------------------------------------
+    # ดึงค่าจากฟอร์มกรองข้อมูล
+    detailOrder_product_id = request.GET.get('detailOrder_product')
+
+    # ดึงข้อมูลสถานะคำสั่งซื้อ
+    status_mapping = {
+        'จัดส่งสำเร็จ': 'จัดส่งสำเร็จ',
+        'ยกเลิกคำสั่งซื้อ': 'ยกเลิกคำสั่งซื้อ',
+        'เคลม': 'เคลม'
+    }
+
+    # สร้าง query พื้นฐาน
+    orders_query = Order.objects.filter(
+        shop_id=shop_id,
+        status_order__status_name__in=status_mapping.keys()
+    )
+
+    # กรองตามสินค้าหากมีการเลือก
+    if detailOrder_product_id:
+        orders_query = orders_query.filter(
+            orderproduct__product_id=detailOrder_product_id
+        ).distinct()  # ใช้ distinct() เพื่อป้องกันการนับซ้ำ
+
+    # นับจำนวนคำสั่งซื้อตามสถานะ
+    status_counts = orders_query.values(
+        'status_order__status_name'
+    ).annotate(
+        count=Count('order_id')
+    )
+
+    print("สถานะคำสั่งซื้อที่พบ:", status_counts)
+
+    status_data = [
+        {'status': 'จัดส่งสำเร็จ', 'count': 0},
+        {'status': 'ยกเลิกคำสั่งซื้อ', 'count': 0},
+        {'status': 'เคลม', 'count': 0}
+    ]
+    for item in status_counts:
+        status_name = item['status_order__status_name']
+        if status_name in status_mapping:
+            # หาตำแหน่งของสถานะใน status_data แล้วอัปเดตค่า
+            for i, status_item in enumerate(status_data):
+                if status_item['status'] == status_mapping[status_name]:
+                    status_data[i]['count'] = item['count']
+                    break
+
+    print("ข้อมูลสำหรับกราฟ:", status_data)
+
+    # สร้าง DataFrame
+    status_df = pd.DataFrame(status_data)
+
+    # สร้างกราฟด้วย Plotly Express
+    if not status_df.empty:
+        status_fig = px.bar(
+            status_df,
+            x="status",
+            y="count",
+            color="status",
+            title="<b>สถานะคำสั่งซื้อ</b>",
+            labels={
+                "status": "สถานะ",
+                "count": "จำนวนคำสั่งซื้อ"
+            },
+            color_discrete_map={
+                "จัดส่งสำเร็จ": "#2ecc71",  # สีเขียวสำหรับจัดส่งสำเร็จ
+                "ยกเลิกคำสั่งซื้อ": "#e74c3c",  # สีแดงสำหรับยกเลิก
+                "เคลม": "#f39c12"  # สีส้มสำหรับขอเคลม
+            },
+            text='count',
+            height=500
+        )
+        
+        if detailOrder_product_id:
+            product = Product.objects.get(product_id=detailOrder_product_id)
+            status_fig.update_layout(
+                title_text=f"<b>สถานะคำสั่งซื้อ - {product.product_name}</b>"
+            )
+        
+        # ปรับแต่งรูปแบบกราฟ
+        status_fig.update_layout(
+            plot_bgcolor='white',
+            paper_bgcolor='white',
+            title_x=0.5,
+            xaxis=dict(
+                title=dict(text='<b>สถานะคำสั่งซื้อ</b>', font=dict(size=14)),
+                gridcolor='rgba(0,0,0,0.1)'
+            ),
+            yaxis=dict(
+                title=dict(text='<b>จำนวนคำสั่งซื้อ</b>', font=dict(size=14)),
+                gridcolor='rgba(0,0,0,0.1)'
+            ),
+            hoverlabel=dict(
+                bgcolor='white',
+                font_size=14,
+                font_family='Prompt'
+            ),
+            margin=dict(t=80, b=100, l=80, r=50)
+        )
+        
+        status_fig.update_traces(
+            texttemplate='<b>%{y:,}</b>',
+            textposition='outside',
+            marker=dict(line=dict(width=1, color='DarkSlateGrey')),
+            hovertemplate='<b>%{x}</b><br>จำนวน: <b>%{y:,}</b> คำสั่งซื้อ<extra></extra>'
+        )
+        
+        # แปลงกราฟเป็น HTML
+        status_chart = plot(status_fig, output_type='div', include_plotlyjs=True)
+    else:
+        status_chart = "<div class='text-center py-5'><p>ไม่มีข้อมูลสถานะคำสั่งซื้อ</p></div>"
+    #### --------------------END จำนวนสินค้าที่ถูกเคลม/ยกเลิก/จัดส่งสำเร็จ -----------------------------------------------------------
+        
     context = {
         'title': 'Dashboard',
         'today': today,
@@ -954,6 +1074,8 @@ def dashboard_admin(request):
         'top_start_date':top_start_date,
         'top_end_date':top_end_date,
         'top_category':top_category,
+        'status_chart': status_chart,
+        'selected_detailOrder_product_id': int(detailOrder_product_id) if detailOrder_product_id else None,
     }
     
     return render(request, 'admin_function/Dashboard.html', context)
