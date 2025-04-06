@@ -1,0 +1,554 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-pink: #ff6b9d;
+        --secondary-pink: #ffc0d5;
+        --light-pink: #ffe5ec;
+        --dark-pink: #d6346a;
+        --pink-gradient: linear-gradient(135deg, var(--primary-pink), var(--dark-pink));
+    }
+    
+    .pink-theme {
+        background-color: var(--light-pink);
+    }
+    
+    .pink-header {
+        background: var(--pink-gradient);
+        color: white;
+    }
+    
+    .pink-card {
+        border-radius: 15px;
+        border: 1px solid var(--secondary-pink);
+        transition: all 0.3s;
+        background-color: white;
+    }
+    
+    .pink-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(255, 107, 157, 0.2);
+    }
+    
+    .pink-btn {
+        background-color: var(--primary-pink);
+        border-color: var(--primary-pink);
+        color: white;
+        transition: all 0.3s;
+    }
+    
+    .pink-btn:hover {
+        background-color: var(--dark-pink);
+        border-color: var(--dark-pink);
+        transform: translateY(-2px);
+    }
+    
+    .pink-outline-btn {
+        border-color: var(--primary-pink);
+        color: var(--primary-pink);
+    }
+    
+    .pink-outline-btn:hover {
+        background-color: var(--light-pink);
+    }
+    
+    .pink-badge {
+        background-color: var(--secondary-pink);
+        color: var(--dark-pink);
+    }
+    
+    .pink-text {
+        color: var(--dark-pink);
+    }
+    
+    .pink-border {
+        border-color: var(--secondary-pink);
+    }
+    
+    .pink-bg {
+        background-color: var(--light-pink);
+    }
+    
+    .pink-focus:focus {
+        border-color: var(--primary-pink);
+        box-shadow: 0 0 0 0.25rem rgba(255, 107, 157, 0.25);
+    }
+    
+    .star-rating {
+        color: var(--primary-pink);
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: var(--light-pink);
+    }
+    
+    .pink-modal-header {
+        background: var(--pink-gradient);
+        color: white;
+    }
+    
+    .pink-chart-tooltip {
+        background-color: var(--dark-pink) !important;
+        border-color: var(--dark-pink) !important;
+    }
+</style>
+
+<div class="container-fluid pink-bg">
+    <!-- Header Section -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 pt-4">
+        <h1 class="h3 mb-0 pink-text">
+            <i class="fas fa-comments me-2"></i>แดชบอร์ดรีวิวสินค้า
+        </h1>
+        <div>
+            <span class="badge pink-badge rounded-pill">
+                <i class="fas fa-sync-alt me-1"></i>อัปเดตล่าสุด: {% now "j F Y H:i" %}
+            </span>
+        </div>
+    </div>
+
+    <!-- ส่วน Filter -->
+    <div class="card shadow mb-4 pink-card">
+        <div class="card-header py-3 pink-header">
+            <h6 class="m-0 fw-bold">
+                <i class="fas fa-filter me-2"></i>ตัวกรองข้อมูลรีวิว
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="get" action="{% url 'review_dashboard' %}" class="row g-3">
+                <div class="col-md-4">
+                    <label for="productFilter" class="form-label fw-bold pink-text">สินค้า</label>
+                    <select class="form-select pink-focus" id="productFilter" name="product">
+                        <option value="all">ทั้งหมด</option>
+                        {% for product in products %}
+                        <option value="{{ product.product_id }}" 
+                            {% if selected_product == product.product_id|stringformat:"s" %}selected{% endif %}>
+                            {{ product.product_name }} ({{ product.review_count }} รีวิว)
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="ratingFilter" class="form-label fw-bold pink-text">ระดับดาว</label>
+                    <select class="form-select pink-focus" id="ratingFilter" name="rating">
+                        <option value="all">ทั้งหมด</option>
+                        <option value="5" {% if selected_rating == "5" %}selected{% endif %}>5 ดาว</option>
+                        <option value="4" {% if selected_rating == "4" %}selected{% endif %}>4 ดาว</option>
+                        <option value="3" {% if selected_rating == "3" %}selected{% endif %}>3 ดาว</option>
+                        <option value="2" {% if selected_rating == "2" %}selected{% endif %}>2 ดาว</option>
+                        <option value="1" {% if selected_rating == "1" %}selected{% endif %}>1 ดาว</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="dateFilter" class="form-label fw-bold pink-text">ช่วงเวลา</label>
+                    <select class="form-select pink-focus" id="dateFilter" name="date">
+                        <option value="all" {% if selected_date == "all" %}selected{% endif %}>ทุกเวลา</option>
+                        <option value="week" {% if selected_date == "week" %}selected{% endif %}>1 สัปดาห์</option>
+                        <option value="month" {% if selected_date == "month" %}selected{% endif %}>1 เดือน</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn pink-btn w-100 py-2">
+                        <i class="fas fa-filter me-1"></i> กรอง
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ตรวจสอบว่ามีรีวิวหรือไม่ -->
+    {% if not has_reviews %}
+    <div class="card shadow mb-4 pink-card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-comment-slash fa-4x pink-text mb-4"></i>
+            <h4 class="pink-text mb-3">ยังไม่มีรีวิวในระบบ</h4>
+            <p class="text-muted">เมื่อมีลูกค้ามารีวิวสินค้า ข้อมูลจะแสดงที่นี่</p>
+            <a href="{% url 'ProductsAdmin' %}" class="btn pink-btn mt-3">
+                <i class="fas fa-arrow-left me-2"></i> กลับไปหน้ารายการสินค้า
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <!-- Total Reviews Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card pink-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="p-2 rounded-circle bg-pink-light">
+                                <i class="fas fa-comments fa-2x pink-text"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="small text-muted">รีวิวทั้งหมด</div>
+                            <div class="h4 fw-bold pink-text">{{ total_reviews }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Average Rating Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card pink-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="p-2 rounded-circle bg-pink-light">
+                                <i class="fas fa-star fa-2x pink-text"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="small text-muted">คะแนนเฉลี่ย</div>
+                            <div class="h4 fw-bold pink-text">
+                                {{ average_rating|floatformat:1 }} <small class="text-muted">/ 5.0</small>
+                            </div>
+                            <div class="star-rating">
+                                {% with ''|center:average_rating as range %}
+                                {% for _ in range %}★{% endfor %}
+                                {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Positive Reviews Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card pink-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="p-2 rounded-circle bg-pink-light">
+                                <i class="fas fa-thumbs-up fa-2x pink-text"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="small text-muted">รีวิวเชิงบวก</div>
+                            <div class="h4 fw-bold pink-text">
+                                {% for stat in category_stats %}
+                                    {% if stat.review_category == 'สินค้าดีมาก!' %}
+                                        {{ stat.count }}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="small text-muted">(4-5 ดาว)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Negative Reviews Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card pink-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="p-2 rounded-circle bg-pink-light">
+                                <i class="fas fa-thumbs-down fa-2x pink-text"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="small text-muted">รีวิวเชิงลบ</div>
+                            <div class="h4 fw-bold pink-text">
+                                {% for stat in category_stats %}
+                                    {% if stat.review_category == 'ไม่พอใจ' %}
+                                        {{ stat.count }}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="small text-muted">(1-2 ดาว)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <!-- Category Distribution Chart -->
+        <div class="col-lg-6 mb-4">
+            <div class="card pink-card h-100">
+                <div class="card-header py-3 pink-header">
+                    <h6 class="m-0 fw-bold">
+                        <i class="fas fa-chart-pie me-2"></i>ประเภทความคิดเห็น
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container position-relative" style="height: 300px;">
+                        <canvas id="categoryPieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rating Distribution Chart -->
+        <div class="col-lg-6 mb-4">
+            <div class="card pink-card h-100">
+                <div class="card-header py-3 pink-header">
+                    <h6 class="m-0 fw-bold">
+                        <i class="fas fa-star-half-alt me-2"></i>การกระจายคะแนน
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container position-relative" style="height: 300px;">
+                        <canvas id="ratingBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Reviews Table -->
+    <div class="card shadow mb-4 pink-card">
+        <div class="card-header py-3 pink-header">
+            <h6 class="m-0 fw-bold">
+                <i class="fas fa-table me-2"></i>รีวิวแยกตามสินค้า
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="pink-bg">
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th>สินค้า</th>
+                            <th class="text-center">รีวิว</th>
+                            <th class="text-center">คะแนนเฉลี่ย</th>
+                            <th class="text-center">5 ดาว</th>
+                            <th class="text-center">4 ดาว</th>
+                            <th class="text-center">3 ดาว</th>
+                            <th class="text-center">2 ดาว</th>
+                            <th class="text-center">1 ดาว</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products_with_reviews %}
+                        <tr>
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ product.image_url|default:'/static/img/default-product.png' }}" 
+                                         class="rounded me-3" width="40" height="40" alt="{{ product.name }}"
+                                         style="object-fit: cover; border: 1px solid var(--secondary-pink);">
+                                    <div>
+                                        <div class="fw-bold pink-text">{{ product.name }}</div>
+                                        <div class="small text-muted">{{ product.category }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">{{ product.review_count }}</td>
+                            <td class="text-center">
+                                <div class="d-flex flex-column align-items-center">
+                                    <span class="fw-bold pink-text">{{ product.avg_rating|floatformat:1 }}</span>
+                                    <div class="star-rating small">
+                                        {% with ''|center:product.avg_rating as range %}
+                                        {% for _ in range %}★{% endfor %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center bg-success bg-opacity-10">{{ product.rating_5 }}</td>
+                            <td class="text-center bg-info bg-opacity-10">{{ product.rating_4 }}</td>
+                            <td class="text-center">{{ product.rating_3 }}</td>
+                            <td class="text-center bg-warning bg-opacity-10">{{ product.rating_2 }}</td>
+                            <td class="text-center bg-danger bg-opacity-10">{{ product.rating_1 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // กำหนดสีสำหรับธีมสีชมพู
+    const pinkTheme = {
+        primary: '#ff6b9d',
+        secondary: '#ffc0d5',
+        light: '#ffe5ec',
+        dark: '#d6346a',
+        gradient: 'linear-gradient(135deg, #ff6b9d, #d6346a)'
+    };
+
+    // ข้อมูลสำหรับกราฟ
+    const chartData = {
+        categoryPieChart: {
+            labels: [{% for stat in category_stats %}"{{ stat.review_category }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+            data: [{% for stat in category_stats %}{{ stat.count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+            colors: [{% for stat in category_stats %}'{{ stat.color }}'{% if not forloop.last %}, {% endif %}{% endfor %}]
+        },
+        ratingBarChart: {
+            labels: [{% for stat in rating_stats %}"{{ stat.rating }} ดาว"{% if not forloop.last %}, {% endif %}{% endfor %}],
+            data: [{% for stat in rating_stats %}{{ stat.count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+            colors: ['#e74a3b', '#f6c23e', '#36b9cc', '#1cc88a', '#4e73df']
+        }
+    };
+
+    // สร้างกราฟวงกลม
+    const pieCtx = document.getElementById('categoryPieChart').getContext('2d');
+    new Chart(pieCtx, {
+        type: 'doughnut',
+        data: {
+            labels: chartData.categoryPieChart.labels,
+            datasets: [{
+                data: chartData.categoryPieChart.data,
+                backgroundColor: chartData.categoryPieChart.colors,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        font: {
+                            family: "'Kanit', sans-serif"
+                        },
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    backgroundColor: pinkTheme.dark,
+                    titleFont: {
+                        family: "'Kanit', sans-serif",
+                        size: 14
+                    },
+                    bodyFont: {
+                        family: "'Kanit', sans-serif",
+                        size: 12
+                    },
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((context.raw / total) * 100);
+                            return ` ${context.label}: ${context.raw} รีวิว (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            }
+        }
+    });
+
+    // สร้างกราฟแท่ง
+    const barCtx = document.getElementById('ratingBarChart').getContext('2d');
+    new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: chartData.ratingBarChart.labels,
+            datasets: [{
+                label: 'จำนวนรีวิว',
+                data: chartData.ratingBarChart.data,
+                backgroundColor: chartData.ratingBarChart.colors,
+                borderColor: chartData.ratingBarChart.colors,
+                borderWidth: 1,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: pinkTheme.dark,
+                    titleFont: {
+                        family: "'Kanit', sans-serif",
+                        size: 14
+                    },
+                    bodyFont: {
+                        family: "'Kanit', sans-serif",
+                        size: 12
+                    }
+                }
+            }
+        }
+    });
+
+    // ฟังก์ชันสำหรับการกรองข้อมูล
+    const filterForm = document.querySelector('form[method="get"]');
+    if (filterForm) {
+        filterForm.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> กำลังกรอง...';
+            submitBtn.disabled = true;
+        });
+    }
+});
+</script>
+
+<style>
+.bg-pink-light {
+    background-color: rgba(255, 107, 157, 0.1);
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap');
+
+body {
+    font-family: 'Kanit', sans-serif;
+    background-color: #f8f9fa;
+}
+
+.chart-container {
+    position: relative;
+    min-height: 300px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.spinner-border {
+    vertical-align: middle;
+}
+
+.rounded-circle {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>
+{% endblock %}

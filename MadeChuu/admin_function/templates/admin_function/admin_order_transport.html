@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}จัดการข้อมูลการจัดส่ง - คำสั่งซื้อ #{{ order.order_id }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow">
+        <div class="card-header bg-pink text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-truck me-2"></i>
+                    จัดการข้อมูลการจัดส่ง - คำสั่งซื้อ #{{ order.order_id }}
+                </h4>
+                <a href="{% url 'admin_order_detail' order.order_id %}" class="btn btn-light btn-sm">
+                    <i class="fas fa-arrow-left"></i> ย้อนกลับ
+                </a>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <form method="post" action="{% url 'admin_order_transport' order.order_id %}">
+                {% csrf_token %}
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="place_delivery" class="form-label">ที่อยู่จัดส่ง</label>
+                            <textarea class="form-control" id="place_delivery" name="place_delivery" 
+                                      rows="3" required>{{ order.place_delivery }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="shipper" class="form-label">บริษัทขนส่ง</label>
+                            <select class="form-select" id="shipper" name="shipper" required>
+                                <option value="">-- เลือกบริษัทขนส่ง --</option>
+                                {% for shipper in shippers %}
+                                <option value="{{ shipper.shipper_id }}"
+                                    {% if order.shipper and order.shipper.shipper_id == shipper.shipper_id %}selected{% endif %}>
+                                    {{ shipper.shipper_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="shipper_date" class="form-label">วันที่จัดส่ง</label>
+                            <input type="datetime-local" class="form-control" id="shipper_date" 
+                                   name="shipper_date" value="{{ order.shipper_date|date:'Y-m-d\TH:i' }}">
+                            <small class="text-muted">หากไม่กรอกจะใช้เวลาปัจจุบัน</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="tracking_num" class="form-label">หมายเลขติดตาม</label>
+                            <input type="text" class="form-control" id="tracking_num" 
+                                   name="tracking_num" value="{{ order.tracking_num|default:'' }}"
+                                   placeholder="กรอกหมายเลขติดตามพัสดุ">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-pink">
+                        <i class="fas fa-save me-1"></i> บันทึกข้อมูลการจัดส่ง
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-pink {
+    background-color: #ff6b9d;
+}
+.btn-pink {
+    background-color: #ff6b9d;
+    color: white;
+}
+.btn-pink:hover {
+    background-color: #d6346a;
+    color: white;
+}
+</style>
+{% endblock %}

@@ -298,10 +298,6 @@
         window.location.reload();
     }
 
-    window.onbeforeunload = function() {
-        return "คุณแน่ใจหรือไม่ที่จะออกจากหน้านี้? การเปลี่ยนแปลงอาจไม่ถูกบันทึก";
-    };
-
     // ป้องกันการย้อนกลับ
     history.pushState(null, null, document.URL);
     window.addEventListener('popstate', function() {

@@ -97,10 +97,22 @@
     <h3 class="items-list">รายการสินค้า</h3>
     <ul class="list-group">
         {% for item in items_with_price %}
-            <li class="list-group-item">
-                <span>{{ item.product_name }}</span>
-                <span>{{ item.quantity }} x {{ item.price }} บาท</span>
-            </li>
+        <ul class="list-group">
+            {% for item in items_with_price %}
+                <li class="list-group-item">
+                    <span>{{ item.product_name }}</span>
+                    <span>
+                        {{ item.quantity }} x 
+                        {% if item.discount > 0 %}
+                            <span style="text-decoration: line-through;">{{ item.price }}</span>
+                            {{ item.discounted_price }} บาท (โปรโมชั่น)
+                        {% else %}
+                            {{ item.price }} บาท
+                        {% endif %}
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
         {% endfor %}
     </ul>
 

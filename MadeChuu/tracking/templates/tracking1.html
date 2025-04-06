@@ -333,7 +333,7 @@
             </div>
             <div class="step {% if order.status_order.status_name == 'กำลังจัดส่ง' %} active {% endif %}">
                 <i class="fa-solid fa-check-circle"></i>
-                <span>ส่งพัสดุแล้ว</span>
+                <span>อยู่ระหว่งจัดส่งพัสดุ</span>
             </div>
             <div class="step {% if order.status_order.status_name == 'จัดส่งสำเร็จ' %} active {% endif %}">
                 <i class="fa-solid fa-check-circle"></i>
@@ -367,7 +367,7 @@
                 <div class="text-muted">ไม่มีรูปภาพ</div>
                 {% endif %}
                 <h2>{{ orderproduct.product.product_name }}</h2>
-                <p>฿{{ orderproduct.product.price }}</p>
+                <p>฿{{ order.total_price }}</p>
             </div>
             {% endfor %}
 

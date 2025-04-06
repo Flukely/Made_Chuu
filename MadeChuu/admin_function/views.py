@@ -4,41 +4,28 @@ from django.contrib.admin.views.decorators import staff_member_required
 from .filters import *
 from .forms import ProductForm , PromotionForm ,ProductSelectionForm
 from main.models import *
-from django.core.paginator import Paginator
 from django.db.models import Count
 from datetime import datetime, timedelta
-from django.db.models import Sum , F
+from django.db.models import Sum , F, Count , Q, Avg
 from django.utils.timezone import now
 from django.utils import timezone
 import plotly.express as px
 from plotly.offline import plot
 import plotly.graph_objs as go
-import pandas as pd
+from datetime import timedelta
+from django.db.models import Sum
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
 from django.http import JsonResponse
-import numpy as np
-from django.db.models.functions import TruncDate
-from plotly.subplots import make_subplots
+from django.core.paginator import Paginator
+from django.views.decorators.http import require_POST
+
 
 def admin_function(request):
     return render(request, 'admin_function/Dashboard.html')
 
 def Dashboard(request):
     return render(request , 'admin_function/Dashboard.html')
-
-def ChatAdmin(request):
-    return render(request, 'admin_function/ChatsAdmin.html')
-
-def OrderAdmin(request):
-    #Query from model Order
-    order_filter = OrderFilter(request.GET, queryset=Order.objects.all())
-    paginator = Paginator(order_filter.qs, 5)
-
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return render(request, 'admin_function/OrderAdmin.html',{'orders':order_filter , 'page_obj': page_obj}) 
-
-def CommentAdmin(request):
-    return render(request, 'admin_function/CommentAdmin.html')
 
 def ProductAdmin(request):
     return render(request, 'admin_function/ProductsAdmin.html')
@@ -47,21 +34,48 @@ def PromotionsAdmin(request):
     return render(request, 'admin_function/promotion_list.html')
 
 def product_list(request):
-    request.session['shop_id'] = 1
-    product_filter = ProductFilter(request.GET, queryset=Product.objects.all())
-    if request.method == 'POST':
-        add_form = ProductForm(request.POST, request.FILES)
-        if add_form.is_valid():
-            product = add_form.save(commit=False)
-            product.shop_id = request.session.get('shop_id')
-            product.save()
-            return redirect('ProductsAdmin')
-    else:
-        add_form = ProductForm()
-    return render(request, "admin_function/ProductsAdmin.html", 
-                  {"products":product_filter , 
-                   'form': add_form
-                   })
+    try:
+        # ตรวจสอบว่า admin นี้ดูแลร้านอะไรบ้าง
+        admin_shops = Admin.objects.filter(user=request.user).values_list('shop_id', flat=True)
+        
+        if not admin_shops.exists():
+            messages.error(request, "คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
+            return redirect('admin_function')  # หรือหน้าอื่นที่เหมาะสม
+            
+        # ใช้ shop_id แรก (หรือปรับตาม logic ของคุณ)
+        shop_id = admin_shops[0]
+        
+        # กรองสินค้าเฉพาะร้านนี้
+        base_queryset = Product.objects.filter(shop_id=shop_id)
+        
+        # ใช้ Filter
+        product_filter = ProductFilter(request.GET, queryset=base_queryset)
+        
+        # จัดการฟอร์มเพิ่มสินค้า
+        if request.method == 'POST':
+            add_form = ProductForm(request.POST, request.FILES)
+            if add_form.is_valid():
+                product = add_form.save(commit=False)
+                product.shop_id = shop_id  # กำหนดร้านให้สินค้า
+                product.save()
+                messages.success(request, "เพิ่มสินค้าสำเร็จแล้ว")
+                return redirect('ProductsAdmin')
+            else:
+                messages.error(request, "กรุณาตรวจสอบข้อมูลให้ถูกต้อง")
+        else:
+            add_form = ProductForm()
+        
+        context = {
+            "products": product_filter,
+            'form': add_form,
+            'current_shop_id': shop_id,
+        }
+        return render(request, "admin_function/ProductsAdmin.html", context)
+        
+    except Exception as e:
+        messages.error(request, f"เกิดข้อผิดพลาด: {str(e)}")
+        return redirect('admin_dashboard')
+    
 @csrf_exempt
 def edit_product(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
@@ -86,67 +100,14 @@ def delete_product(request, product_id):
     else:
         # ถ้าวิธีการของคำขอไม่ใช่ POST, เปลี่ยนเส้นทางกลับไปยังหน้า ProductsAdmin
         return redirect('ProductsAdmin')
-    
 
-from datetime import timedelta
-from django.db.models import Sum
-
-
-@staff_member_required
-def comment_admin(request):
-    reviews = Review.objects.all()
-    products = Product.objects.all()
-    return render(request, 'admin_function/CommentAdmin.html', {'reviews': reviews, 'products': products})
-
-@csrf_exempt
-def add_reply(request):
-    if request.method == 'POST':
-        review_id = request.POST.get('review_id')
-        reply_text = request.POST.get('reply_text')
-
-        try:
-            review = models.Review.objects.get(review_id=review_id)
-            review.review_text_admin = reply_text
-            review.save()
-            return redirect('admin_comment')
-        except models.Review.DoesNotExist:
-            return redirect('admin_comment')
-
-    return redirect('admin_comment')
-
-def status_wait(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    return render(request, 'orders/status_wait.html', {'order': order})
-
-def status_paid(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    return render(request, 'orders/status_paid.html', {'order': order})
-
-def status_packing(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    return render(request, 'orders/status_packing.html', {'order': order})
-
-def status_prepare(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    return render(request, 'orders/status_prepare.html', {'order': order})
-
-def status_delivery(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    return render(request, 'orders/status_delivery.html', {'order': order})
-
-def status_ordersuccess(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    return render(request, 'orders/status_ordersuccess.html', {'order': order})
-
-def status_claim(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    return render(request, 'orders/status_claim.html', {'order': order})
-
-## test
+## Dashboard Admin
 @staff_member_required
 def dashboard_admin(request):
     today = timezone.localtime(timezone.now()).date()
-    shop_id = request.session['shop_id']
+    # shop_id = request.session['shop_id'] 
+    shop_id = Admin.objects.filter(user=request.user).values_list('shop_id', flat=True)
+    shop_id = shop_id[0]
     products = Product.objects.filter(shop_id=shop_id)
     categorys = Category.objects.filter(shop_id=shop_id)
     
@@ -788,7 +749,115 @@ def dashboard_admin(request):
         # Convert to HTML div
     top_seller_chart = plot(top_seller_fig, output_type='div', include_plotlyjs=False)
     #### --------------------END สินค้าขายดี 10 อันดับ -----------------------------------------------------------
+        # ดึงค่าจากฟอร์มกรองข้อมูล
+    detailOrder_product_id = request.GET.get('detailOrder_product')
 
+    # ดึงข้อมูลสถานะคำสั่งซื้อ
+    status_mapping = {
+        'จัดส่งสำเร็จ': 'จัดส่งสำเร็จ',
+        'ยกเลิกคำสั่งซื้อ': 'ยกเลิกคำสั่งซื้อ',
+        'เคลม': 'เคลม'
+    }
+
+    # สร้าง query พื้นฐาน
+    orders_query = Order.objects.filter(
+        shop_id=shop_id,
+        status_order__status_name__in=status_mapping.keys()
+    )
+
+    # กรองตามสินค้าหากมีการเลือก
+    if detailOrder_product_id:
+        orders_query = orders_query.filter(
+            orderproduct__product_id=detailOrder_product_id
+        ).distinct()  # ใช้ distinct() เพื่อป้องกันการนับซ้ำ
+
+    # นับจำนวนคำสั่งซื้อตามสถานะ
+    status_counts = orders_query.values(
+        'status_order__status_name'
+    ).annotate(
+        count=Count('order_id')
+    )
+
+    print("สถานะคำสั่งซื้อที่พบ:", status_counts)
+
+    status_data = [
+        {'status': 'จัดส่งสำเร็จ', 'count': 0},
+        {'status': 'ยกเลิกคำสั่งซื้อ', 'count': 0},
+        {'status': 'เคลม', 'count': 0}
+    ]
+    for item in status_counts:
+        status_name = item['status_order__status_name']
+        if status_name in status_mapping:
+            # หาตำแหน่งของสถานะใน status_data แล้วอัปเดตค่า
+            for i, status_item in enumerate(status_data):
+                if status_item['status'] == status_mapping[status_name]:
+                    status_data[i]['count'] = item['count']
+                    break
+
+    print("ข้อมูลสำหรับกราฟ:", status_data)
+
+    # สร้าง DataFrame
+    status_df = pd.DataFrame(status_data)
+
+    # สร้างกราฟด้วย Plotly Express
+    if not status_df.empty:
+        status_fig = px.bar(
+            status_df,
+            x="status",
+            y="count",
+            color="status",
+            title="<b>สถานะคำสั่งซื้อ</b>",
+            labels={
+                "status": "สถานะ",
+                "count": "จำนวนคำสั่งซื้อ"
+            },
+            color_discrete_map={
+                "จัดส่งสำเร็จ": "#2ecc71",  # สีเขียวสำหรับจัดส่งสำเร็จ
+                "ยกเลิกคำสั่งซื้อ": "#e74c3c",  # สีแดงสำหรับยกเลิก
+                "เคลม": "#f39c12"  # สีส้มสำหรับขอเคลม
+            },
+            text='count',
+            height=500
+        )
+        
+        if detailOrder_product_id:
+            product = Product.objects.get(product_id=detailOrder_product_id)
+            status_fig.update_layout(
+                title_text=f"<b>สถานะคำสั่งซื้อ - {product.product_name}</b>"
+            )
+        
+        # ปรับแต่งรูปแบบกราฟ
+        status_fig.update_layout(
+            plot_bgcolor='white',
+            paper_bgcolor='white',
+            title_x=0.5,
+            xaxis=dict(
+                title=dict(text='<b>สถานะคำสั่งซื้อ</b>', font=dict(size=14)),
+                gridcolor='rgba(0,0,0,0.1)'
+            ),
+            yaxis=dict(
+                title=dict(text='<b>จำนวนคำสั่งซื้อ</b>', font=dict(size=14)),
+                gridcolor='rgba(0,0,0,0.1)'
+            ),
+            hoverlabel=dict(
+                bgcolor='white',
+                font_size=14,
+                font_family='Prompt'
+            ),
+            margin=dict(t=80, b=100, l=80, r=50)
+        )
+        
+        status_fig.update_traces(
+            texttemplate='<b>%{y:,}</b>',
+            textposition='outside',
+            marker=dict(line=dict(width=1, color='DarkSlateGrey')),
+            hovertemplate='<b>%{x}</b><br>จำนวน: <b>%{y:,}</b> คำสั่งซื้อ<extra></extra>'
+        )
+        
+        # แปลงกราฟเป็น HTML
+        status_chart = plot(status_fig, output_type='div', include_plotlyjs=True)
+    else:
+        status_chart = "<div class='text-center py-5'><p>ไม่มีข้อมูลสถานะคำสั่งซื้อ</p></div>"
     
     
     context = {
@@ -827,12 +896,12 @@ def dashboard_admin(request):
         'top_start_date':top_start_date,
         'top_end_date':top_end_date,
         'top_category':top_category,
+        'status_chart': status_chart,
+        'selected_detailOrder_product_id': int(detailOrder_product_id) if detailOrder_product_id else None,
     }
     
     return render(request, 'admin_function/Dashboard.html', context)
 
-
-###############################################################################################
 def promotion_list(request):
     # ดึงข้อมูลโปรโมชันทั้งหมดและสินค้าที่เกี่ยวข้อง
     promotions = Promotion.objects.prefetch_related(
@@ -896,10 +965,6 @@ def add_promotion(request):
     
     return render(request, 'admin_function/add_promotion.html', context)
 
-# views.py
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
-
 def edit_promotion(request, promotion_id):
     promotion = get_object_or_404(Promotion, pk=promotion_id)
     
@@ -950,7 +1015,6 @@ def edit_promotion(request, promotion_id):
     
     return render(request, 'admin_function/edit_promotion.html', context)
 
-# views.py
 def delete_promotion(request, promotion_id):
     promotion = get_object_or_404(Promotion, pk=promotion_id)
     if request.method == 'POST':
@@ -958,3 +1022,349 @@ def delete_promotion(request, promotion_id):
         messages.success(request, "ลบโปรโมชันสำเร็จแล้ว!")
         return redirect('promotion_list')
     return render(request, 'admin_function/confirm_delete.html', {'promotion': promotion})
+
+@staff_member_required
+def review_admin(request):
+    # ตรวจสอบว่า admin นี้ดูแลร้านอะไรบ้าง
+    admin_shops = Admin.objects.filter(user=request.user).values_list('shop_id', flat=True)
+        
+    if not admin_shops.exists():
+        messages.error(request, "คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
+        return redirect('admin_function')  # หรือหน้าอื่นที่เหมาะสม
+            
+    # ใช้ shop_id แรก (หรือปรับตาม logic ของคุณ)
+    shop_id = admin_shops[0]
+    
+    # ดึงค่ากรองจาก URL parameters
+    rating_filter = request.GET.get('rating', 'all')
+    product_filter = request.GET.get('product', 'all')
+    date_sort = request.GET.get('date', 'newest')
+    
+    # สร้าง query เริ่มต้น
+    reviews_query = Review.objects.select_related('product', 'order__user').filter(
+        product__shop_id=shop_id
+    )
+    
+    # กรองตาม rating
+    if rating_filter.isdigit() and 1 <= int(rating_filter) <= 5:
+        reviews_query = reviews_query.filter(rating=int(rating_filter))
+    
+    # กรองตามสินค้า
+    if product_filter != 'all':
+        reviews_query = reviews_query.filter(product__product_name=product_filter)
+    
+    # เรียงลำดับตามวันที่
+    if date_sort == 'oldest':
+        reviews_query = reviews_query.order_by('review_date')
+    else:  # newest (default)
+        reviews_query = reviews_query.order_by('-review_date')
+    
+    # จัดการ pagination
+    paginator = Paginator(reviews_query, 6)  # แสดง 6 รีวิวต่อหน้า
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # ดึงข้อมูลสินค้าสำหรับ dropdown
+    products = Product.objects.all()
+    
+    return render(request, 'admin_function/CommentAdmin.html', {
+        'reviews': page_obj,
+        'products': products,
+        'current_rating': rating_filter,
+        'current_product': product_filter,
+        'current_date_sort': date_sort
+    })
+
+def add_reply(request):
+    if request.method == 'POST':
+        review_id = request.POST.get('review_id')
+        reply_text = request.POST.get('reply_text')
+        
+        try:
+            review = Review.objects.get(review_id=review_id)
+            review.review_text_admin = reply_text
+            review.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'บันทึกข้อมูลสำเร็จ'
+            })
+            
+        except Review.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'ไม่พบรีวิวที่ต้องการแก้ไข'
+            }, status=404)
+    
+    return JsonResponse({
+        'success': False,
+        'message': 'วิธีการร้องขอไม่ถูกต้อง'
+    }, status=400)
+
+@staff_member_required
+def review_dashboard(request):
+
+    # ตรวจสอบว่า admin นี้ดูแลร้านอะไรบ้าง
+    admin_shops = Admin.objects.filter(user=request.user).values_list('shop_id', flat=True)
+        
+    if not admin_shops.exists():
+        messages.error(request, "คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
+        return redirect('admin_function')  # หรือหน้าอื่นที่เหมาะสม
+            
+    # ใช้ shop_id แรก (หรือปรับตาม logic ของคุณ)
+    shop_id = admin_shops[0]
+    
+    # รับค่าการกรองจาก request.GET
+    product_filter = request.GET.get('product', 'all')
+    rating_filter = request.GET.get('rating', 'all')
+    date_filter = request.GET.get('date', 'all')
+    
+    # Query ข้อมูลพื้นฐาน - กรองเฉพาะร้านค้าของผู้ใช้
+    reviews = Review.objects.filter(product__shop_id=shop_id)
+    products = Product.objects.filter(shop_id=shop_id).annotate(
+        review_count=Count('review')
+    ).order_by('-review_count')
+    
+    # กรองข้อมูลตาม parameters
+    if product_filter != 'all':
+        reviews = reviews.filter(product_id=product_filter)
+    
+    if rating_filter != 'all':
+        reviews = reviews.filter(rating=rating_filter)
+    
+    if date_filter != 'all':
+        if date_filter == 'week':
+            reviews = reviews.filter(review_date__gte=timezone.now() - timezone.timedelta(days=7))
+        elif date_filter == 'month':
+            reviews = reviews.filter(review_date__gte=timezone.now() - timezone.timedelta(days=30))
+    
+    # สถิติข้อมูล
+    total_reviews = reviews.count()
+    has_reviews = total_reviews > 0
+    
+    # เตรียมข้อมูลพื้นฐานที่ต้องใช้ในทุกกรณี
+    base_context = {
+        'products': products,
+        'selected_product': product_filter,
+        'selected_rating': rating_filter,
+        'selected_date': date_filter,
+        'has_reviews': has_reviews,
+        'total_reviews': total_reviews,
+    }
+    
+    # ถ้าไม่มีรีวิว ให้ส่งคืนเฉพาะข้อมูลพื้นฐาน
+    if not has_reviews:
+        return render(request, 'admin_function/review_dashboard.html', base_context)
+    
+    # กรณีที่มีรีวิว คำนวณสถิติต่างๆ
+    average_rating = reviews.aggregate(avg_rating=Avg('rating'))['avg_rating'] or 0
+    
+    # จัดกลุ่มความคิดเห็นโดยวิเคราะห์จากข้อความ
+    review_categories = {
+        'สินค้าดีมาก!': reviews.filter(
+            Q(review_text__icontains='ดีมาก') |
+            Q(review_text__icontains='เยี่ยม') |
+            Q(review_text__icontains='สุดยอด')
+        ).count(),
+        # ... (ส่วนอื่นๆ เหมือนเดิม)
+    }
+    
+    # แปลงเป็นรูปแบบที่ใช้ใน template
+    category_stats = [
+        {
+            'review_category': k, 
+            'count': v, 
+            'percentage': round((v / total_reviews * 100), 1),
+            'color': ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'][i]
+        }
+        for i, (k, v) in enumerate(review_categories.items())
+    ]
+    
+    # สถิติแยกตามระดับความพึงพอใจ
+    rating_stats = reviews.values('rating').annotate(
+        count=Count('review_id'),
+        percentage=Count('review_id') * 100 / total_reviews
+    ).order_by('rating')
+    
+    # สถิติแยกตามสินค้า
+    products_with_reviews = []
+    for product in products:
+        product_reviews = reviews.filter(product=product)
+        if product_reviews.exists():
+            products_with_reviews.append({
+                'id': product.product_id,
+                'name': product.product_name,
+                'category': product.category.category_name,
+                'image_url': product.product_image.url if product.product_image else None,
+                'review_count': product_reviews.count(),
+                'rating_5': product_reviews.filter(rating=5).count(),
+                'rating_4': product_reviews.filter(rating=4).count(),
+                'rating_3': product_reviews.filter(rating=3).count(),
+                'rating_2': product_reviews.filter(rating=2).count(),
+                'rating_1': product_reviews.filter(rating=1).count(),
+                'avg_rating': product_reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+            })
+    
+    # เพิ่มข้อมูลสถิติลงใน context
+    context = {
+        **base_context,
+        'average_rating': round(average_rating, 1),
+        'category_stats': category_stats,
+        'rating_stats': rating_stats,
+        'products_with_reviews': products_with_reviews,
+    }
+    
+    return render(request, 'admin_function/review_dashboard.html', context)
+
+def admin_order_list(request):
+    # ตรวจสอบว่า Admin คนนี้ดูแลร้านอะไรบ้าง
+    admin_shops = Admin.objects.filter(user=request.user).values_list('shop_id', flat=True)
+    
+    # ตัวกรองสถานะ Order
+    status_filter = request.GET.get('status', None)
+    
+    # ดึง Order เฉพาะร้านที่ Admin ดูแล
+    if status_filter:
+        orders = Order.objects.filter(
+            shop_id__in=admin_shops,
+            status_order_id=status_filter
+        ).select_related(
+            'user', 'shop', 'status_order'
+        ).order_by('-order_date')
+    else:
+        orders = Order.objects.filter(
+            shop_id__in=admin_shops
+        ).select_related(
+            'user', 'shop', 'status_order'
+        ).order_by('-order_date')
+    
+    statuses = StatusOrder.objects.all()
+    
+    context = {
+        'orders': orders,
+        'statuses': statuses,
+        'current_status': int(status_filter) if status_filter else None,
+        'status_order': StatusOrder.objects.all(),
+    }
+    return render(request, 'admin_function/order_list.html', context)
+
+def admin_order_detail(request, order_id):
+    # ตรวจสอบสิทธิ์การเข้าถึง
+    admin_shops = Admin.objects.filter(user=request.user).values_list('shop_id', flat=True)
+    
+    order = get_object_or_404(Order.objects.filter(
+        shop_id__in=admin_shops,
+        pk=order_id
+    ).select_related(
+        'user', 'shop', 'status_order', 'shipper'
+    ).prefetch_related(
+        'orderproduct_set__product',
+        'payment_set__payment_status',
+        'claim_set__claim_status'  # เพิ่ม prefetch สำหรับ claim_status
+    ))
+    
+    order_products = order.orderproduct_set.all()
+    payments = order.payment_set.all().select_related('payment_status')
+    claims = order.claim_set.all().select_related('claim_status')  # ดึงข้อมูล claim พร้อม status
+    
+    context = {
+        'order': order,
+        'order_products': order_products,
+        'payments': payments,
+        'claims': claims,  # ส่งข้อมูล claims ไปยัง template
+        'payment_statuses': PaymentStatus.objects.all(),
+        'status_order': StatusOrder.objects.all(),
+        'claim_statuses': ClaimStatus.objects.all(),  # สำหรับ dropdown เปลี่ยนสถานะเคลม
+    }
+    return render(request, 'admin_function/order_detail.html', context)
+
+@require_POST
+def update_payment_status(request, payment_id):
+        payment = Payment.objects.get(pk=payment_id, order__shop__admin__user=request.user)
+        payment.payment_status_id = request.POST.get('payment_status')
+        payment.amount = request.POST.get('amount')
+        payment.save()
+        
+        if payment.payment_status.payment_status_name == "ไม่สำเร็จ":
+           order = Order.objects.get(order_id=payment.order.order_id)
+           order.status_order = StatusOrder.objects.get(status_name='ไม่สำเร็จ')
+           order.save()
+           return redirect('admin_order_list')
+        
+        Receipt.objects.create(
+                        order= payment.order,
+                        payment= payment,
+                        receipt_date=now()
+                    )
+        
+        Order.objects.filter(order_id=payment.order.order_id).update(status_order=StatusOrder.objects.get(status_name='เตรียมของ'))
+        
+        return redirect('admin_order_list')
+    
+@require_POST
+def update_order_status(request, order_id):
+        order = Order.objects.get(pk=order_id)
+        order.status_order_id = request.POST.get('order_status')
+        order.save()
+        
+        return redirect('admin_order_list')
+    
+@require_POST
+def admin_order_transport(request, order_id):
+    # ตรวจสอบสิทธิ์และดึงข้อมูลคำสั่งซื้อ
+    order = get_object_or_404(
+        Order,
+        pk=order_id,
+        shop__admin__user=request.user  # ตรวจสอบว่าเป็น admin ของร้านนี้
+    )
+    
+    if request.method == 'POST':
+        try:
+            # รับข้อมูลจากฟอร์ม
+            place_delivery = request.POST.get('place_delivery')
+            shipper_id = request.POST.get('shipper')
+            shipper_date = request.POST.get('shipper_date')
+            tracking_num = request.POST.get('tracking_num')
+            
+            # อัปเดตข้อมูลการจัดส่ง
+            if place_delivery:
+                order.place_delivery = place_delivery
+            
+            if shipper_id:
+                shipper = ShippingBrand.objects.get(pk=shipper_id)
+                order.shipper = shipper
+            
+            if shipper_date:
+                order.shipper_date = shipper_date
+            else:
+                order.shipper_date = timezone.now()
+            
+            if tracking_num:
+                order.tracking_num = tracking_num
+                
+            order.status_order = StatusOrder.objects.get(status_name='กำลังจัดส่ง')
+            
+            order.save()
+            messages.success(request, 'อัปเดตข้อมูลการจัดส่งเรียบร้อยแล้ว')
+            
+        except Exception as e:
+            messages.error(request, f'เกิดข้อผิดพลาด: {str(e)}')
+        
+        return redirect('admin_order_detail', order_id=order_id)
+    
+    else:
+        # ถ้าไม่ใช่ POST request ให้แสดงฟอร์มการจัดส่ง
+        shippers = ShippingBrand.objects.all()
+        context = {
+            'order': order,
+            'shippers': shippers,
+        }
+        return render(request, 'admin_function/admin_order_transport.html', context)
+    
+@require_POST
+def update_claim_status(request, claim_id):
+    claim = get_object_or_404(Claim, pk=claim_id)
+    claim.claim_status_id = request.POST.get('claim_status')
+    claim.save()
+    
+    return redirect('admin_order_list')

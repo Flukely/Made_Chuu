@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from main.models import Receipt, OrderProduct, Order, Payment, Product, Shop, User
+from main.models import Receipt, OrderProduct, Order, Payment, Product, Shop, User, PromotionProduct
 
 @login_required(login_url='/login/')
 def check_receipt(request):
@@ -10,14 +10,28 @@ def check_receipt(request):
 
     for payment in user_payments:
         order_items = OrderProduct.objects.filter(order=payment.order)
-        items_with_price = [
-            {
-                'product_name': item.product.product_name,
+        items_with_price = []
+        
+        for item in order_items:
+            product = item.product
+            # ตรวจสอบว่าสินค้ามีโปรโมชั่นหรือไม่
+            promotion = PromotionProduct.objects.filter(product_id=product).first()
+            
+            if promotion:
+                discount = promotion.promotion_id.discount / 100
+                discounted_price = product.price * (1 - discount)
+            else:
+                discounted_price = product.price
+                discount = 0
+            
+            items_with_price.append({
+                'product_name': product.product_name,
                 'quantity': item.quantity,
-                'price': item.product.price,
-            }
-            for item in order_items
-        ]
+                'price': product.price,
+                'discounted_price': round(discounted_price, 2),
+                'discount': discount * 100,  # แปลงเป็นเปอร์เซ็นต์
+            })
+
         payments_with_items.append({
             'payment': payment,
             'items_with_price': items_with_price,
@@ -35,14 +49,27 @@ def receipt(request, order_id):
         return render(request, 'receipt.html', {'message': "กำลังดำเนินการ", 'order': order})
 
     order_items = OrderProduct.objects.filter(order=order)
-    items_with_price = [
-        {
-            'product_name': item.product.product_name,
+    items_with_price = []
+    
+    for item in order_items:
+        product = item.product
+        # ตรวจสอบว่าสินค้ามีโปรโมชั่นหรือไม่
+        promotion = PromotionProduct.objects.filter(product_id=product).first()
+        
+        if promotion:
+            discount = promotion.promotion_id.discount / 100
+            discounted_price = product.price * (1 - discount)
+        else:
+            discounted_price = product.price
+            discount = 0
+        
+        items_with_price.append({
+            'product_name': product.product_name,
             'quantity': item.quantity,
-            'price': item.product.price,
-        }
-        for item in order_items
-    ]
+            'price': product.price,
+            'discounted_price': round(discounted_price, 2),
+            'discount': discount * 100,  # แปลงเป็นเปอร์เซ็นต์
+        })
 
     store_name = order_items.first().product.shop.shop_name if order_items else "ไม่พบร้านค้า"
 

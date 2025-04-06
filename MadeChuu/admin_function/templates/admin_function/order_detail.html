@@ -1,0 +1,432 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}รายละเอียดคำสั่งซื้อ #{{ order.order_id }}{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-pink: #ff6b9d;
+        --secondary-pink: #ffc0d5;
+        --light-pink: #ffe5ec;
+        --dark-pink: #d6346a;
+        --pink-gradient: linear-gradient(135deg, var(--primary-pink), var(--dark-pink));
+    }
+    
+    .order-header {
+        background: var(--pink-gradient);
+        color: white;
+        border-radius: 10px 10px 0 0;
+    }
+    
+    .order-card {
+        border: 1px solid var(--secondary-pink);
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(255, 107, 157, 0.1);
+    }
+    
+    .order-status {
+        background-color: var(--light-pink);
+        color: var(--dark-pink);
+        border-radius: 20px;
+        padding: 5px 15px;
+        font-weight: 600;
+    }
+    
+    .product-img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid var(--secondary-pink);
+    }
+    
+    .summary-card {
+        background-color: white;
+        border: 1px solid var(--secondary-pink);
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(255, 107, 157, 0.05);
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background-color: var(--secondary-pink);
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-bottom: 20px;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -30px;
+        top: 5px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: var(--primary-pink);
+        border: 3px solid white;
+    }
+    
+    .btn-pink {
+        background-color: var(--primary-pink);
+        color: white;
+        border: none;
+    }
+    
+    .btn-pink:hover {
+        background-color: var(--dark-pink);
+        color: white;
+    }
+    
+    .text-pink {
+        color: var(--primary-pink);
+    }
+    
+    .bg-pink-light {
+        background-color: var(--light-pink);
+    }
+</style>
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-receipt text-pink me-2"></i>
+            รายละเอียดคำสั่งซื้อ #{{ order.order_id }}
+        </h2>
+        <a href="{% url 'admin_order_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> กลับไปหน้ารายการ
+        </a>
+    </div>
+
+    <!-- Order Summary Card -->
+    <div class="order-card mb-4">
+        <div class="order-header p-4">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h4 class="mb-0">
+                        <i class="fas fa-store-alt me-2"></i>
+                        {{ order.shop.shop_name }}
+                    </h4>
+                    <p class="mb-0 small">
+                        <i class="fas fa-calendar-alt me-1"></i>
+                        {{ order.order_date|date:"d/m/Y H:i" }}
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <span class="order-status">
+                        <i class="fas fa-truck me-1"></i>
+                        {{ order.status_order.status_name }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="text-pink">
+                        <i class="fas fa-user me-2"></i>ข้อมูลลูกค้า
+                    </h5>
+                    <p class="mb-1">
+                        <strong>ชื่อ:</strong> {{ order.user.user_name }}
+                    </p>
+                    <p class="mb-1">
+                        <strong>อีเมล:</strong> {{ order.user.email }}
+                    </p>
+                    <p class="mb-1">
+                        <strong>โทรศัพท์:</strong> {{ order.user.phone_num }}
+                    </p>
+                </div>
+                
+                {% if order.status_order.status_name == "กำลังจัดส่ง" or order.status_order.status_name == "จัดส่งแล้ว" %}
+                    <div class="col-md-6">
+                        <h5 class="text-pink">
+                            <i class="fas fa-truck me-2"></i>ข้อมูลการจัดส่ง
+                        </h5>
+                        <p class="mb-1">
+                            <strong>ที่อยู่จัดส่ง:</strong> {{ order.place_delivery }}
+                        </p>
+                        {% if order.shipper %}
+                        <p class="mb-1">
+                            <strong>บริษัทขนส่ง:</strong> {{ order.shipper.shipper_name }}
+                        </p>
+                        {% endif %}
+                        {% if order.tracking_num %}
+                        <p class="mb-1">
+                            <strong>หมายเลขติดตาม:</strong> {{ order.tracking_num }}
+                        </p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Items -->
+    <div class="order-card mb-4">
+        <div class="p-4">
+            <h5 class="text-pink mb-4">
+                <i class="fas fa-boxes me-2"></i>สินค้าในคำสั่งซื้อ
+            </h5>
+            
+            <div class="table-responsive">
+                <table class="table">
+                    <thead class="bg-pink-light">
+                        <tr>
+                            <th style="width: 60px"></th>
+                            <th>สินค้า</th>
+                            <th class="text-center">ราคาต่อหน่วย</th>
+                            <th class="text-center">จำนวน</th>
+                            <th class="text-end">รวม</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order_products %}
+                        <tr>
+                            <td>
+                                <img src="{{ item.product.product_image.url|default:'/static/img/default-product.png' }}" 
+                                     class="product-img" alt="{{ item.product.product_name }}">
+                            </td>
+                            <td>
+                                <h6 class="mb-1">{{ item.product.product_name }}</h6>
+                                <small class="text-muted">{{ item.product.category.category_name }}</small>
+                            </td>
+                            <td class="text-center">{{ item.price|floatformat:2 }} ฿</td>
+                            <td class="text-center">{{ item.quantity }}</td>
+                            <td class="text-end">{{ item.order.total_price|floatformat:2 }} ฿</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+     <!-- ส่วนแสดงข้อมูลการชำระเงิน -->
+    {% if order.status_order.status_name == "ตรวจสอบจ่ายเงิน" %}
+    <div class="card shadow-sm mb-4 border-pink">
+        <div class="card-header bg-pink-light">
+        <h5 class="mb-0 text-pink">
+            <i class="fas fa-credit-card me-2"></i>ข้อมูลการชำระเงิน
+        </h5>
+        </div>
+        <div class="card-body">
+        
+        
+        <!-- ตารางรายการชำระเงิน -->
+            {% if payments %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                <thead class="bg-pink-light">
+                    <tr>
+                    <th class="text-pink">วันที่ชำระ</th>
+                    <th class="text-pink">สถานะ</th>
+                    <th class="text-pink">หลักฐาน</th>
+                    <th class="text-pink">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                    <td>{{ payment.payment_date|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <span class="badge bg-{% if payment.payment_status.status_name == 'สำเร็จ' %}success{% else %}warning{% endif %}">
+                        {{ payment.payment_status.status_name }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if payment.payment_image %}
+                        <a href="{{ payment.payment_image.url }}" target="_blank" class="btn btn-sm btn-outline-pink">
+                        <i class="fas fa-image"></i> ดูหลักฐาน
+                        </a>
+                        {% else %}
+                        <span class="text-muted">ไม่มีหลักฐาน</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-pink" data-bs-toggle="modal" data-bs-target="#editPaymentModal{{ payment.payment_id }}">
+                        <i class="fas fa-edit"></i> แก้ไข
+                        </button>
+                    </td>
+                    </tr>
+                    
+                    <!-- Modal แก้ไขสถานะการชำระเงิน -->
+                    <div class="modal fade" id="editPaymentModal{{ payment.payment_id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                        <div class="modal-header bg-pink-light">
+                            <h5 class="modal-title text-pink">แก้ไขสถานะการชำระเงิน</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form method="post" action="{% url 'update_payment_status' payment.payment_id %}">
+                            {% csrf_token %}
+                            <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">สถานะการชำระเงิน</label>
+                                <select name="payment_status" class="form-select border-pink">
+                                {% for status in payment_statuses %}
+                                <option value="{{ status.payment_status_id }}" 
+                                    {% if status.status_id == payment.payment_status.status_id %}selected{% endif %}>
+                                    {{ status.payment_status_name }}
+                                </option>
+                                {% endfor %}
+                                </select>
+                            </div>
+                            </div>
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-pink" data-bs-dismiss="modal">ยกเลิก</button>
+                            <button type="submit" class="btn btn-pink">บันทึกการเปลี่ยนแปลง</button>
+                            </div>
+                        </form>
+                        </div>
+                    </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+                </table>
+            </div>
+            {% else %}
+                <div class="alert alert-pink">
+                    <i class="fas fa-info-circle me-2"></i> ไม่พบข้อมูลการชำระเงิน
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Update Satatus -->
+    {% if order.status_order.status_name == "เตรียมของ" %}
+        <form method="post" action="{% url 'update_order_status' order.order_id %}">
+            {% csrf_token %}
+            <div class="modal-body">
+            <div class="mb-3">
+                <label class="form-label">สถานะคำสั่งซื้อ</label>
+                <select name="order_status" class="form-select border-pink">
+                {% for status in status_order %}
+                <option value="{{ status.status_order_id }}" 
+                    {% if status.status_order_id == order.status_order.status_order_id %}selected{% endif %}>
+                    {{ status.status_name }}
+                </option>
+                {% endfor %}
+                </select>
+            </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-outline-pink" data-bs-dismiss="modal">ยกเลิก</button>
+            <button type="submit" class="btn btn-pink">บันทึกการเปลี่ยนแปลง</button>
+            </div>
+        </form>
+    {% endif %}
+
+    {% if order.status_order.status_name == "เคลม" and claims %}
+        {% for claim in claims %}
+            <div class="card shadow-sm mb-4 border-3 border-pink rounded-4 overflow-hidden">
+                <div class="card-header bg-pink-light d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 text-pink fw-bold">
+                        <i class="fas fa-exclamation-triangle me-2"></i>ข้อมูลการเคลม #{{ forloop.counter }}
+                    </h5>
+                    <span class="badge rounded-pill fs-6 py-2 px-3 bg-{{ claim.claim_status.color_class|default:'secondary' }}">
+                        <i class="fas fa-info-circle me-1"></i>{{ claim.claim_status.status_name }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="bg-light p-3 rounded-3 h-100">
+                                <h6 class="text-pink mb-3 fw-bold"><i class="fas fa-file-alt me-2"></i>รายละเอียดการเคลม</h6>
+                                <div class="mb-3">
+                                    <label class="text-muted small mb-1">เหตุผล</label>
+                                    <p class="mb-0 p-2 bg-white rounded">{{ claim.reason }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted small mb-1">คอมเมนต์</label>
+                                    <p class="mb-0 p-2 bg-white rounded">{{ claim.comment }}</p>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="text-muted small mb-1">วันที่ส่งคำขอ</label>
+                                        <p class="mb-0 p-2 bg-white rounded">{{ claim.claim_date|date:"d/m/Y H:i" }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="text-muted small mb-1">เบอร์ติดต่อ</label>
+                                        <p class="mb-0 p-2 bg-white rounded">{{ claim.claim_contact }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="bg-light p-3 rounded-3 h-100">
+                                <h6 class="text-pink mb-3 fw-bold"><i class="fas fa-money-bill-wave me-2"></i>ข้อมูลการคืนเงิน</h6>
+                                <div class="mb-3">
+                                    <label class="text-muted small mb-1">พร้อมเพย์รับเงิน</label>
+                                    <p class="mb-0 p-2 bg-white rounded font-monospace">{{ claim.promtpay_number }}</p>
+                                </div>
+                                
+                                {% if claim.claim_image %}
+                                <div class="mb-3">
+                                    <label class="text-muted small mb-1">รูปภาพหลักฐาน</label>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <a href="{{ claim.claim_image.url }}" data-fancybox="gallery-{{ claim.claim_id }}" class="d-block">
+                                            <img src="{{ claim.claim_image.url }}" class="img-thumbnail rounded-3" style="width: 120px; height: 90px; object-fit: cover;">
+                                        </a>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if claim.claim_video %}
+                    <div class="mt-4">
+                        <div class="bg-light p-3 rounded-3">
+                            <h6 class="text-pink mb-3 fw-bold"><i class="fas fa-video me-2"></i>วิดีโอหลักฐาน</h6>
+                            <div class="ratio ratio-16x9 rounded-3 overflow-hidden">
+                                <video controls class="w-100">
+                                    <source src="{{ claim.claim_video.url }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <form method="post" action="{% url 'update_claim_status' claim.claim_id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">สถานะเคลมสินค้า</label>
+                    <select name="claim_status" class="form-select border-pink">
+                    {% for status in claim_statuses %}
+                    <option value="{{ status.claim_status_id }}" 
+                        {% if status.claim_status_id == claim.claim_status.claim_status_id %}selected{% endif %}>
+                        {{ status.claim_status_name }}
+                    </option>
+                    {% endfor %}
+                    </select>
+                </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-outline-pink" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="submit" class="btn btn-pink">บันทึกการเปลี่ยนแปลง</button>
+                </div>
+            </form>
+        {% endfor %}
+    {% endif %}
+
+    </div>
+{% endblock %}

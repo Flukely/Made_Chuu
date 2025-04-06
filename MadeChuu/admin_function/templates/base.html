@@ -39,7 +39,6 @@
 
         <!-- Css style -->
             <link rel= "stylesheet" href = "{% static 'MadeChuu/css/style_Admin.css' %}">
-            <link rel= "stylesheet" href = "{% static 'MadeChuu/css/style.css' %}">
     </head>
 <body>
 
@@ -77,7 +76,6 @@
                 <a href="{% url 'ProductsAdmin' %}" class="nav-link text-truncate">
                     <i class="fs-5 bi-grid"></i><span class="ms-1 d-none d-sm-inline">Products</span>
                 </a>
-
             </li>
             <li class = "box-sidebar">
                 <a href="{% url 'promotion_list' %}" class="nav-link text-truncate ">
@@ -85,17 +83,18 @@
                 </a>
             </li>
             <li class = "box-sidebar">
-                <a href="{% url 'CommentAdmin' %}" class="nav-link text-truncate">
-                 <i class="fs-5 bi bi-chat-left-dots-fill"></i><span class="ms-1 d-none d-sm-inline">Comments</span>
+                <a href="{% url 'review_dashboard' %}" class="nav-link text-truncate">
+                 <i class="fs-5 bi bi-chat-left-dots-fill"></i><span class="ms-1 d-none d-sm-inline">Reviews Dashboard</span>
                 </a>
             </li>
             <li class = "box-sidebar">
-                <a href="{% url 'ChatsAdmin' %}" class="nav-link text-truncate ">
-                    <i class="bi bi-chat-dots-fill"></i><span class="ms-1 d-none d-sm-inline">Chats</span>
+                <a href="{% url 'review_admin' %}" class="nav-link text-truncate">
+                 <i class="fs-5 bi bi-chat-left-dots-fill"></i><span class="ms-1 d-none d-sm-inline">Comment Reviews</span>
                 </a>
             </li>
+            
             <li class = "box-sidebar">
-                <a href="{% url 'OrderAdmin' %}" class="nav-link text-truncate">
+                <a href="{% url 'admin_order_list' %}" class="nav-link text-truncate">
                     <i class="fs-5 bi bi-cart-check-fill"></i><span class="ms-1 d-none d-sm-inline">Orders</span> 
                 </a>
             </li>

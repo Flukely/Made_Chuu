@@ -182,9 +182,18 @@
                                 {{ payment_with_items.payment.payment_date|date:"d/m/Y H:i" }}
                             </td>
                             <td data-label="สินค้า">
+                                <!-- ในส่วนของ product-list -->
                                 <ul class="product-list">
                                     {% for item in payment_with_items.items_with_price %}
-                                    <li>{{ item.product_name }} - {{ item.quantity }} x {{ item.price }} บาท</li>
+                                    <li>
+                                        {{ item.product_name }} - {{ item.quantity }} x 
+                                        {% if item.discount > 0 %}
+                                            <span style="text-decoration: line-through;">{{ item.price }}</span>
+                                            {{ item.discounted_price }} บาท (โปรโมชั่น)
+                                        {% else %}
+                                            {{ item.price }} บาท
+                                        {% endif %}
+                                    </li>
                                     {% endfor %}
                                 </ul>
                             </td>
