@@ -19,6 +19,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
+from django.core.exceptions import PermissionDenied
 
 
 def admin_function(request):
@@ -27,13 +28,17 @@ def admin_function(request):
 def Dashboard(request):
     return render(request , 'admin_function/Dashboard.html')
 
-def ProductAdmin(request):
-    return render(request, 'admin_function/ProductsAdmin.html')
+# def ProductAdmin(request):
+#     return render(request, 'admin_function/ProductsAdmin.html')
 
 def PromotionsAdmin(request):
+    if not request.user.groups.filter(name__in=['Board']).exists():
+        raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
     return render(request, 'admin_function/promotion_list.html')
 
 def product_list(request):
+    if not request.user.groups.filter(name__in=['Stock']).exists():
+        raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
     try:
         # ตรวจสอบว่า admin นี้ดูแลร้านอะไรบ้าง
         admin_shops = Admin.objects.filter(user=request.user).values_list('shop_id', flat=True)
@@ -78,6 +83,8 @@ def product_list(request):
     
 @csrf_exempt
 def edit_product(request, product_id):
+    if not request.user.groups.filter(name__in=['Stock']).exists():
+        raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
     product = get_object_or_404(Product, pk=product_id)
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, instance=product)
@@ -89,6 +96,8 @@ def edit_product(request, product_id):
     return render(request, 'admin_function/Edit_ProductsAdmin.html', {'form': form, 'product': product})
 
 def delete_product(request, product_id):
+    if not request.user.groups.filter(name__in=['Stock']).exists():
+        raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
     # ตรวจสอบว่าวิธีการของคำขอเป็น POST หรือไม่
     if request.method == 'POST':
         # ดึงข้อมูลสินค้าที่ต้องการลบจากฐานข้อมูล
@@ -100,6 +109,25 @@ def delete_product(request, product_id):
     else:
         # ถ้าวิธีการของคำขอไม่ใช่ POST, เปลี่ยนเส้นทางกลับไปยังหน้า ProductsAdmin
         return redirect('ProductsAdmin')
+
+def delete_Order(request):
+    if request.method == 'POST':
+        today = timezone.localtime(timezone.now()).date()
+        # shop_id = request.session['shop_id'] 
+        shop_id = Admin.objects.filter(user=request.user).values_list('shop_id', flat=True)
+        shop_id = shop_id[0]
+
+        orders_to_delete = Order.objects.filter(
+            shop_id=shop_id,
+            status_order__status_name='รอจ่ายเงิน',  # เงื่อนไข: สถานะคำสั่งซื้อเป็น "รอจ่ายเงิน"
+            order_date__lt=today - timedelta(days=1)  # เงื่อนไข: วันที่คำสั่งซื้อน้อยกว่าวันนี้ - 1 วัน
+        )
+
+        # ลบคำสั่งซื้อที่กรองได้
+        deleted_count = orders_to_delete.delete()[0]  # คืนค่าจำนวนคำสั่งซื้อที่ถูกลบ
+        messages.success(request, f"ลบคำสั่งซื้อสำเร็จแล้ว! จำนวน {deleted_count} รายการ")
+    
+    return redirect('admin_order_list')
 
 ## Dashboard Admin
 @staff_member_required
@@ -903,6 +931,8 @@ def dashboard_admin(request):
     return render(request, 'admin_function/Dashboard.html', context)
 
 def promotion_list(request):
+    if not request.user.groups.filter(name__in=['Board']).exists():
+        raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
     # ดึงข้อมูลโปรโมชันทั้งหมดและสินค้าที่เกี่ยวข้อง
     promotions = Promotion.objects.prefetch_related(
         'promotionproduct_set__product_id'
@@ -914,6 +944,8 @@ def promotion_list(request):
     return render(request, 'admin_function/promotion_list.html', context)
 
 def add_promotion(request):
+    if not request.user.groups.filter(name__in=['Board']).exists():
+        raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
     # รับค่า filter จาก URL parameters
     shop_id = request.GET.get('shop_id')
     category_id = request.GET.get('category_id')
@@ -966,6 +998,8 @@ def add_promotion(request):
     return render(request, 'admin_function/add_promotion.html', context)
 
 def edit_promotion(request, promotion_id):
+    if not request.user.groups.filter(name__in=['Board']).exists():
+        raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
     promotion = get_object_or_404(Promotion, pk=promotion_id)
     
     if request.method == 'POST':
@@ -1016,6 +1050,8 @@ def edit_promotion(request, promotion_id):
     return render(request, 'admin_function/edit_promotion.html', context)
 
 def delete_promotion(request, promotion_id):
+    if not request.user.groups.filter(name__in=['Board']).exists():
+        raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
     promotion = get_object_or_404(Promotion, pk=promotion_id)
     if request.method == 'POST':
         promotion.delete()
@@ -1025,6 +1061,8 @@ def delete_promotion(request, promotion_id):
 
 @staff_member_required
 def review_admin(request):
+    if not request.user.groups.filter(name__in=['sales', 'Board']).exists():
+        raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
     # ตรวจสอบว่า admin นี้ดูแลร้านอะไรบ้าง
     admin_shops = Admin.objects.filter(user=request.user).values_list('shop_id', flat=True)
         
@@ -1076,6 +1114,10 @@ def review_admin(request):
     })
 
 def add_reply(request):
+    if not request.user.groups.filter(name__in=['sales']).exists():
+        raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
+    if not request.user.groups.filter(name__in=['Board, sales']).exists():
+        raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
     if request.method == 'POST':
         review_id = request.POST.get('review_id')
         reply_text = request.POST.get('reply_text')
@@ -1103,6 +1145,8 @@ def add_reply(request):
 
 @staff_member_required
 def review_dashboard(request):
+    if not request.user.groups.filter(name__in=['sales', 'Board']).exists():
+        raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
 
     # ตรวจสอบว่า admin นี้ดูแลร้านอะไรบ้าง
     admin_shops = Admin.objects.filter(user=request.user).values_list('shop_id', flat=True)
@@ -1217,6 +1261,8 @@ def review_dashboard(request):
     return render(request, 'admin_function/review_dashboard.html', context)
 
 def admin_order_list(request):
+    if not request.user.groups.filter(name__in=['sales']).exists():
+        raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
     # ตรวจสอบว่า Admin คนนี้ดูแลร้านอะไรบ้าง
     admin_shops = Admin.objects.filter(user=request.user).values_list('shop_id', flat=True)
     
@@ -1249,6 +1295,8 @@ def admin_order_list(request):
     return render(request, 'admin_function/order_list.html', context)
 
 def admin_order_detail(request, order_id):
+    if not request.user.groups.filter(name__in=['sales']).exists():
+        raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
     # ตรวจสอบสิทธิ์การเข้าถึง
     admin_shops = Admin.objects.filter(user=request.user).values_list('shop_id', flat=True)
     
@@ -1280,6 +1328,8 @@ def admin_order_detail(request, order_id):
 
 @require_POST
 def update_payment_status(request, payment_id):
+        if not request.user.groups.filter(name__in=['sales']).exists():
+            raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
         payment = Payment.objects.get(pk=payment_id, order__shop__admin__user=request.user)
         payment.payment_status_id = request.POST.get('payment_status')
         payment.amount = request.POST.get('amount')
@@ -1303,14 +1353,17 @@ def update_payment_status(request, payment_id):
     
 @require_POST
 def update_order_status(request, order_id):
+        if not request.user.groups.filter(name__in=['sales']).exists():
+            raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
         order = Order.objects.get(pk=order_id)
         order.status_order_id = request.POST.get('order_status')
         order.save()
         
         return redirect('admin_order_list')
     
-@require_POST
 def admin_order_transport(request, order_id):
+    if not request.user.groups.filter(name__in=['sales']).exists():
+            raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
     # ตรวจสอบสิทธิ์และดึงข้อมูลคำสั่งซื้อ
     order = get_object_or_404(
         Order,
@@ -1363,6 +1416,9 @@ def admin_order_transport(request, order_id):
     
 @require_POST
 def update_claim_status(request, claim_id):
+    if not request.user.groups.filter(name__in=['sales']).exists():
+            raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
+    
     claim = get_object_or_404(Claim, pk=claim_id)
     claim.claim_status_id = request.POST.get('claim_status')
     claim.save()

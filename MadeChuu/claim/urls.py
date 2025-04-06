@@ -8,4 +8,5 @@ urlpatterns = [
     path('claim_status/<int:claim_id>/', claim_status, name='claim_status'),
     path('claim_success/<int:claim_id>/', claim_success, name='claim_success'),
     path('cancel_claim/<int:claim_id>/', cancel_claim, name='cancel_claim'),
+    path('claim_condition/', claim_conditions, name='claim_condition'),
 ]

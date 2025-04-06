@@ -102,7 +102,6 @@ def delete(request, id):
     try:
         cart_item = CartItem.objects.get(id=id, cart__user_id=request.session.get('user_id'))
         cart_item.delete()
-        messages.success(request, "ลบสินค้าเรียบร้อยแล้ว")
     except CartItem.DoesNotExist:
         messages.error(request, "ไม่มีสินค้าในตะกร้า")
     return redirect('Cart:AddCart')

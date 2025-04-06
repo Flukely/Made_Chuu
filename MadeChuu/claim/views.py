@@ -80,3 +80,8 @@ def cancel_claim(request, claim_id):
 
     # ใช้ reverse() เพื่อ redirect ไปยังหน้า track โดยส่ง order_id
     return redirect(reverse('tracking:tracking', kwargs={'order_id': order.order_id}))
+
+@login_required(login_url='/login/')
+def claim_conditions(request):
+    return render(request, 'Claim_conditions.html')
+    

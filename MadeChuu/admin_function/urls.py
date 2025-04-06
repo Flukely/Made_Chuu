@@ -32,6 +32,7 @@ urlpatterns = [
     path('admin/orders/<int:order_id>/update/', views.update_order_status, name='update_order_status'),
     path('admin/orders/<int:order_id>/transport/', views.admin_order_transport, name='admin_order_transport'),
     path('admin/orders/claim/<int:claim_id>/', views.update_claim_status, name='update_claim_status'),
+    path('delete-order/', views.delete_Order, name='delete_order'),
     
     
     path('django_plotly_dash/', include('django_plotly_dash.urls')),

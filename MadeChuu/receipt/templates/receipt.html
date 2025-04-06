@@ -13,41 +13,197 @@
         --light-pink: #FFF0F5;
         --dark-pink: #D85A7F;
         --text-color: #5A5A5A;
+        --success-green: #A8E6CF;
+    }
+    
+    body {
+        background-color: var(--light-pink);
+        font-family: 'Kanit', sans-serif;
+        color: var(--text-color);
     }
     
     .receipt-container {
         background-color: white;
-        padding: 30px;
-        margin: 30px auto;
+        padding: 40px;
+        margin: 40px auto;
         max-width: 800px;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(216, 90, 127, 0.1);
-        border: 1px solid var(--secondary-pink);
+        border-radius: 20px;
+        box-shadow: 0 8px 25px rgba(216, 90, 127, 0.15);
+        border: 2px solid var(--secondary-pink);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .receipt-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 10px;
+        background: linear-gradient(90deg, 
+            var(--primary-pink), 
+            var(--secondary-pink), 
+            var(--primary-pink));
     }
     
     .receipt-header {
         text-align: center;
         margin-bottom: 30px;
-        padding-bottom: 20px;
+        padding-bottom: 25px;
         border-bottom: 2px dashed var(--secondary-pink);
+        position: relative;
     }
     
     .receipt-header h1 {
-        font-size: 28px;
+        font-size: 32px;
         color: var(--dark-pink);
         font-weight: 700;
         margin-bottom: 10px;
+        letter-spacing: 1px;
     }
     
     .store-name {
-        font-size: 20px;
+        font-size: 22px;
         color: var(--primary-pink);
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    
+    .receipt-details {
+        background-color: var(--light-pink);
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .receipt-info {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-bottom: 5px;
+    }
+    
+    .receipt-label {
+        font-weight: 600;
+        color: var(--dark-pink);
+        min-width: 150px;
+    }
+    
+    .items-list {
+        color: var(--dark-pink);
+        font-weight: 600;
+        font-size: 22px;
+        margin: 25px 0 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--secondary-pink);
+    }
+    
+    .list-group-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        border: none;
+        border-bottom: 1px dashed #eee;
+        transition: all 0.3s;
+    }
+    
+    .list-group-item:hover {
+        background-color: var(--light-pink);
+        transform: translateX(5px);
+    }
+    
+    .product-name {
         font-weight: 500;
+        flex: 2;
+    }
+    
+    .product-price {
+        flex: 1;
+        text-align: right;
+        font-weight: 500;
+    }
+    
+    .discounted {
+        color: var(--dark-pink);
+        font-weight: 600;
+    }
+    
+    .original-price {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 0.9em;
+        margin-right: 5px;
+    }
+    
+    .total-price {
+        background-color: var(--primary-pink);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 12px;
+        font-size: 22px;
+        font-weight: 700;
+        text-align: center;
+        margin: 30px 0;
+        box-shadow: 0 4px 8px rgba(216, 90, 127, 0.2);
+    }
+    
+    .btn-print {
+        background-color: var(--dark-pink);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 50px;
+        font-weight: 600;
+        margin-right: 15px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 8px rgba(216, 90, 127, 0.2);
+    }
+    
+    .btn-print:hover {
+        background-color: var(--primary-pink);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(216, 90, 127, 0.3);
+    }
+    
+    .btn-back {
+        background-color: white;
+        color: var(--dark-pink);
+        border: 2px solid var(--dark-pink);
+        padding: 10px 25px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .btn-back:hover {
+        background-color: var(--light-pink);
+        transform: translateY(-3px);
+        color: var(--dark-pink);
+        text-decoration: none;
+    }
+    
+    .thank-you {
+        text-align: center;
+        margin-top: 30px;
+        font-style: italic;
+        color: var(--primary-pink);
+        font-size: 18px;
+    }
+    
+    .stamp {
+        position: absolute;
+        top: 40px;
+        right: 40px;
+        width: 120px;
+        opacity: 0.8;
+        transform: rotate(15deg);
     }
     
     /* Hide elements when printing */
     @media print {
-        nav, .btn-print, .btn-back {
+        nav, .no-print {
             display: none !important;
         }
         
@@ -60,15 +216,23 @@
         .receipt-container {
             box-shadow: none;
             border: none;
-            padding: 0;
+            padding: 20px;
             margin: 0;
             width: 100%;
             max-width: 100%;
         }
         
+        .receipt-container::before {
+            height: 5px;
+        }
+        
+        .btn-print, .btn-back {
+            display: none;
+        }
+        
         @page {
             size: auto;
-            margin: 5mm;
+            margin: 10mm;
         }
     }
 </style>
@@ -76,56 +240,103 @@
 
 {% block content %}
 <div class="receipt-container">
+    
     <div class="receipt-header">
-        <h1>ใบเสร็จรับเงิน</h1>
+        <h1><i class="fas fa-receipt"></i> ใบเสร็จรับเงิน</h1>
         <p class="store-name">Made Chuu</p>
+        <p><small>ขอบคุณที่ช้อปปิ้งกับเรา 💖</small></p>
     </div>
 
     {% if message %}
         <div class="alert alert-warning">{{ message }}</div>
     {% else %}
     <div class="receipt-details">
-        <p><span class="bold">ร้านค้า:</span> {{ store_name }}</p>
-        <p><span class="bold">หมายเลขใบเสร็จ:</span> {{ receipt.receipt_id }}</p>
-        <p><span class="bold">หมายเลขการชำระเงิน:</span> {{ receipt.payment_id }}</p>
-        <p><span class="bold">หมายเลขคำสั่งซื้อ:</span> {{ receipt.order_id }}</p>
-        <p><span class="bold">ชื่อผู้ใช้:</span> {{ logged_in_user.user_name }}</p>
-        <p><span class="bold">อีเมล:</span> {{ logged_in_user.email }}</p>
-        <p><span class="bold">วันที่ออกใบเสร็จ:</span> {{ receipt.receipt_date|date:"d/m/Y H:i" }}</p>
+        <div class="receipt-info">
+            <span class="receipt-label"><i class="fas fa-store"></i> ร้านค้า:</span>
+            <span>{{ store_name }}</span>
+        </div>
+        <div class="receipt-info">
+            <span class="receipt-label"><i class="fas fa-receipt"></i> หมายเลขใบเสร็จ:</span>
+            <span>#{{ receipt.receipt_id }}</span>
+        </div>
+        <div class="receipt-info">
+            <span class="receipt-label"><i class="fas fa-credit-card"></i> การชำระเงิน:</span>
+            <span>#{{ receipt.payment_id }}</span>
+        </div>
+        <div class="receipt-info">
+            <span class="receipt-label"><i class="fas fa-shopping-bag"></i> คำสั่งซื้อ:</span>
+            <span>#{{ receipt.order_id }}</span>
+        </div>
+        <div class="receipt-info">
+            <span class="receipt-label"><i class="fas fa-user"></i> ชื่อผู้ใช้:</span>
+            <span>{{ logged_in_user.user_name }}</span>
+        </div>
+        <div class="receipt-info">
+            <span class="receipt-label"><i class="fas fa-envelope"></i> อีเมล:</span>
+            <span>{{ logged_in_user.email }}</span>
+        </div>
+        <div class="receipt-info">
+            <span class="receipt-label"><i class="fas fa-calendar-alt"></i> วันที่:</span>
+            <span>{{ receipt.receipt_date|date:"d/m/Y H:i" }}</span>
+        </div>
     </div>
 
-    <h3 class="items-list">รายการสินค้า</h3>
+    <h3 class="items-list"><i class="fas fa-list-ul"></i> รายการสินค้า</h3>
     <ul class="list-group">
         {% for item in items_with_price %}
-        <ul class="list-group">
-            {% for item in items_with_price %}
-                <li class="list-group-item">
-                    <span>{{ item.product_name }}</span>
-                    <span>
-                        {{ item.quantity }} x 
-                        {% if item.discount > 0 %}
-                            <span style="text-decoration: line-through;">{{ item.price }}</span>
-                            {{ item.discounted_price }} บาท (โปรโมชั่น)
-                        {% else %}
-                            {{ item.price }} บาท
-                        {% endif %}
-                    </span>
-                </li>
-            {% endfor %}
-        </ul>
+            <li class="list-group-item">
+                <span class="product-name">{{ item.product_name }}</span>
+                <span class="product-price">
+                    {% if item.discount > 0 %}
+                        <span class="original-price">{{ item.price }} บาท</span>
+                        <span class="discounted">
+                            {{ item.discounted_price }} บาท
+                            <span class="badge bg-success" style="background-color: var(--success-green); color: #333;">
+                                <i class="fas fa-tag"></i> ส่วนลด
+                            </span>
+                        </span>
+                    {% else %}
+                        {{ item.price }} บาท
+                    {% endif %}
+                    <br>
+                    <small class="text-muted">จำนวน: {{ item.quantity }}</small>
+                </span>
+            </li>
         {% endfor %}
     </ul>
 
-    <p class="total-price">รวมทั้งหมด: {{ order.total_price }} บาท</p>
+    <div class="total-price">
+        <i class="fas fa-coins"></i> ยอดรวมทั้งหมด: {{ order.total_price|floatformat:2 }} บาท
+    </div>
+
+    <p class="thank-you">
+        ขอบคุณสำหรับการช้อปปิ้งกับ Made Chuu 💖<br>
+        กรุณาเก็บใบเสร็จนี้เป็นหลักฐานในการรับประกันสินค้า
+    </p>
 
     <div class="text-center no-print">
         <button onclick="window.print()" class="btn-print">
             <i class="fas fa-print"></i> พิมพ์ใบเสร็จ
         </button>
         <a href="{% url 'receipt:check_receipt' %}" class="btn-back">
-            <i class="fas fa-arrow-left"></i> กลับ
+            <i class="fas fa-arrow-left"></i> กลับไปหน้าหลัก
         </a>
     </div>
     {% endif %}
 </div>
+
+<script>
+    // Add animation when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        const receipt = document.querySelector('.receipt-container');
+        receipt.style.opacity = '0';
+        receipt.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            receipt.style.transition = 'all 0.5s ease-out';
+            receipt.style.opacity = '1';
+            receipt.style.transform = 'translateY(0)';
+        }, 100);
+    });
+</script>
 {% endblock %}

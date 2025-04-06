@@ -6,21 +6,38 @@ from django.utils.html import format_html
 
 class CustomUserAdmin(UserAdmin):
     model = User
-    list_display = ('email', 'user_name', 'is_staff', 'is_active', 'get_user_role')
-    list_filter = ('is_staff', 'is_active')
+    # แก้ไข ordering ให้ใช้ฟิลด์ที่คุณมี (เช่น email หรือ user_name)
+    ordering = ('email',)  # หรือใช้ 'user_name' ถ้าต้องการเรียงตามชื่อ
+    
+    # ระบุ list_display ให้ใช้ฟิลด์ที่มีอยู่จริงในโมเดล
+    list_display = ('email', 'user_name', 'is_staff', 'is_active')
+    
+    # ระบุ fieldsets โดยใช้ฟิลด์ที่มีอยู่จริง
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal Info', {'fields': ('user_name', 'address', 'district', 'province', 'postal_code', 'gender', 'birth_date', 'phone_num')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active', 'user_role')}),
+        ('Personal info', {'fields': ('user_name',)}),  # ใช้ user_name แทน username
+        ('Permissions', {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+        })
     )
+    
+    # ระบุ add_fieldsets โดยใช้ฟิลด์ที่มีอยู่จริง
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'user_name', 'password1', 'password2', 'is_staff', 'is_active')}
-        ),
+            'fields': ('email', 'user_name', 'password1', 'password2', 'is_staff', 'is_active'),
+        }),
     )
+    
+    # ระบุ search_fields ด้วยฟิลด์ที่มีอยู่
     search_fields = ('email', 'user_name')
-    ordering = ('email',)
+    
+    # ระบุ filter_horizontal สำหรับ groups และ user_permissions
+    filter_horizontal = ('groups', 'user_permissions',)
+    
+    def get_groups(self, obj):
+        return ", ".join([g.name for g in obj.groups.all()])
+    get_groups.short_description = 'Groups'
 
     def get_user_role(self, obj):
         return obj.user_role.user_role_name if obj.user_role else None
