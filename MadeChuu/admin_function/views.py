@@ -1335,9 +1335,9 @@ def update_payment_status(request, payment_id):
         payment.amount = request.POST.get('amount')
         payment.save()
         
-        if payment.payment_status.payment_status_name == "ไม่สำเร็จ":
+        if payment.payment_status.payment_status_name == "ชำระเงินไม่สำเร็จ":
            order = Order.objects.get(order_id=payment.order.order_id)
-           order.status_order = StatusOrder.objects.get(status_name='ไม่สำเร็จ')
+           order.status_order = StatusOrder.objects.get(status_name='ชำระเงินไม่สำเร็จ')
            order.save()
            return redirect('admin_order_list')
         

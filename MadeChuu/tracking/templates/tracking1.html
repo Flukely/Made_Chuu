@@ -11,6 +11,9 @@
         --madechuu-darkpink: #D85A7F;
         --madechuu-lightpink: #FFD1DC;
         --madechuu-whitepink: #FFF0F5;
+        --madechuu-red: #ff6b6b;
+        --madechuu-green: #51cf66;
+        --madechuu-orange: #fcc419;
     }
 
     .tracking-container {
@@ -136,35 +139,64 @@
         font-size: 18px;
     }
 
-    /* Buttons */
-    .btn-madechuu {
-        background: linear-gradient(135deg, var(--madechuu-pink), var(--madechuu-darkpink));
-        border: none;
-        border-radius: 14px;
-        padding: 12px 24px;
-        font-weight: 700;
-        color: white;
-        text-transform: uppercase;
-        font-size: 14px;
-        box-shadow: 0 4px 15px rgba(216, 90, 127, 0.3);
-        transition: all 0.3s;
+    /* ปุ่มแบบใหม่ */
+    .btn-action {
         display: inline-block;
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-weight: bold;
+        text-decoration: none;
+        margin: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s;
+        border: none;
+        cursor: pointer;
+        font-family: 'Prompt', sans-serif;
         text-align: center;
-        margin: 10px 5px;
+        color: white !important;
     }
 
-    .btn-madechuu:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(216, 90, 127, 0.4);
-        color: white;
+    /* ปุ่มคืนเงิน/คืนสินค้า */
+    .btn-refund {
+        background: linear-gradient(135deg, var(--madechuu-red), #f03e3e);
+        box-shadow: 0 4px 15px rgba(240, 62, 62, 0.3);
     }
 
-    .btn-madechuu-danger {
-        background: linear-gradient(135deg, #ff6b6b, #f03e3e);
+    /* ปุ่มให้คะแนนสินค้า */
+    .btn-review {
+        background: linear-gradient(135deg, var(--madechuu-green), #2b8a3e);
+        box-shadow: 0 4px 15px rgba(43, 138, 62, 0.3);
     }
 
-    .btn-madechuu-secondary {
-        background: linear-gradient(135deg, #adb5bd, #6c757d);
+    /* ปุ่มกรอกข้อมูลคืนเงิน */
+    .btn-refund-info {
+        background: linear-gradient(135deg, var(--madechuu-orange), #f59f00);
+        box-shadow: 0 4px 15px rgba(245, 159, 0, 0.3);
+    }
+
+    /* เอฟเฟกต์เมื่อโฮเวอร์ */
+    .btn-action:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-action:active {
+        transform: translateY(1px);
+    }
+
+    /* ไอคอนในปุ่ม */
+    .btn-action i {
+        margin-right: 8px;
+        font-size: 16px;
+    }
+
+    /* กลุ่มปุ่ม */
+    .button-group {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        margin: 20px 0;
     }
 
     /* Summary Tables */
@@ -204,72 +236,6 @@
         width: 40%;
     }
 
-    /* Product List */
-    .product-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 20px;
-        margin-top: 30px;
-    }
-
-    .product-card {
-        background-color: white;
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-    }
-
-    .product-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(216, 90, 127, 0.15);
-    }
-
-    .product-img {
-        width: 100%;
-        height: 180px;
-        object-fit: cover;
-    }
-
-    .product-info {
-        padding: 15px;
-    }
-
-    .product-name {
-        font-size: 16px;
-        color: #333;
-        margin-bottom: 8px;
-        height: 40px;
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-    }
-
-    .product-price {
-        color: var(--madechuu-darkpink);
-        font-weight: 700;
-        font-size: 18px;
-        margin-bottom: 12px;
-    }
-
-    .btn-cart {
-        background-color: var(--madechuu-lightpink);
-        color: var(--madechuu-darkpink);
-        border: none;
-        border-radius: 8px;
-        padding: 8px 12px;
-        font-weight: 600;
-        width: 100%;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-    .btn-cart:hover {
-        background-color: var(--madechuu-pink);
-        color: white;
-    }
-
     /* Responsive */
     @media (max-width: 768px) {
         .progress-steps {
@@ -290,19 +256,21 @@
             margin-right: 0;
             margin-bottom: 15px;
         }
-        
-        .product-list {
-            grid-template-columns: repeat(2, 1fr);
+
+        .button-group {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-action {
+            width: 100%;
+            max-width: 280px;
         }
     }
 
     @media (max-width: 480px) {
         .progress-steps .step {
             width: 50%;
-        }
-        
-        .product-list {
-            grid-template-columns: 1fr;
         }
     }
 </style>
@@ -376,47 +344,52 @@
                 {% if order.status_order.status_name == 'เตรียมของ' %}
                 <form action="{% url 'tracking:cancel_order' order.order_id %}" method="post" style="display: inline;">
                     {% csrf_token %}
-                    <button type="submit" class="cancel-order-btn"
-                        style="
-                            background: #ffebf1;
-                            color: #ff5c8d;
-                            border: 1px solid #ff5c8d;
-                            padding: 8px 20px;
-                            border-radius: 50px;
-                            transition: all 0.3s;
-                        "
-                        onmouseover="this.style.background='#ffd6e7'" 
-                        onmouseout="this.style.background='#ffebf1'">
+                    <button type="submit" class="btn-action btn-refund">
                         <i class="fas fa-times"></i> ยกเลิกคำสั่งซื้อ
                     </button>
                 </form>
                 {% endif %}
             
                 {% if order.status_order.status_name == 'ยกเลิกคำสั่งซื้อ' %}
-                <a href="{% url 'tracking:refund_info' order.order_id %}" class="btn-madechuu">กรอกข้อมูลการคืนเงิน</a>
+                <div class="button-group">
+                    <a href="{% url 'tracking:refund_info' order.order_id %}" class="btn-action btn-refund-info">
+                        <i class="fas fa-file-invoice-dollar"></i> กรอกข้อมูลการคืนเงิน
+                    </a>
+                </div>
                 {% endif %}
 
                 {% if order.status_order.status_name == 'กำลังจัดส่ง' %}
-                <form method="post" action="{% url 'tracking:submit_order' order.order_id %}" class="d-inline">
-                    {% csrf_token %}
-                    <button type="submit" class="btn-madechuu">ยืนยันรับสินค้า</button>
-                </form>
+                <div class="button-group">
+                    <form method="post" action="{% url 'tracking:submit_order' order.order_id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-action btn-review">
+                            <i class="fas fa-check-circle"></i> ยืนยันรับสินค้า
+                        </button>
+                    </form>
+                </div>
                 {% endif %}
 
                 {% if order.status_order.status_name == 'จัดส่งสำเร็จ' or order.status_order.status_name == 'เคลม' %}
                     {% with existing_claim=order.claim_set.first %}
-                        <div class="btn-group">
+                        <div class="button-group">
                             {% if existing_claim %}
                                 {% if existing_claim.claim_status == 'ยกเลิกคำขอ' %}
-                                    <button class="btn-madechuu btn-madechuu-secondary" disabled>ไม่สามารถเคลมได้</button>
+                                    <button class="btn-action" style="background: #adb5bd; cursor: not-allowed;" disabled>
+                                        <i class="fas fa-ban"></i> ไม่สามารถเคลมได้
+                                    </button>
                                 {% else %}
-                                    <a href="{% url 'claim:claim_status' claim.claim_id %}" class="btn-madechuu">คืนเงิน/คืนสินค้า</a>
+                                    <a href="{% url 'claim:claim_status' claim.claim_id %}" class="btn-action btn-refund">
+                                        <i class="fas fa-exchange-alt"></i> คืนเงิน/คืนสินค้า
+                                    </a>
                                 {% endif %}
                             {% else %}
-                                <a href="{% url 'claim:claim_request' order.order_id %}" class="btn-madechuu">คืนเงิน/คืนสินค้า</a>
+                                <a href="{% url 'claim:claim_request' order.order_id %}" class="btn-action btn-refund">
+                                    <i class="fas fa-exchange-alt"></i> คืนเงิน/คืนสินค้า
+                                </a>
                             {% endif %}
-                            <br>
-                            <a href="{% url 'review:review_page' %}" class="btn-madechuu">ให้คะแนนสินค้า</a>
+                            <a href="{% url 'review:review_page' %}" class="btn-action btn-review">
+                                <i class="fas fa-star"></i> ให้คะแนนสินค้า
+                            </a>
                         </div>
                     {% endwith %}
                 {% endif %}
@@ -499,7 +472,7 @@
         </div>
         {% endif %}
 
-        <!-- Other Products -->
+        {% comment %} <!-- Other Products -->
         <h2 class="text-left" style="color: var(--madechuu-darkpink); margin-top: 40px;">
           สินค้าที่คล้ายกัน
       </h2>
@@ -515,8 +488,7 @@
           </div>
           {% endfor %}
       </div>
-        </div>
-    </div>
+    </div> {% endcomment %}
 </div>
 {% endblock %}
 
@@ -568,6 +540,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 button.style.backgroundColor = 'var(--madechuu-lightpink)';
                 button.style.color = 'var(--madechuu-darkpink)';
             }, 2000);
+        });
+    });
+
+    // Button hover effect
+    const buttons = document.querySelectorAll('.btn-action');
+    buttons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-3px)';
+            this.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.15)';
+        });
+        
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.1)';
+        });
+        
+        button.addEventListener('mousedown', function() {
+            this.style.transform = 'translateY(1px)';
+        });
+        
+        button.addEventListener('mouseup', function() {
+            this.style.transform = 'translateY(-3px)';
         });
     });
 });
