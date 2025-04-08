@@ -1114,10 +1114,6 @@ def review_admin(request):
     })
 
 def add_reply(request):
-    if not request.user.groups.filter(name__in=['sales']).exists():
-        raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
-    if not request.user.groups.filter(name__in=['Board, sales']).exists():
-        raise PermissionDenied("คุณไม่มีสิทธิ์เข้าถึงหน้านี้")
     if request.method == 'POST':
         review_id = request.POST.get('review_id')
         reply_text = request.POST.get('reply_text')
